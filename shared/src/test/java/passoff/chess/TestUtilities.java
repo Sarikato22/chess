@@ -84,8 +84,7 @@ public class TestUtilities {
     public static List<ChessMove> loadMoves(ChessPosition startPosition, int[][] endPositions) {
         var validMoves = new ArrayList<ChessMove>();
         for (var endPosition : endPositions) {
-            validMoves.add(new ChessMove(startPosition,
-                    new ChessPosition(endPosition[0], endPosition[1]), null));
+            validMoves.add(new ChessMoveBuilder().setStartPosition(startPosition).setEndPosition(new ChessPosition(endPosition[0], endPosition[1])).setPromotionPiece(null).createChessMove());
         }
         return validMoves;
     }

@@ -1,6 +1,7 @@
 package passoff.chess.piecemoves;
 
 import chess.ChessMove;
+import chess.ChessMoveBuilder;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import org.junit.jupiter.api.Assertions;
@@ -417,10 +418,10 @@ public class PawnMoveTests {
         var validMoves = new ArrayList<ChessMove>();
         for (var endPosition : endPositions) {
             var end = new ChessPosition(endPosition[0], endPosition[1]);
-            validMoves.add(new ChessMove(startingPosition, end, ChessPiece.PieceType.QUEEN));
-            validMoves.add(new ChessMove(startingPosition, end, ChessPiece.PieceType.BISHOP));
-            validMoves.add(new ChessMove(startingPosition, end, ChessPiece.PieceType.ROOK));
-            validMoves.add(new ChessMove(startingPosition, end, ChessPiece.PieceType.KNIGHT));
+            validMoves.add(new ChessMoveBuilder().setStartPosition(startingPosition).setEndPosition(end).setPromotionPiece(ChessPiece.PieceType.QUEEN).createChessMove());
+            validMoves.add(new ChessMoveBuilder().setStartPosition(startingPosition).setEndPosition(end).setPromotionPiece(ChessPiece.PieceType.BISHOP).createChessMove());
+            validMoves.add(new ChessMoveBuilder().setStartPosition(startingPosition).setEndPosition(end).setPromotionPiece(ChessPiece.PieceType.ROOK).createChessMove());
+            validMoves.add(new ChessMoveBuilder().setStartPosition(startingPosition).setEndPosition(end).setPromotionPiece(ChessPiece.PieceType.KNIGHT).createChessMove());
         }
 
         TestUtilities.validateMoves(board, testPiece, startingPosition, validMoves);

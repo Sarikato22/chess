@@ -1,6 +1,7 @@
 package passoff.chess;
 
 import chess.ChessMove;
+import chess.ChessMoveBuilder;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
@@ -15,19 +16,19 @@ public class ChessMoveTests extends EqualsTestingUtility<ChessMove> {
 
     @Override
     protected ChessMove buildOriginal() {
-        return new ChessMove(new ChessPosition(2, 6), new ChessPosition(1, 5), null);
+        return new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(null).createChessMove();
     }
 
     @Override
     protected Collection<ChessMove> buildAllDifferent() {
         return List.of(
-                new ChessMove(new ChessPosition(1, 5), new ChessPosition(2, 6), null),
-                new ChessMove(new ChessPosition(2, 4), new ChessPosition(1, 5), null),
-                new ChessMove(new ChessPosition(2, 6), new ChessPosition(5, 3), null),
-                new ChessMove(new ChessPosition(2, 6), new ChessPosition(1, 5), ChessPiece.PieceType.QUEEN),
-                new ChessMove(new ChessPosition(2, 6), new ChessPosition(1, 5), ChessPiece.PieceType.ROOK),
-                new ChessMove(new ChessPosition(2, 6), new ChessPosition(1, 5), ChessPiece.PieceType.BISHOP),
-                new ChessMove(new ChessPosition(2, 6), new ChessPosition(1, 5), ChessPiece.PieceType.KNIGHT)
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(1, 5)).setEndPosition(new ChessPosition(2, 6)).setPromotionPiece(null).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 4)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(null).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(5, 3)).setPromotionPiece(null).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(ChessPiece.PieceType.QUEEN).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(ChessPiece.PieceType.ROOK).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(ChessPiece.PieceType.BISHOP).createChessMove(),
+                new ChessMoveBuilder().setStartPosition(new ChessPosition(2, 6)).setEndPosition(new ChessPosition(1, 5)).setPromotionPiece(ChessPiece.PieceType.KNIGHT).createChessMove()
         );
     }
 
