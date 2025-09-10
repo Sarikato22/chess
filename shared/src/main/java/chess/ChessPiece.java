@@ -53,8 +53,32 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new HashSet<ChessMove>();
+        Collection<ChessMove> moves = new HashSet<>();
+
+        switch (this.type) {
+            case ROOK:
+
+                break;
+            case BISHOP:
+                // generate bishop moves
+                break;
+            case QUEEN:
+                // generate queen moves
+                break;
+            case KNIGHT:
+                // generate knight moves
+                break;
+            case KING:
+                // generate king moves
+                break;
+            case PAWN:
+                // generate pawn moves (trickier: forward, capture, promotion)
+                break;
+        }
+
+        return moves;
     }
+
 
     @Override
     public boolean equals(Object o) {
