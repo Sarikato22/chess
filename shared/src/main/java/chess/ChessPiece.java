@@ -45,6 +45,32 @@ public class ChessPiece {
 
         return type;
     }
+    private void addDirectionalMoves(ChessBoard board, ChessPosition from,
+                                     Collection<ChessMove> moves, int[][] directions) {
+        for (int[] dir : directions) {
+            int row = from.getRow();
+            int col = from.getColumn();
+
+            while (true) {
+                row += dir[0];
+                col += dir[1];
+
+                if (!board.inBounds(row, col)) break;
+
+                ChessPosition to = new ChessPosition(row, col);
+                ChessPiece occupant = board.getPiece(to);
+
+                if (occupant == null) {
+                    moves.add(new ChessMove(from, to, null));
+                } else {
+                    if (occupant.getTeamColor() != this.getTeamColor()) {
+                        moves.add(new ChessMove(from, to, null));
+                    }
+                    break; // stop in this direction
+                }
+            }
+        }
+    }
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -56,12 +82,16 @@ public class ChessPiece {
         Collection<ChessMove> moves = new HashSet<>();
 
         switch (this.type) {
-            case ROOK:
-
+            case ROOK: {
+                int[][] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+                addDirectionalMoves(board, myPosition, moves, directions);
                 break;
-            case BISHOP:
-                // generate bishop moves
+            }
+            case BISHOP: {
+                int[][] directions = { {1,1}, {1,-1}, {-1,1}, {-1,-1} };
+                addDirectionalMoves(board, myPosition, moves, directions);
                 break;
+            }
             case QUEEN:
                 // generate queen moves
                 break;

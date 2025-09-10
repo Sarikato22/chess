@@ -61,4 +61,14 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.hashCode(board);
     }
+
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "board=" + Arrays.toString(board) +
+                '}';
+    }
+    public boolean inBounds(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
 }
