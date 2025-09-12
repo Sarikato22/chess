@@ -45,8 +45,9 @@ public class ChessPiece {
 
         return type;
     }
-    private void addDirectionalMoves(ChessBoard board, ChessPosition from,
-                                     Collection<ChessMove> moves, int[][] directions) {
+    /** Helper method for pieceMoves method
+     * addSlidingMoves works with the pieces whose movements can go as far as possible like rook, bishop and queen **/
+    private void addSlidingMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions) {
         for (int[] dir : directions) {
             int row = from.getRow();
             int col = from.getColumn();
@@ -66,10 +67,30 @@ public class ChessPiece {
                     if (occupant.getTeamColor() != this.getTeamColor()) {
                         moves.add(new ChessMove(from, to, null));
                     }
-                    break; // stop in this direction
+                    break;
                 }
             }
         }
+    }
+    private void addStepMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions){
+        for (int[] dir: directions) {
+            int row = from.getRow() + dir[0];
+            int col = from.getColumn() + dir[1];
+
+            if (!board.inBounds(row, col)) break;
+            ChessPosition to = new ChessPosition(row,col);
+            ChessPiece occupant = board.getPiece(to);
+
+            if (occupant == null){
+                moves.add(new ChessMove(from, to, null));
+            }else {
+                if (occupant.getTeamColor() != this.getTeamColor()){
+                    moves.add(new ChessMove(from, to, null));
+                }
+            }
+            break;
+        }
+
     }
     /**
      * Calculates all the positions a chess piece can move to
@@ -84,16 +105,17 @@ public class ChessPiece {
         switch (this.type) {
             case ROOK: {
                 int[][] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
-                addDirectionalMoves(board, myPosition, moves, directions);
+                addSlidingMoves(board, myPosition, moves, directions);
                 break;
             }
             case BISHOP: {
                 int[][] directions = { {1,1}, {1,-1}, {-1,1}, {-1,-1} };
-                addDirectionalMoves(board, myPosition, moves, directions);
+                addSlidingMoves(board, myPosition, moves, directions);
                 break;
             }
             case QUEEN:
-                // generate queen moves
+                int[][] directions = {{1,0}, {-1,0}, {0,1}, {0,-1},{1,1}, {1,-1}, {-1,1}, {-1,-1}};
+                addSlidingMoves(board, myPosition, moves, directions);
                 break;
             case KNIGHT:
                 // generate knight moves
