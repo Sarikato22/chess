@@ -77,21 +77,57 @@ public class ChessPiece {
             int row = from.getRow() + dir[0];
             int col = from.getColumn() + dir[1];
 
-            if (!board.inBounds(row, col)) break;
-            ChessPosition to = new ChessPosition(row,col);
+            if (!board.inBounds(row, col)) continue; // skip out-of-bounds
+
+            ChessPosition to = new ChessPosition(row, col);
             ChessPiece occupant = board.getPiece(to);
 
-            if (occupant == null){
+            if (occupant == null) {
                 moves.add(new ChessMove(from, to, null));
-            }else {
-                if (occupant.getTeamColor() != this.getTeamColor()){
-                    moves.add(new ChessMove(from, to, null));
-                }
+            } else if (occupant.getTeamColor() != this.getTeamColor()) {
+                moves.add(new ChessMove(from, to, null));
             }
-            break;
         }
 
     }
+
+    public void pawnMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions){
+        int direction;
+        int startRow;
+        int promotionRow;
+
+        if (this.getTeamColor() == ChessGame.TeamColor.WHITE){
+            direction = 1;
+            startRow = 2;
+            promotionRow = 8;
+        } else{
+            direction = -1;
+            startRow = 7;
+            promotionRow = 1;
+        }
+
+        int col = from.getColumn();
+        int row = from.getRow();
+
+        //double step
+        if (row == startRow){
+          int twoStep = row + 2* direction;
+          if (board.inBounds(twoStep, col) && board.getPiece(new ChessPosition(twoStep,col)) == null){
+              moves.add(new ChessMove(from, new ChessPosition(twoStep,col),null));
+
+          }
+        } else if (row == promotionRow) {
+            //call promotion method
+
+        } else {
+            int oneStep = row + direction;
+
+            if(board.inBounds(oneStep,col) && board.getPiece(new ChessPosition(oneStep, col)) == null) {
+                moves.add(new ChessMove(from, new ChessPosition(oneStep, col), null));
+            }
+        }
+
+    }//end of pawn moves
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -113,16 +149,26 @@ public class ChessPiece {
                 addSlidingMoves(board, myPosition, moves, directions);
                 break;
             }
-            case QUEEN:
-                int[][] directions = {{1,0}, {-1,0}, {0,1}, {0,-1},{1,1}, {1,-1}, {-1,1}, {-1,-1}};
+            case QUEEN: {
+                int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 addSlidingMoves(board, myPosition, moves, directions);
                 break;
-            case KNIGHT:
-                // generate knight moves
+            }
+            case KNIGHT: {
+                int[][] directions = {
+                        {-2, -1}, {-2, 1},   // up 2, left/right 1
+                        {-1, -2}, {-1, 2},   // up 1, left/right 2
+                        {1, -2},  {1, 2},    // down 1, left/right 2
+                        {2, -1},  {2, 1}     // down 2, left/right 1
+                };
+                addStepMoves(board, myPosition, moves, directions);
                 break;
-            case KING:
-                // generate king moves
+            }
+            case KING: {
+                int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}};
+                addStepMoves(board, myPosition, moves, directions);
                 break;
+            }
             case PAWN:
                 // generate pawn moves (trickier: forward, capture, promotion)
                 break;
@@ -147,5 +193,13 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
     }
 }

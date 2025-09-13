@@ -12,10 +12,8 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-
         
     }
-
     /**
      * Adds a chess piece to the chessboard
      *
@@ -42,8 +40,36 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
-    }
+        //clearing board
+        for(int row = 0; row < 8; row++) {
+            for(int col = 0; col < 8; col ++) {
+                this.board[row][col] = null;
+            }
+        }
+
+        //setting pawns, indexes are different because addPiece accounts for it:
+        for(int col = 1; col <= 8; col++){
+            addPiece(new ChessPosition(2,col),new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7,col),new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        }
+
+        //setting other pieces
+        ChessPiece.PieceType[] backRow =
+                {       ChessPiece.PieceType.ROOK,
+                        ChessPiece.PieceType.KNIGHT,
+                        ChessPiece.PieceType.BISHOP,
+                        ChessPiece.PieceType.QUEEN,
+                        ChessPiece.PieceType.KING,
+                        ChessPiece.PieceType.BISHOP,
+                        ChessPiece.PieceType.KNIGHT,
+                        ChessPiece.PieceType.ROOK
+
+                };
+        for (int col=1; col <=8; col++){
+            addPiece(new ChessPosition(1,col),new ChessPiece(ChessGame.TeamColor.WHITE, backRow[col-1]));
+            addPiece(new ChessPosition(8,col),new ChessPiece(ChessGame.TeamColor.BLACK, backRow[col-1]));
+        }
+    }//end of reset board
 
     @Override
     public boolean equals(Object o) {
@@ -54,18 +80,18 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Arrays.equals(board, that.board);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(board);
+        return Arrays.deepHashCode(board);
     }
 
     @Override
     public String toString() {
         return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
+                "board=" + Arrays.deepToString(board) +
                 '}';
     }
     public boolean inBounds(int row, int col) {
