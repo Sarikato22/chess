@@ -133,6 +133,44 @@ public class ChessPiece {
             }
         }
     }
+    private void pawnCaptures(ChessBoard board, ChessPosition from, Collection<ChessMove> moves){
+        int direction;
+        int startRow;
+        int promotionRow;
+
+        if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            direction = 1;
+            startRow = 2;
+            promotionRow = 8;
+        } else {
+            direction = -1;
+            startRow = 7;
+            promotionRow = 1;
+        }
+
+        int col = from.getColumn();
+        int row = from.getRow();
+
+        //diagonal capture
+        int cols[] = {col-1, col+1};
+        int diagonalRow = row + direction;
+
+        for(int i:cols){
+            if (!board.inBounds(diagonalRow, i)) continue;
+            ChessPosition to = new ChessPosition(diagonalRow, i);
+            ChessPiece occupant = board.getPiece(to);
+
+            //checking if they are the enemy
+            if(occupant!= null && occupant.getTeamColor() != this.getTeamColor()){
+                if (diagonalRow == promotionRow){
+                    addPromotions(moves, from, to);
+                } else {
+                    moves.add(new ChessMove(from, to, null));
+                }
+            }
+        }
+
+    }
 
         /**
          * Calculates all the positions a chess piece can move to
@@ -177,6 +215,7 @@ public class ChessPiece {
             }
             case PAWN:
                 pawnMoves(board, myPosition, moves);
+                pawnCaptures(board, myPosition, moves);
                 break;
         }
 
