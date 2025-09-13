@@ -90,17 +90,22 @@ public class ChessPiece {
         }
 
     }
-
-    public void pawnMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions){
+    private void addPromotions(Collection<ChessMove> moves, ChessPosition from, ChessPosition to) {
+        moves.add(new ChessMove(from, to, ChessPiece.PieceType.QUEEN));
+        moves.add(new ChessMove(from, to, ChessPiece.PieceType.ROOK));
+        moves.add(new ChessMove(from, to, ChessPiece.PieceType.BISHOP));
+        moves.add(new ChessMove(from, to, ChessPiece.PieceType.KNIGHT));
+    }
+    public void pawnMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves) {
         int direction;
         int startRow;
         int promotionRow;
 
-        if (this.getTeamColor() == ChessGame.TeamColor.WHITE){
+        if (this.getTeamColor() == ChessGame.TeamColor.WHITE) {
             direction = 1;
             startRow = 2;
             promotionRow = 8;
-        } else{
+        } else {
             direction = -1;
             startRow = 7;
             promotionRow = 1;
@@ -109,32 +114,33 @@ public class ChessPiece {
         int col = from.getColumn();
         int row = from.getRow();
 
-        //double step
-        if (row == startRow){
-          int twoStep = row + 2* direction;
-          if (board.inBounds(twoStep, col) && board.getPiece(new ChessPosition(twoStep,col)) == null){
-              moves.add(new ChessMove(from, new ChessPosition(twoStep,col),null));
+        //one step
+        int oneStep = row + direction;
+        if (board.inBounds(oneStep, col) && board.getPiece(new ChessPosition(oneStep, col)) == null) {
+            ChessPosition onePos = new ChessPosition(oneStep, col);
 
-          }
-        } else if (row == promotionRow) {
-            //call promotion method
-
-        } else {
-            int oneStep = row + direction;
-
-            if(board.inBounds(oneStep,col) && board.getPiece(new ChessPosition(oneStep, col)) == null) {
-                moves.add(new ChessMove(from, new ChessPosition(oneStep, col), null));
+            if (oneStep == promotionRow) {
+                addPromotions(moves, from, onePos);
+            } else {
+                moves.add(new ChessMove(from, onePos, null));
+                //two steps
+                if (row == startRow) {
+                    int twoStep = row + 2 * direction;
+                    if (board.inBounds(twoStep, col) && board.getPiece(new ChessPosition(twoStep, col)) == null) {
+                        moves.add(new ChessMove(from, new ChessPosition(twoStep, col), null));
+                    }
+                }
             }
         }
+    }
 
-    }//end of pawn moves
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
+        /**
+         * Calculates all the positions a chess piece can move to
+         * Does not take into account moves that are illegal due to leaving the king in
+         * danger
+         *
+         * @return Collection of valid moves
+         */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
 
@@ -156,10 +162,10 @@ public class ChessPiece {
             }
             case KNIGHT: {
                 int[][] directions = {
-                        {-2, -1}, {-2, 1},   // up 2, left/right 1
-                        {-1, -2}, {-1, 2},   // up 1, left/right 2
-                        {1, -2},  {1, 2},    // down 1, left/right 2
-                        {2, -1},  {2, 1}     // down 2, left/right 1
+                        {-2, -1}, {-2, 1},
+                        {-1, -2}, {-1, 2},
+                        {1, -2},  {1, 2},
+                        {2, -1},  {2, 1}
                 };
                 addStepMoves(board, myPosition, moves, directions);
                 break;
@@ -170,7 +176,7 @@ public class ChessPiece {
                 break;
             }
             case PAWN:
-                // generate pawn moves (trickier: forward, capture, promotion)
+                pawnMoves(board, myPosition, moves);
                 break;
         }
 
