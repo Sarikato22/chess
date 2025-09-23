@@ -13,8 +13,10 @@ import java.util.Objects;
  */
 public class ChessGame {
     ChessGame.TeamColor teamTurn;
-    private ChessBoard board;
+    ChessBoard board;
     public ChessGame() {
+        this.board = new ChessBoard();
+        this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE; //white ALWAYS starts first
     }
 
@@ -93,8 +95,8 @@ public class ChessGame {
 
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
             Collection<ChessMove> legalMoves = new HashSet<>();
-            if(this.board.getPiece(startPosition) == null) return legalMoves;
             ChessPiece piece = getBoard().getPiece(startPosition);
+            if(this.board.getPiece(startPosition) == null) return legalMoves;
 
             Collection<ChessMove> possibleMoves = piece.pieceMoves(getBoard(), startPosition);
 
@@ -176,7 +178,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board){
         this.board = board;
-        board.resetBoard();
+//
     }
 
     /**
