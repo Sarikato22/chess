@@ -57,6 +57,7 @@ public class ChessGame {
         ChessPosition kingPos = findKing(board, teamColor);
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
+
                 ChessPosition pos = new ChessPosition(row, col);
                 ChessPiece otherPiece = board.getPiece(pos);
                 if (otherPiece != null && otherPiece.getTeamColor() != teamColor) {
@@ -138,8 +139,8 @@ public class ChessGame {
         return true;
     }
     public ChessPosition findKing(ChessBoard board, TeamColor teamColor) {
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
+        for (int row = 1; row < 8; row++) {
+            for (int col = 1; col < 8; col++) {
                 ChessPosition current = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(current);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
