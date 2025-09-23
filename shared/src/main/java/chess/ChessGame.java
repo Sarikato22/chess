@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -9,16 +10,16 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-
+    ChessGame.TeamColor teamTurn;
     public ChessGame() {
-
+        this.teamTurn = TeamColor.WHITE; //white ALWAYS starts first
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return this.teamTurn;
     }
 
     /**
@@ -27,9 +28,19 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
-    }
 
+        if (team == null) {
+            throw new IllegalArgumentException("Team cannot be null.");
+        }
+        this.teamTurn = team;
+    }
+    public void switchTurns() {
+        if (this.teamTurn == TeamColor.WHITE){
+            this.teamTurn = TeamColor.BLACK;
+        } else {
+            this.teamTurn = TeamColor.WHITE;
+        }
+    }
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -75,6 +86,18 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
+    public ChessPosition findKing(ChessBoard board, TeamColor teamColor) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition current = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(current);
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return current;
+                }
+            }
+        }
+        return null;
+    }
     public boolean isInCheckmate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
     }
@@ -106,5 +129,28 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChessGame chessGame)) {
+            return false;
+        }
+        return teamTurn == chessGame.teamTurn;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "teamTurn=" + teamTurn +
+                '}';
     }
 }
