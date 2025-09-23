@@ -11,6 +11,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     ChessGame.TeamColor teamTurn;
+    private ChessBoard board;
     public ChessGame() {
         this.teamTurn = TeamColor.WHITE; //white ALWAYS starts first
     }
@@ -91,7 +92,7 @@ public class ChessGame {
             for (int col = 0; col < 8; col++) {
                 ChessPosition current = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(current);
-                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                     return current;
                 }
             }
@@ -99,7 +100,9 @@ public class ChessGame {
         return null;
     }
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKing(getBoard(), teamColor);
+
+
     }
 
     /**
@@ -118,8 +121,9 @@ public class ChessGame {
      *
      * @param board the new board to use
      */
-    public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+    public void setBoard(ChessBoard board){
+        this.board = board;
+        board.resetBoard();
     }
 
     /**
@@ -128,7 +132,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
 
     @Override
