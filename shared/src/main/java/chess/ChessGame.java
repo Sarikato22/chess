@@ -105,8 +105,14 @@ public class ChessGame {
                 ChessBoard boardCopy = copyBoard(getBoard());
 
                 // Simulate the move
-                boardCopy.addPiece(move.getEndPosition(), piece);
-                boardCopy.addPiece(startPosition, null);
+                if(move.getPromotionPiece() != null){
+                    boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
+                    boardCopy.addPiece(startPosition, null);
+                }else {
+                    boardCopy.addPiece(move.getEndPosition(),piece);
+                    boardCopy.addPiece(startPosition, null);
+                };
+
 
                 // Check if after this move, the player's own king is in check
                 if (!wouldBeInCheck(boardCopy, piece.getTeamColor())) {
@@ -116,8 +122,6 @@ public class ChessGame {
 
             return legalMoves;
     }
-
-
     /**
      * Makes a move in a chess game
      *
@@ -125,15 +129,23 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        //only move if its your turn
         //approach promotions
         ChessPosition startPosition = move.getStartPosition();
+        if(board.getPiece(startPosition) == null) throw new InvalidMoveException("No piece found");
         ChessPiece piece = board.getPiece(startPosition);
+
+        if (piece.getTeamColor() != getTeamTurn()) throw new InvalidMoveException("Not your turn");
+
         ChessPosition endPosition  = move.getEndPosition();
         Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
         if(legalMoves.contains(move)) {
-            board.addPiece(endPosition, piece);
-            board.addPiece(startPosition, null);
+            if(move.getPromotionPiece() != null){
+                board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
+                board.addPiece(startPosition, null);
+            }else {
+                board.addPiece(move.getEndPosition(),piece);
+                board.addPiece(startPosition, null);
+            };
             switchTurns();
         } else {
             throw new InvalidMoveException("Move is invalid.");
