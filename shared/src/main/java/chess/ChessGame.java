@@ -125,6 +125,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        //only move if its your turn
+        //approach promotions
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
         ChessPosition endPosition  = move.getEndPosition();
@@ -132,6 +134,7 @@ public class ChessGame {
         if(legalMoves.contains(move)) {
             board.addPiece(endPosition, piece);
             board.addPiece(startPosition, null);
+            switchTurns();
         } else {
             throw new InvalidMoveException("Move is invalid.");
         }
@@ -208,12 +211,13 @@ public class ChessGame {
         if (!(o instanceof ChessGame chessGame)) {
             return false;
         }
-        return teamTurn == chessGame.teamTurn;
+        return teamTurn == chessGame.teamTurn &&
+                Objects.equals(board, chessGame.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamTurn);
+        return Objects.hash(teamTurn, board);
     }
 
     @Override
