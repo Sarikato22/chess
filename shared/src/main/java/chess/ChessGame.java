@@ -109,7 +109,7 @@ public class ChessGame {
                     boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
                     boardCopy.addPiece(startPosition, null);
                 }else {
-                    boardCopy.addPiece(move.getEndPosition(),piece);
+                    boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
                     boardCopy.addPiece(startPosition, null);
                 };
 
@@ -117,6 +117,8 @@ public class ChessGame {
                 // Check if after this move, the player's own king is in check
                 if (!wouldBeInCheck(boardCopy, piece.getTeamColor())) {
                     legalMoves.add(move);
+                } else {
+                    System.out.println("Move would result in check and was rejected: " + move);
                 }
             }
 
@@ -163,8 +165,8 @@ public class ChessGame {
         return true;
     }
     public ChessPosition findKing(ChessBoard board, TeamColor teamColor) {
-        for (int row = 1; row < 8; row++) {
-            for (int col = 1; col < 8; col++) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
                 ChessPosition current = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(current);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
