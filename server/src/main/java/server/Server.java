@@ -21,4 +21,11 @@ public class Server {
     public void stop() {
         javalin.stop();
     }
+
+    public static void main(String[] args) {
+        var server = new Server();
+        server.run(8080);
+        System.out.println("Server running on port 8080");
+    }
 }
+
