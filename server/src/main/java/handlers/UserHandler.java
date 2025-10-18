@@ -1,18 +1,22 @@
 package handlers;
 
+import chess.model.request.RegisterRequest;
+import chess.model.result.RegisterResult;
+import dataaccess.MemoryDataAccess;
 import io.javalin.http.Context;
+import services.UserService;
+
 import java.util.Map;
 
 public class UserHandler {
+    private static final UserService userService = new UserService(new MemoryDataAccess());
 
-    // POST /user
     public static void register(Context ctx) {
-        Map<String, String> response = Map.of(
-                "authToken", "fake-auth-token",
-                "message", "User registered successfully"
-        );
-        ctx.json(response);
+        RegisterRequest request = ctx.bodyAsClass(RegisterRequest.class);
+        var result = userService.register(request);
+        ctx.json(result);
     }
+
 
     // POST /session
     public static void login(Context ctx) {
@@ -30,4 +34,4 @@ public class UserHandler {
         );
         ctx.json(response);
     }
-}
+}//end of class
