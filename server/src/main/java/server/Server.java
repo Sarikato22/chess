@@ -1,6 +1,7 @@
-package server;
-
+import io.javalin.Javalin;
 import handlers.UserHandler;
+import handlers.GameHandler;
+import handlers.AdminHandler;
 
 import io.javalin.*;
 
@@ -11,10 +12,20 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // Register your endpoints and exception handlers here.
+        // User endpoints
         javalin.post("/user", UserHandler::register);
+        javalin.post("/session", UserHandler::login);
+        javalin.delete("/session", UserHandler::logout);
 
+        // Game endpoints
+        javalin.get("/game", GameHandler::listGames);
+        javalin.post("/game", GameHandler::createGame);
+        javalin.put("/game", GameHandler::joinGame);
+
+        // Admin endpoint
+        javalin.delete("/db", AdminHandler::clearDatabase);
     }
+
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
