@@ -1,21 +1,27 @@
+import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
 import io.javalin.Javalin;
 import handlers.UserHandler;
 import handlers.GameHandler;
 import handlers.AdminHandler;
 
 import io.javalin.*;
+import services.UserService;
 
 public class Server {
 
     private final Javalin javalin;
 
     public Server() {
+        DataAccess dao = new MemoryDataAccess();
+        UserService userService = new UserService(dao);
+        UserHandler userHandler = new UserHandler(userService);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // User endpoints
-        javalin.post("/user", UserHandler::register);
-        javalin.post("/session", UserHandler::login);
-        javalin.delete("/session", UserHandler::logout);
+        javalin.post("/user", userHandler::register);
+//        javalin.post("/session", userHandler::login);
+//        javalin.delete("/session", userHandler::logout);
 
         // Game endpoints
         javalin.get("/game", GameHandler::listGames);

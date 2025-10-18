@@ -2,36 +2,32 @@ package handlers;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;
-import dataaccess.MemoryDataAccess;
-import io.javalin.http.Context;
 import services.UserService;
-
+import io.javalin.http.Context;
 import java.util.Map;
 
 public class UserHandler {
-    private static final UserService userService = new UserService(new MemoryDataAccess());
 
-    public static void register(Context ctx) {
-        RegisterRequest request = ctx.bodyAsClass(RegisterRequest.class);
-        var result = userService.register(request);
-        ctx.json(result);
+    private final UserService userService;
+
+    public UserHandler(UserService userService) {
+        this.userService = userService;
     }
 
+    public void register(Context ctx) {
+        RegisterRequest request;
+        try {
+            request = ctx.bodyAsClass(RegisterRequest.class);
+        } catch (Exception e) {
+            ctx.status(400).json(Map.of("message", "Invalid request JSON"));
+            return;
+        }
 
-    // POST /session
-    public static void login(Context ctx) {
-        Map<String, String> response = Map.of(
-                "authToken", "fake-auth-token",
-                "message", "User logged in successfully"
-        );
-        ctx.json(response);
+        try {
+            RegisterResult result = userService.register(request);
+            ctx.json(result);
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Internal server error"));
+        }
     }
-
-    // DELETE /session
-    public static void logout(Context ctx) {
-        Map<String, String> response = Map.of(
-                "message", "User logged out successfully"
-        );
-        ctx.json(response);
-    }
-}//end of class
+}

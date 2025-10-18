@@ -2,30 +2,36 @@ package dataaccess;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class MemoryDataAccess implements DataAccess {
 
-    private final Map<String, String> users = new HashMap<>(); // username -> password
-    private final Map<String, String> authTokens = new HashMap<>(); // authToken -> username
+    private final Map<String, String> users = new HashMap<>(); // username → password
+    private final Map<String, String> authTokens = new HashMap<>(); // username → token
 
-    @Override
-    public RegisterResult registerUser(RegisterRequest request) throws Exception {
-        if (users.containsKey(request.getUsername())) {
-            return new RegisterResult(false, "Error: username already taken", null);
+    public RegisterResult register(String username, String password, String email) {
+        if (users.containsKey(username)) {
+            return new RegisterResult("Username already taken");
         }
 
-        users.put(request.getUsername(), request.getPassword()); // (no hashing yet)
-        String authToken = UUID.randomUUID().toString();
-        authTokens.put(authToken, request.getUsername());
+        // Store the user in memory
+        users.put(username, password);
 
-        return new RegisterResult(true, null, authToken);
+        // Create fake auth token
+        String token = "token_" + username;
+        authTokens.put(username, token);
+
+        // Return a success result
+        return new RegisterResult(username, token);
     }
 
     @Override
+    public RegisterResult registerUser(RegisterRequest request) throws Exception {
+        return null;
+    }
+
+    // Optional: for testing
     public void clear() {
         users.clear();
         authTokens.clear();

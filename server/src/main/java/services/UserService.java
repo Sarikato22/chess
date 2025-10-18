@@ -14,9 +14,13 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest request) {
         try {
-            return dao.registerUser(request);
+            RegisterResult result = dao.registerUser(request);
+
+            return result;
         } catch (Exception e) {
-            return new RegisterResult(false, "Error: " + e.getMessage(), null);
+            // Return failure with message
+            return new RegisterResult("Error: " + e.getMessage());
         }
     }
 }
+
