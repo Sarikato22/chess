@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/UserHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/UserHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/services/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/RegisterResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/RegisterResult.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,7 +186,8 @@
       <workItem from="1760827071246" duration="427000" />
       <workItem from="1760827540889" duration="1313000" />
       <workItem from="1760828869109" duration="108000" />
-      <workItem from="1760828987218" duration="2508000" />
+      <workItem from="1760828987218" duration="2722000" />
+      <workItem from="1760836226210" duration="329000" />
     </task>
     <servers />
   </component>

@@ -28,7 +28,10 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public RegisterResult registerUser(RegisterRequest request) throws Exception {
-        return null;
+        if (request == null) {
+            throw new IllegalArgumentException("RegisterRequest cannot be null");
+        }
+        return register(request.getUsername(), request.getPassword(), request.getEmail());
     }
 
     // Optional: for testing
