@@ -19,15 +19,33 @@ public class UserHandler {
         try {
             request = ctx.bodyAsClass(RegisterRequest.class);
         } catch (Exception e) {
-            ctx.status(400).json(Map.of("message", "Invalid request JSON"));
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
             return;
         }
 
         try {
             RegisterResult result = userService.register(request);
-            ctx.json(result);
+
+            if (result.isSuccess()) {
+                // Success
+                ctx.status(200).json(Map.of(
+                        "username", result.getUsername(),
+                        "authToken", result.getAuthToken()
+                ));
+            } else {
+                // Failure
+                String message = result.getMessage() != null ? result.getMessage() : "Internal error";
+
+                if (message.contains("already taken")) {
+                    ctx.status(403).json(Map.of("message", "Error: already taken"));
+                } else if (message.contains("bad request")) {
+                    ctx.status(400).json(Map.of("message", "Error: bad request"));
+                } else {
+                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                }
+            }
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Internal server error"));
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 }

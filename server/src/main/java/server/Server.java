@@ -1,3 +1,5 @@
+package server;
+
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import io.javalin.Javalin;
