@@ -7,7 +7,7 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserServiceTest {
+public class UnitTests {
 
     private UserService userService;
 
@@ -17,8 +17,8 @@ public class UserServiceTest {
         MemoryDataAccess dao = new MemoryDataAccess();
         userService = new UserService(dao);
     }
-}
-//Positive test for register
+
+    //Positive test for register
     @Test
     @DisplayName("Register new user successfully")
     public void testRegisterSuccess() {
@@ -30,7 +30,8 @@ public class UserServiceTest {
         assertNotNull(result.getAuthToken(), "Auth token should be generated");
         assertNull(result.getMessage(), "Message should be null for success");
     }
-//Negative test for register, user already exists
+
+    //Negative test for register, user already exists
     @Test
     @DisplayName("Register duplicate username fails")
     public void testRegisterDuplicateUsername() {
@@ -45,3 +46,4 @@ public class UserServiceTest {
         assertNull(result.getAuthToken(), "No auth token should be returned on failure");
         assertTrue(result.getMessage().contains("already taken"), "Error message should indicate username conflict");
     }
+}//end of class

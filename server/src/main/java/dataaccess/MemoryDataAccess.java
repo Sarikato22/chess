@@ -12,7 +12,7 @@ public class MemoryDataAccess implements DataAccess {
 
     public RegisterResult register(String username, String password, String email) {
         if (users.containsKey(username)) {
-            return new RegisterResult("Username already taken");
+            return new RegisterResult(username, "Error: Username already taken");
         }
 
         // Store the user in memory
@@ -27,12 +27,23 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public RegisterResult registerUser(RegisterRequest request) throws Exception {
-        if (request == null) {
-            throw new IllegalArgumentException("RegisterRequest cannot be null");
+    public RegisterResult registerUser(RegisterRequest request) {
+        String username = request.getUsername();
+        String password = request.getPassword();
+        String email = request.getEmail();
+
+        if (users.containsKey(username)) {
+            return RegisterResult.failure(username, "Error: already taken");
         }
-        return register(request.getUsername(), request.getPassword(), request.getEmail());
+
+        // Store user
+        users.put(username, password);
+        String token = "token_" + username;
+        authTokens.put(username, token);
+
+        return new RegisterResult(username, token);
     }
+
 
     // Optional: for testing
     public void clear() {
