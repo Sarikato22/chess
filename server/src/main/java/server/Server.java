@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import handlers.SessionHandler;
 import io.javalin.Javalin;
 import handlers.UserHandler;
 import handlers.GameHandler;
@@ -9,6 +10,7 @@ import handlers.AdminHandler;
 
 import io.javalin.*;
 import services.ClearService;
+import services.SessionService;
 import services.UserService;
 
 public class Server {
@@ -21,12 +23,14 @@ public class Server {
         ClearService clearService = new ClearService(dao);
         AdminHandler adminHandler = new AdminHandler(clearService);
         UserHandler userHandler = new UserHandler(userService);
+        SessionService sessionService  = new SessionService(dao);
+        SessionHandler sessionHandler = new SessionHandler(sessionService);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // User endpoints
         javalin.post("/user", userHandler::register);
-//      javalin.post("/session", userHandler::login);
-//      javalin.delete("/session", userHandler::logout);
+        javalin.post("/session", sessionHandler::login);
+//        javalin.delete("/session", sessionHandler::logout);
 
         // Game endpoints
         javalin.get("/game", GameHandler::listGames);

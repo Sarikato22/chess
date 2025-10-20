@@ -1,7 +1,10 @@
 package handlers;
 
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
+import chess.model.result.SessionResult;
+import services.SessionService;
 import services.UserService;
 import io.javalin.http.Context;
 import java.util.Map;
@@ -48,4 +51,5 @@ public class UserHandler {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
 }
