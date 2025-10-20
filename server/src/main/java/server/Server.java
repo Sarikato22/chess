@@ -8,6 +8,7 @@ import handlers.GameHandler;
 import handlers.AdminHandler;
 
 import io.javalin.*;
+import services.ClearService;
 import services.UserService;
 
 public class Server {
@@ -17,13 +18,15 @@ public class Server {
     public Server() {
         DataAccess dao = new MemoryDataAccess();
         UserService userService = new UserService(dao);
+        ClearService clearService = new ClearService(dao);
+        AdminHandler adminHandler = new AdminHandler(clearService);
         UserHandler userHandler = new UserHandler(userService);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // User endpoints
         javalin.post("/user", userHandler::register);
-//        javalin.post("/session", userHandler::login);
-//        javalin.delete("/session", userHandler::logout);
+//      javalin.post("/session", userHandler::login);
+//      javalin.delete("/session", userHandler::logout);
 
         // Game endpoints
         javalin.get("/game", GameHandler::listGames);
@@ -31,7 +34,8 @@ public class Server {
         javalin.put("/game", GameHandler::joinGame);
 
         // Admin endpoint
-        javalin.delete("/db", AdminHandler::clearDatabase);
+        javalin.delete("/db", adminHandler::clear);
+
     }
 
 

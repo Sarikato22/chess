@@ -19,15 +19,15 @@ public class UserService {
             }
 
             if (request.getUsername() == null || request.getUsername().isEmpty()) {
-                return RegisterResult.failure(null, "Error: Username is required");
+                return RegisterResult.failure(null, "Bad request: Username is required");
             }
 
             if (request.getPassword() == null || request.getPassword().isEmpty()) {
-                return RegisterResult.failure(request.getUsername(), "Error: Password is required");
+                return RegisterResult.failure(request.getUsername(), "Bad request: Password is required");
             }
 
             if (request.getEmail() == null || request.getEmail().isEmpty()) {
-                return RegisterResult.failure(request.getUsername(), "Error: Email is required");
+                return RegisterResult.failure(request.getUsername(), "Bad request: Email is required");
             }
 
             return dao.registerUser(request);

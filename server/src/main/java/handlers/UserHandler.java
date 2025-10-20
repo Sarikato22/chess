@@ -38,7 +38,7 @@ public class UserHandler {
 
                 if (message.contains("already taken")) {
                     ctx.status(403).json(Map.of("message", "Error: already taken"));
-                } else if (message.contains("bad request")) {
+                } else if (message.contains("Bad request")) {
                     ctx.status(400).json(Map.of("message", "Error: bad request"));
                 } else {
                     ctx.status(500).json(Map.of("message", "Error: " + message));
