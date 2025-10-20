@@ -14,9 +14,30 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest request) {
         try {
+            // Validation first
+            if (request == null) {
+                return RegisterResult.failure(null, "Error: Request cannot be null");
+            }
+
+            if (request.getUsername() == null || request.getUsername().isEmpty()) {
+                return RegisterResult.failure(null, "Error: Username is required");
+            }
+
+            if (request.getPassword() == null || request.getPassword().isEmpty()) {
+                return RegisterResult.failure(request.getUsername(), "Error: Password is required");
+            }
+
+            if (request.getEmail() == null || request.getEmail().isEmpty()) {
+                return RegisterResult.failure(request.getUsername(), "Error: Email is required");
+            }
+
+            // If all good, call DAO to register user
             return dao.registerUser(request);
+
         } catch (Exception e) {
-            return new RegisterResult(request.getUsername(), "Error: " + e.getMessage());
+            return RegisterResult.failure(request != null ? request.getUsername() : null,
+                    "Error: " + e.getMessage());
         }
     }
+
 }

@@ -46,7 +46,7 @@ public class UnitTests {
         assertNull(result.getAuthToken(), "No auth token should be returned on failure");
         assertTrue(result.getMessage().contains("already taken"), "Error message should indicate username conflict");
     }
-
+        //Missing Username, should fail
         @Test
         void testRegisterMissingUsername() {
             RegisterRequest request = new RegisterRequest(null, "pass", "email@example.com");
@@ -55,7 +55,7 @@ public class UnitTests {
             assertFalse(result.isSuccess(), "Missing username should fail");
             assertTrue(result.getMessage().toLowerCase().contains("username"));
         }
-
+        //Missing password, should fail
         @Test
         void testRegisterMissingPassword() {
             RegisterRequest request = new RegisterRequest("Charlie", null, "email@example.com");
