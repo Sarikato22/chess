@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/UserHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/UserHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/Server.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/services/SessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/services/SessionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +204,7 @@
       <workItem from="1760828987218" duration="2722000" />
       <workItem from="1760836226210" duration="1417000" />
       <workItem from="1760837660473" duration="1684000" />
-      <workItem from="1760986261884" duration="10107000" />
+      <workItem from="1760986261884" duration="11137000" />
     </task>
     <servers />
   </component>

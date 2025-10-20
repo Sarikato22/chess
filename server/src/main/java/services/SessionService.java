@@ -39,7 +39,7 @@ public class SessionService {
             if (success) {
                 return SessionResult.success("Logged out successfully");
             } else {
-                return SessionResult.failure("Invalid auth token");
+                return SessionResult.failure("Unauthorized");
             }
         } catch (Exception e) {
             return SessionResult.failure("Error: " + e.getMessage());

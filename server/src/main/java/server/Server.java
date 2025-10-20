@@ -30,7 +30,7 @@ public class Server {
         // User endpoints
         javalin.post("/user", userHandler::register);
         javalin.post("/session", sessionHandler::login);
-//        javalin.delete("/session", sessionHandler::logout);
+        javalin.delete("/session", sessionHandler::logout);
 
         // Game endpoints
         javalin.get("/game", GameHandler::listGames);
