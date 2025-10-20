@@ -44,8 +44,6 @@ public class MemoryDataAccess implements DataAccess {
         return new RegisterResult(username, token);
     }
 
-
-    // Optional: for testing
     public void clear() {
         users.clear();
         authTokens.clear();
