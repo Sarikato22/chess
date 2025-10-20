@@ -2,6 +2,8 @@ package services;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;
+import chess.model.result.SessionResult;
+import chess.model.request.SessionRequest;
 import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.*;
 
@@ -87,6 +89,54 @@ public class UnitTests {
             assertDoesNotThrow(() -> clearService.clear(), "Clearing an empty database should not throw an exception");
         }
 
+        //Session tests:
+        @Test
+        @DisplayName("Login success with valid credentials")
+        void testLoginSuccess() {
+            RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
+            userService.register(register);
+
+            // Act: attempt to login
+            SessionRequest login = new SessionRequest("Alice", "password123");
+            SessionResult result = SessionService.login(login);
+
+            // Assert
+            assertTrue(result.isSuccess(), "Login should succeed with correct credentials");
+            assertEquals("Alice", result.getUsername());
+            assertNotNull(result.getAuthToken(), "Auth token should be returned on successful login");
+        }
+
+        @Test
+        @DisplayName("Login fails with wrong password")
+        void testLoginWrongPassword() {
+            RegisterRequest register = new RegisterRequest("Bob", "securePass", "bob@email.com");
+            userService.register(register);
+
+            // Act: attempt to login with wrong password
+            SessionRequest login = new SessionRequest("Bob", "wrongPass");
+            SessionResult result = SessionService.login(login);
+
+            // Assert
+            assertFalse(result.isSuccess(), "Login should fail with wrong password");
+            assertNull(result.getAuthToken(), "No auth token should be returned on failure");
+            assertTrue(result.getMessage().toLowerCase().contains("password"));
+        }
+
+    @Test
+    @DisplayName("Logout invalidates session")
+    void testLogout() throws Exception {
+        RegisterRequest register = new RegisterRequest("Charlie", "pass123", "charlie@email.com");
+        userService.register(register);
+        SessionRequest login = new SessionRequest("Charlie", "pass123");
+        SessionResult loginResult = SessionService.login(login);
+
+        // Act: logout
+        SessionResult logoutResult = SessionService.logout(loginResult.getAuthToken());
+
+        // Assert
+        assertTrue(logoutResult.isSuccess(), "Logout should succeed");
+        assertNull(SessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated");
+    }
 
 
 }//end of class

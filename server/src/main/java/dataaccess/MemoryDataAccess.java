@@ -1,7 +1,10 @@
 package dataaccess;
 
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
+import chess.model.result.SessionResult;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,4 +51,31 @@ public class MemoryDataAccess implements DataAccess {
         users.clear();
         authTokens.clear();
     }
+    //Session Code:
+    @Override
+    public SessionResult loginUser(SessionRequest request) {
+        if (!users.containsKey(request.getUsername()) ||
+                !users.get(request.getUsername()).equals(request.getPassword())) {
+            return null; // invalid login
+        }
+        String token = "token_" + request.getUsername();
+        authTokens.put(request.getUsername(), token);
+        return new SessionResult(request.getUsername(), token);
+    }
+
+    @Override
+    public boolean invalidateToken(String authToken) {
+        return authTokens.values().remove(authToken);
+    }
+
+    @Override
+    public String getUsernameByToken(String token) {
+        return authTokens.entrySet().stream()
+                .filter(e -> e.getValue().equals(token))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
+
+
 }
