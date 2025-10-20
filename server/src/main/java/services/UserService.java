@@ -14,7 +14,6 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest request) {
         try {
-            // Validation first
             if (request == null) {
                 return RegisterResult.failure(null, "Error: Request cannot be null");
             }
@@ -31,7 +30,6 @@ public class UserService {
                 return RegisterResult.failure(request.getUsername(), "Error: Email is required");
             }
 
-            // If all good, call DAO to register user
             return dao.registerUser(request);
 
         } catch (Exception e) {

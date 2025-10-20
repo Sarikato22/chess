@@ -16,6 +16,7 @@ public class UnitTests {
         // Each test starts with a fresh in-memory database
         MemoryDataAccess dao = new MemoryDataAccess();
         userService = new UserService(dao);
+        clearService = new ClearService(dao);
     }
 
     //Positive test for register
@@ -63,6 +64,27 @@ public class UnitTests {
 
             assertFalse(result.isSuccess(), "Missing password should fail");
             assertTrue(result.getMessage().toLowerCase().contains("password"));
+        }
+
+        //Tests for clear:
+        private ClearService clearService;
+
+        @Test
+        @DisplayName("Clear database successfully removes all users")
+        public void testClearSuccess() {
+            RegisterRequest request = new RegisterRequest("Diana", "secret", "diana@email.com");
+            RegisterResult result = userService.register(request);
+            assertTrue(result.isSuccess(), "Registration should succeed before clear");
+
+            clearService.clear();
+
+            RegisterResult resultAfterClear = userService.register(request);
+            assertTrue(resultAfterClear.isSuccess(), "After clear, registration should succeed again");
+        }
+        @Test
+        @DisplayName("Clear on empty database should not throw")
+        public void testClearEmptyDatabase() {
+            assertDoesNotThrow(() -> clearService.clear(), "Clearing an empty database should not throw an exception");
         }
 
 }//end of class
