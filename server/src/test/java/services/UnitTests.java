@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UnitTests {
 
     private UserService userService;
+    private SessionService sessionService;
 
     @BeforeEach
     public void setup() {
@@ -19,6 +20,7 @@ public class UnitTests {
         MemoryDataAccess dao = new MemoryDataAccess();
         userService = new UserService(dao);
         clearService = new ClearService(dao);
+        sessionService = new SessionService(dao);
     }
 
     //Positive test for register
@@ -90,6 +92,7 @@ public class UnitTests {
         }
 
         //Session tests:
+
         @Test
         @DisplayName("Login success with valid credentials")
         void testLoginSuccess() {
@@ -98,7 +101,7 @@ public class UnitTests {
 
             // Act: attempt to login
             SessionRequest login = new SessionRequest("Alice", "password123");
-            SessionResult result = SessionService.login(login);
+            SessionResult result = sessionService.login(login); // use instance, not static
 
             // Assert
             assertTrue(result.isSuccess(), "Login should succeed with correct credentials");
@@ -106,21 +109,21 @@ public class UnitTests {
             assertNotNull(result.getAuthToken(), "Auth token should be returned on successful login");
         }
 
-        @Test
-        @DisplayName("Login fails with wrong password")
-        void testLoginWrongPassword() {
-            RegisterRequest register = new RegisterRequest("Bob", "securePass", "bob@email.com");
-            userService.register(register);
+    @Test
+    @DisplayName("Login fails with wrong password")
+    void testLoginWrongPassword() {
+        RegisterRequest register = new RegisterRequest("Bob", "securePass", "bob@email.com");
+        userService.register(register);
 
-            // Act: attempt to login with wrong password
-            SessionRequest login = new SessionRequest("Bob", "wrongPass");
-            SessionResult result = SessionService.login(login);
+        // Act: attempt to login with wrong password
+        SessionRequest login = new SessionRequest("Bob", "wrongPass");
+        SessionResult result = sessionService.login(login); // use instance
 
-            // Assert
-            assertFalse(result.isSuccess(), "Login should fail with wrong password");
-            assertNull(result.getAuthToken(), "No auth token should be returned on failure");
-            assertTrue(result.getMessage().toLowerCase().contains("password"));
-        }
+        // Assert
+        assertFalse(result.isSuccess(), "Login should fail with wrong password");
+        assertNull(result.getAuthToken(), "No auth token should be returned on failure");
+        assertTrue(result.getMessage().toLowerCase().contains("password"));
+    }
 
     @Test
     @DisplayName("Logout invalidates session")
@@ -128,14 +131,14 @@ public class UnitTests {
         RegisterRequest register = new RegisterRequest("Charlie", "pass123", "charlie@email.com");
         userService.register(register);
         SessionRequest login = new SessionRequest("Charlie", "pass123");
-        SessionResult loginResult = SessionService.login(login);
+        SessionResult loginResult = sessionService.login(login); // use instance
 
         // Act: logout
-        SessionResult logoutResult = SessionService.logout(loginResult.getAuthToken());
+        SessionResult logoutResult = sessionService.logout(loginResult.getAuthToken()); // use instance
 
         // Assert
         assertTrue(logoutResult.isSuccess(), "Logout should succeed");
-        assertNull(SessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated");
+        assertNull(sessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated"); // instance
     }
 
 

@@ -6,15 +6,14 @@ import dataaccess.DataAccess;
 
 public class SessionService {
 
-    private static DataAccess dao = null;
+    private final DataAccess dao;
 
     public SessionService(DataAccess dao) {
         this.dao = dao;
     }
 
     // Login user
-    public static SessionResult login(SessionRequest request) {
-        // Validate input
+    public SessionResult login(SessionRequest request) {
         if (request.getUsername() == null || request.getUsername().isEmpty()) {
             return SessionResult.failure("Username is required");
         }
@@ -23,9 +22,7 @@ public class SessionService {
         }
 
         try {
-            // Attempt to authenticate via DAO
             SessionResult result = dao.loginUser(request);
-
             if (result == null) {
                 return SessionResult.failure("Invalid username or password");
             }
@@ -36,7 +33,7 @@ public class SessionService {
     }
 
     // Logout user
-    public static SessionResult logout(String authToken) {
+    public SessionResult logout(String authToken) {
         try {
             boolean success = dao.invalidateToken(authToken);
             if (success) {
@@ -49,8 +46,8 @@ public class SessionService {
         }
     }
 
-    // Optional: helper for tests
-    public static String getUserByToken(String token) throws Exception {
+    // Optional helper for tests
+    public String getUserByToken(String token) throws Exception {
         return dao.getUsernameByToken(token);
     }
 }
