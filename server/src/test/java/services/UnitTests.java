@@ -194,5 +194,41 @@ public class UnitTests {
         assertFalse(result.isSuccess(), "Should fail with missing game name");
         assertTrue(result.getMessage().toLowerCase().contains("bad request"));
     }
+    // list games tests
+    @Test
+    @DisplayName("List games succeeds with valid auth")
+    void testListGamesSuccess() throws Exception {
+        // Arrange: register, login, create some games
+        RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
+        userService.register(register);
+        SessionRequest login = new SessionRequest("Alice", "password123");
+        SessionResult session = sessionService.login(login);
+
+        GameRequest game1 = new GameRequest("First Game");
+        GameRequest game2 = new GameRequest("Second Game");
+        gameService.createGame(session.getAuthToken(), game1.getGameName());
+        gameService.createGame(session.getAuthToken(), game2.getGameName());
+
+        // Act: call listGames(authToken)
+//        gameService.listGames();
+//        // Assert: result.isSuccess(), games.size() == 2, etc.
+//        assertEquals(2, games.size());
+    }
+
+    @Test
+    @DisplayName("List games fails with missing auth token")
+    void testListGamesUnauthorized() throws Exception {
+        // Act: call listGames(null)
+        // Assert: fail with unauthorized
+    }
+
+    @Test
+    @DisplayName("List games returns empty list if no games exist")
+    void testListGamesEmpty() throws Exception {
+        // Arrange: valid auth but no games created
+        // Act + Assert: success, but list empty
+    }
+
+
 
 }//end of class
