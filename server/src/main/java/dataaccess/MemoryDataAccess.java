@@ -6,7 +6,9 @@ import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MemoryDataAccess implements DataAccess {
@@ -89,5 +91,16 @@ public class MemoryDataAccess implements DataAccess {
         games.put(id, newGame);
         return newGame;
     }
+
+    @Override
+    public List<GameData> listGames() throws DataAccessException {
+        try {
+
+            return new ArrayList<>(games.values());
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to list games: " + e.getMessage());
+        }
+    }
+
 
 }

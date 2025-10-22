@@ -3,9 +3,12 @@ package dataaccess;
 import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
+import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
+
+import java.util.List;
 
 public interface DataAccess {
     RegisterResult registerUser(RegisterRequest request) throws Exception;
@@ -16,4 +19,6 @@ public interface DataAccess {
     String getUsernameByToken(String authToken) throws Exception;
 
     GameData createGame(GameData game) throws DataAccessException;
+
+    List<GameData> listGames() throws DataAccessException;
 }

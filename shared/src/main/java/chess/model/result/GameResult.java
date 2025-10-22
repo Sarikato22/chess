@@ -12,7 +12,6 @@ public class GameResult {
         this.gameID = gameID;
     }
 
-    // Static helpers (for readability)
     public static GameResult success(int gameID) {
         return new GameResult(true, null, gameID);
     }

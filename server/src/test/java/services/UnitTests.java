@@ -219,7 +219,10 @@ public class UnitTests {
     @DisplayName("List games fails with missing auth token")
     void testListGamesUnauthorized() throws Exception {
         // Act: call listGames(null)
+        gameService.listGames(null);
         // Assert: fail with unauthorized
+        assertFalse(result.isSuccess(), "Should fail without auth token");
+        assertTrue(result.getMessage().toLowerCase().contains("unauthorized"));
     }
 
     @Test

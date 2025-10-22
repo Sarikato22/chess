@@ -1,10 +1,14 @@
 package services;
 
+import chess.model.result.GameListResult;
+import chess.model.result.RegisterResult;
 import dataaccess.DataAccess;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.result.GameResult;
 import dataaccess.DataAccessException;
+
+import java.util.List;
 
 public class GameService {
 
@@ -36,6 +40,17 @@ public class GameService {
         }
         System.out.println("Creating GameResult with ID: " + newGame.getGameId());
         return GameResult.success(newGame.getGameId());
+    }
+
+    public GameListResult listGames(String authToken) throws Exception {
+            try {
+                dataAccess.getUsernameByToken(authToken);
+                List<GameData> games = dataAccess.listGames();
+                return GameListResult.success(games);
+
+            } catch (Exception e) {
+                return GameListResult.failure("Error: " + e.getMessage());
+            }
     }
 
 

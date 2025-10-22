@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/GameListResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/services/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/services/GameService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/test/java/services/UnitTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/services/UnitTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/GameResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/GameResult.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,7 +207,7 @@
       <workItem from="1760986261884" duration="11137000" />
       <workItem from="1761098964299" duration="237000" />
       <workItem from="1761099239140" duration="3826000" />
-      <workItem from="1761150790920" duration="5631000" />
+      <workItem from="1761150790920" duration="7321000" />
     </task>
     <servers />
   </component>
