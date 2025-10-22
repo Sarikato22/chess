@@ -1,6 +1,8 @@
 package services;
 
+import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
 import chess.model.request.SessionRequest;
@@ -13,6 +15,7 @@ public class UnitTests {
 
     private UserService userService;
     private SessionService sessionService;
+    private GameService gameService;
 
     @BeforeEach
     public void setup() {
@@ -21,6 +24,7 @@ public class UnitTests {
         userService = new UserService(dao);
         clearService = new ClearService(dao);
         sessionService = new SessionService(dao);
+        gameService = new GameService(dao);
     }
 
     //Positive test for register
@@ -92,7 +96,6 @@ public class UnitTests {
         }
 
         //Session tests:
-
         @Test
         @DisplayName("Login success with valid credentials")
         void testLoginSuccess() {
@@ -142,58 +145,53 @@ public class UnitTests {
     }
     //tests for create game
     @Test
-    @DisplayName("Create game succeeds with valid auth token")
+    @DisplayName("Create game succeeds with valid auth token and name")
     void testCreateGameSuccess() throws Exception {
-        // Arrange: register and login a user
+        // Arrange: register and log in
         RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
         userService.register(register);
-
         SessionRequest login = new SessionRequest("Alice", "password123");
-        SessionResult sessionResult = sessionService.login(login);
-        String authToken = sessionResult.getAuthToken();
+        SessionResult session = sessionService.login(login);
 
         // Act: create a game
-        GameRequest request = new GameRequest("My Awesome Game");
-        GameResult result = gameService.createGame(authToken, request);
+        GameRequest request = new GameRequest("My First Game");
+        GameResult result = gameService.createGame(session.getAuthToken(), request.getGameName());
 
         // Assert
-        assertTrue(result.isSuccess(), "Game creation should succeed with valid token");
+        assertTrue(result.isSuccess(), "Game creation should succeed");
         assertTrue(result.getGameID() > 0, "Game ID should be positive");
     }
 
     @Test
-    @DisplayName("Create game fails with invalid or missing auth token")
-    void testCreateGameUnauthorized() throws Exception {
-        // Arrange: prepare a request but no valid token
-        GameRequest request = new GameRequest("Unauthorized Game");
+    @DisplayName("Create game fails with missing auth token")
+    void testCreateGameUnauthorized() {
+        // Arrange
+        GameRequest request = new GameRequest("Lonely Game");
 
         // Act
-        GameResult result = gameService.createGame("invalid_token", request);
+        GameResult result = gameService.createGame(null, request.getGameName());
 
         // Assert
-        assertFalse(result.isSuccess(), "Game creation should fail with invalid token");
+        assertFalse(result.isSuccess(), "Should fail without auth token");
         assertTrue(result.getMessage().toLowerCase().contains("unauthorized"));
     }
 
     @Test
-    @DisplayName("Create game fails with bad request (missing name)")
+    @DisplayName("Create game fails with missing game name")
     void testCreateGameBadRequest() throws Exception {
-        // Arrange: valid user and token
-        RegisterRequest register = new RegisterRequest("Bob", "securePass", "bob@email.com");
+        // Arrange: valid auth
+        RegisterRequest register = new RegisterRequest("Bob", "pass123", "bob@email.com");
         userService.register(register);
+        SessionRequest login = new SessionRequest("Bob", "pass123");
+        SessionResult session = sessionService.login(login);
 
-        SessionRequest login = new SessionRequest("Bob", "securePass");
-        SessionResult sessionResult = sessionService.login(login);
-        String authToken = sessionResult.getAuthToken();
-
-        // Act: send invalid body (missing name)
-        GameRequest request = new GameRequest(""); // or null
-        GameResult result = gameService.createGame(authToken, request);
+        // Act
+        GameRequest request = new GameRequest(null);
+        GameResult result = gameService.createGame(session.getAuthToken(), request.getGameName());
 
         // Assert
-        assertFalse(result.isSuccess(), "Game creation should fail when name is missing");
+        assertFalse(result.isSuccess(), "Should fail with missing game name");
         assertTrue(result.getMessage().toLowerCase().contains("bad request"));
     }
-
 
 }//end of class

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
@@ -10,8 +11,10 @@ import java.util.Map;
 
 public class MemoryDataAccess implements DataAccess {
 
-    private final Map<String, String> users = new HashMap<>(); // username → password
-    private final Map<String, String> authTokens = new HashMap<>(); // username → token
+    private final Map<String, String> users = new HashMap<>();
+    private final Map<String, String> authTokens = new HashMap<>();
+    private final Map<Integer, GameData> games = new HashMap<>();
+    private int nextGameId = 1;
 
     public RegisterResult register(String username, String password, String email) {
         if (users.containsKey(username)) {
@@ -51,6 +54,7 @@ public class MemoryDataAccess implements DataAccess {
         users.clear();
         authTokens.clear();
     }
+
     //Session Code:
     @Override
     public SessionResult loginUser(SessionRequest request) {
@@ -77,5 +81,15 @@ public class MemoryDataAccess implements DataAccess {
                 .orElse(null);
     }
 
+    @Override
+    public GameData createGame(GameData game) throws DataAccessException {
+        int id = nextGameId++;
+
+        // Preserve the creator username if provided
+        GameData newGame = new GameData(id, game.getGameName(), game.getCreatorUsername());
+
+        games.put(id, newGame);
+        return newGame;
+    }
 
 }
