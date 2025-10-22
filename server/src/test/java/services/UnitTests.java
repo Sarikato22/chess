@@ -140,6 +140,60 @@ public class UnitTests {
         assertTrue(logoutResult.isSuccess(), "Logout should succeed");
         assertNull(sessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated"); // instance
     }
+    //tests for create game
+    @Test
+    @DisplayName("Create game succeeds with valid auth token")
+    void testCreateGameSuccess() throws Exception {
+        // Arrange: register and login a user
+        RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
+        userService.register(register);
+
+        SessionRequest login = new SessionRequest("Alice", "password123");
+        SessionResult sessionResult = sessionService.login(login);
+        String authToken = sessionResult.getAuthToken();
+
+        // Act: create a game
+        GameRequest request = new GameRequest("My Awesome Game");
+        GameResult result = gameService.createGame(authToken, request);
+
+        // Assert
+        assertTrue(result.isSuccess(), "Game creation should succeed with valid token");
+        assertTrue(result.getGameID() > 0, "Game ID should be positive");
+    }
+
+    @Test
+    @DisplayName("Create game fails with invalid or missing auth token")
+    void testCreateGameUnauthorized() throws Exception {
+        // Arrange: prepare a request but no valid token
+        GameRequest request = new GameRequest("Unauthorized Game");
+
+        // Act
+        GameResult result = gameService.createGame("invalid_token", request);
+
+        // Assert
+        assertFalse(result.isSuccess(), "Game creation should fail with invalid token");
+        assertTrue(result.getMessage().toLowerCase().contains("unauthorized"));
+    }
+
+    @Test
+    @DisplayName("Create game fails with bad request (missing name)")
+    void testCreateGameBadRequest() throws Exception {
+        // Arrange: valid user and token
+        RegisterRequest register = new RegisterRequest("Bob", "securePass", "bob@email.com");
+        userService.register(register);
+
+        SessionRequest login = new SessionRequest("Bob", "securePass");
+        SessionResult sessionResult = sessionService.login(login);
+        String authToken = sessionResult.getAuthToken();
+
+        // Act: send invalid body (missing name)
+        GameRequest request = new GameRequest(""); // or null
+        GameResult result = gameService.createGame(authToken, request);
+
+        // Assert
+        assertFalse(result.isSuccess(), "Game creation should fail when name is missing");
+        assertTrue(result.getMessage().toLowerCase().contains("bad request"));
+    }
 
 
 }//end of class
