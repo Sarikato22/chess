@@ -94,6 +94,7 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
+
         try {
 
             return new ArrayList<>(games.values());

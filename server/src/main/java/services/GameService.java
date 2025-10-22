@@ -38,13 +38,17 @@ public class GameService {
         if (newGame == null) {
             return GameResult.failure("Error: internal failure");
         }
-        System.out.println("Creating GameResult with ID: " + newGame.getGameId());
+//        System.out.println("Creating GameResult with ID: " + newGame.getGameId());
         return GameResult.success(newGame.getGameId());
     }
 
     public GameListResult listGames(String authToken) throws Exception {
+        if (authToken == null || authToken.isEmpty()) {
+            return GameListResult.failure("Error: unauthorized");
+        }
             try {
                 dataAccess.getUsernameByToken(authToken);
+
                 List<GameData> games = dataAccess.listGames();
                 return GameListResult.success(games);
 
