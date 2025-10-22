@@ -48,5 +48,8 @@ public class GameListResult {
     }
 
 
+    public int size() {
+        return games != null ? games.size() : 0;
+    }
 }
 

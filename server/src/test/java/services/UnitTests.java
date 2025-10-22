@@ -2,6 +2,7 @@ package services;
 
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
@@ -209,29 +210,41 @@ public class UnitTests {
         gameService.createGame(session.getAuthToken(), game1.getGameName());
         gameService.createGame(session.getAuthToken(), game2.getGameName());
 
-        // Act: call listGames(authToken)
-//        gameService.listGames();
-//        // Assert: result.isSuccess(), games.size() == 2, etc.
-//        assertEquals(2, games.size());
+
+        GameListResult gameList = gameService.listGames(session.getAuthToken());
+        assertEquals(2, gameList.size());
+        assertTrue(gameList.isSuccess(), "Listing games should succeed");
+
     }
 
     @Test
     @DisplayName("List games fails with missing auth token")
     void testListGamesUnauthorized() throws Exception {
         // Act: call listGames(null)
-        gameService.listGames(null);
+        GameListResult gameList = gameService.listGames(null);
         // Assert: fail with unauthorized
-        assertFalse(result.isSuccess(), "Should fail without auth token");
-        assertTrue(result.getMessage().toLowerCase().contains("unauthorized"));
+        assertFalse(gameList.isSuccess(), "Should fail without auth token");
+        assertTrue(gameList.getMessage().toLowerCase().contains("unauthorized"));
+        assertNull(gameList.getGames(), "Games list should be null on failure");
+
     }
 
     @Test
     @DisplayName("List games returns empty list if no games exist")
     void testListGamesEmpty() throws Exception {
-        // Arrange: valid auth but no games created
-        // Act + Assert: success, but list empty
+        // Arrange: register and login, but don't create any games
+        RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
+        userService.register(register);
+        SessionRequest login = new SessionRequest("Alice", "password123");
+        SessionResult session = sessionService.login(login);
+
+        // Act: list games
+        GameListResult gameList = gameService.listGames(session.getAuthToken());
+
+        // Assert: success, but list is empty
+        assertTrue(gameList.isSuccess(), "Listing games should succeed");
+        assertEquals(0, gameList.size(), "Game list should be empty when no games exist");
+        assertNotNull(gameList.getGames(), "Games list should not be null even if empty");
     }
-
-
 
 }//end of class
