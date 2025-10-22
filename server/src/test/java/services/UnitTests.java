@@ -6,6 +6,7 @@ import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
 import chess.model.request.SessionRequest;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.*;
 
@@ -164,7 +165,7 @@ public class UnitTests {
 
     @Test
     @DisplayName("Create game fails with missing auth token")
-    void testCreateGameUnauthorized() {
+    void testCreateGameUnauthorized() throws Exception {
         // Arrange
         GameRequest request = new GameRequest("Lonely Game");
 

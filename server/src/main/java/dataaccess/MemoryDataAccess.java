@@ -84,8 +84,6 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
         int id = nextGameId++;
-
-        // Preserve the creator username if provided
         GameData newGame = new GameData(id, game.getGameName(), game.getCreatorUsername());
 
         games.put(id, newGame);

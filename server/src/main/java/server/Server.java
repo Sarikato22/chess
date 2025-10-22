@@ -10,6 +10,7 @@ import handlers.AdminHandler;
 
 import io.javalin.*;
 import services.ClearService;
+import services.GameService;
 import services.SessionService;
 import services.UserService;
 
@@ -23,8 +24,12 @@ public class Server {
         ClearService clearService = new ClearService(dao);
         AdminHandler adminHandler = new AdminHandler(clearService);
         UserHandler userHandler = new UserHandler(userService);
+        //
         SessionService sessionService  = new SessionService(dao);
         SessionHandler sessionHandler = new SessionHandler(sessionService);
+        //
+        GameService gameService = new GameService(dao);
+        GameHandler gameHandler = new GameHandler(gameService);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // User endpoints
@@ -34,7 +39,7 @@ public class Server {
 
         // Game endpoints
         javalin.get("/game", GameHandler::listGames);
-        javalin.post("/game", GameHandler::createGame);
+        javalin.post("/game", gameHandler::createGame);
         javalin.put("/game", GameHandler::joinGame);
 
         // Admin endpoint
