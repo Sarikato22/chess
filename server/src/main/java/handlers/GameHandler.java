@@ -1,5 +1,6 @@
 package handlers;
 
+import chess.model.result.GameListResult;
 import io.javalin.http.Context;
 import java.util.Map;
 import java.util.List;
@@ -15,12 +16,27 @@ public class GameHandler {
     }
 
     // GET /game
-    public static void listGames(Context ctx) {
-        List<Map<String, Object>> fakeGames = List.of(
-                Map.of("id", 1, "name", "Fake Game 1"),
-                Map.of("id", 2, "name", "Fake Game 2")
-        );
-        ctx.json(Map.of("games", fakeGames));
+    public void listGames(Context ctx) {
+        String authToken = ctx.header("authorization");
+        if (authToken == null || authToken.isEmpty()) {
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+        }
+        try {
+           GameListResult gameList =  gameService.listGames(authToken);
+            if (gameList.isSuccess()){
+                ctx.status(200).json(Map.of("games", gameList.getGames()));
+            } else {
+                String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";
+
+                if (message.contains ("unauthorized")) {
+                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                } else {
+                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                }
+            }
+        } catch (Exception e ) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }
 
     // POST /game
@@ -66,4 +82,6 @@ public class GameHandler {
         );
         ctx.json(response);
     }
+
+
 }
