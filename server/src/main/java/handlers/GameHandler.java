@@ -1,5 +1,6 @@
 package handlers;
 
+import chess.model.request.JoinGameRequest;
 import chess.model.result.GameListResult;
 import io.javalin.http.Context;
 import java.util.Map;
@@ -76,11 +77,32 @@ public class GameHandler {
     }
 
     // PUT /game
-    public static void joinGame(Context ctx) {
-        Map<String, Object> response = Map.of(
-                "message", "Joined game successfully"
-        );
-        ctx.json(response);
+    public void joinGame(Context ctx) {
+        String authToken = ctx.header("authorization");
+        JoinGameRequest req;
+        try {
+            req = ctx.bodyAsClass(JoinGameRequest.class);
+        } catch (Exception e) {
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            return;
+        }
+
+        var result = gameService.joinGame(authToken, req);
+        if (result.isSuccess()) {
+            ctx.status(200).result(""); // or ctx.status(200).json(Map.of()) — tests expect {} body
+            // to send an empty JSON object: ctx.status(200).json(Map.of());
+        } else {
+            String message = result.getMessage() == null ? "" : result.getMessage();
+            if (message.contains("unauthorized")) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+            } else if (message.contains("already taken")) {
+                ctx.status(403).json(Map.of("message", "Error: already taken"));
+            } else if (message.contains("bad request")) {
+                ctx.status(400).json(Map.of("message", "Error: bad request"));
+            } else {
+                ctx.status(500).json(Map.of("message", "Error: " + message));
+            }
+        }
     }
 
 
