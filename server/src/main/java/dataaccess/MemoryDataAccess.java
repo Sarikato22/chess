@@ -12,7 +12,7 @@ import java.util.*;
 public class MemoryDataAccess implements DataAccess {
 
     private final Map<String, String> users = new HashMap<>();
-    private final Map<String, String> authTokens = new HashMap<>();
+    private final Map<String, Set<String>> authTokens = new HashMap<>();
     private final Map<Integer, GameData> games = new HashMap<>();
     private int nextGameId = 1;
 
@@ -29,11 +29,13 @@ public class MemoryDataAccess implements DataAccess {
 
         // Store user
         users.put(username, password);
+
         String token = UUID.randomUUID().toString();
-        authTokens.put(username, token);
+        authTokens.computeIfAbsent(username, k -> new HashSet<>()).add(token);
 
         return new RegisterResult(username, token);
     }
+
 
     public void clear() {
         games.clear();
@@ -43,33 +45,26 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public SessionResult loginUser(SessionRequest request) {
-
         String username = request.getUsername();
         String password = request.getPassword();
 
         if (!users.containsKey(username) || !users.get(username).equals(password)) {
-            return null;
+            return null; // invalid login
         }
 
         String token = UUID.randomUUID().toString();
-        authTokens.put(username, token);
+        authTokens.computeIfAbsent(username, k -> new HashSet<>()).add(token);
         System.out.println("Generated token for " + username + ": " + token);
 
         return new SessionResult(username, token);
     }
 
-    @Override
     public boolean invalidateToken(String authToken) {
-        String keyToRemove = null;
-        for (Map.Entry<String, String> entry : authTokens.entrySet()) {
-            if (entry.getValue().equals(authToken)) {
-                keyToRemove = entry.getKey();
-                break;
+        for (Map.Entry<String, Set<String>> entry : authTokens.entrySet()) {
+            if (entry.getValue().remove(authToken)) { // remove token from set
+                if (entry.getValue().isEmpty()) authTokens.remove(entry.getKey()); // cleanup empty set
+                return true;
             }
-        }
-        if (keyToRemove != null) {
-            authTokens.remove(keyToRemove);
-            return true;
         }
         return false;
     }
@@ -77,31 +72,34 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public String getUsernameByToken(String token) {
         return authTokens.entrySet().stream()
-                .filter(e -> e.getValue().equals(token))
+                .filter(e -> e.getValue().contains(token))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse(null);
     }
 
-    @Override
+        @Override
     public GameData createGame(GameData game) throws DataAccessException {
-        int id = nextGameId++;
-        GameData newGame = new GameData(id, game.getGameName(), null, null);
-        games.put(id, newGame);
-        return newGame;
-    }
-    public void joinPlayer(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
-        GameData game = games.get(gameID);
-        if (game == null) throw new DataAccessException("Game not found");
-
-        if (color == ChessGame.TeamColor.WHITE) {
-            game = new GameData(game.getGameId(), game.getGameName(), username, game.getBlackUsername());
-        } else {
-            game = new GameData(game.getGameId(), game.getGameName(), game.getWhiteUsername(), username);
+        if (game == null) {
+            throw new DataAccessException("Cannot create null game");
         }
 
-        games.put(gameID, game);
+        int id = nextGameId++;
+
+        GameData newGame = new GameData(
+                id,
+                game.getGameName(),
+                game.getWhiteUsername(),  // usually null
+                game.getBlackUsername()   // usually null
+        );
+
+        // Store it in the map
+        games.put(id, newGame);
+
+        // Return the same object with ID set
+        return newGame;
     }
+
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
@@ -125,11 +123,16 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        int id = game.getGameId(); // cannot be null
-        if (!games.containsKey(id)) {
+        if (game == null || game.getGameId() <= 0) {
+            throw new DataAccessException("Cannot update game with null ID");
+        }
+
+        if (!games.containsKey(game.getGameId())) {
             throw new DataAccessException("Game not found");
         }
-        games.put(id, game); // use the same object
+
+        // Replace the stored object with the updated one
+        games.put(game.getGameId(), game);
     }
 
 
