@@ -1,6 +1,7 @@
 package chess.model.request;
 
 import chess.ChessGame;
+import com.google.gson.annotations.SerializedName;
 
 public class JoinGameRequest {
     private ChessGame.TeamColor playerColor;
@@ -15,7 +16,7 @@ public class JoinGameRequest {
 
     public ChessGame.TeamColor getPlayerColor() { return playerColor; }
     public void setPlayerColor(ChessGame.TeamColor playerColor) { this.playerColor = playerColor; }
-
+    @SerializedName("gameID")
     public int getGameID() { return gameID; }
     public void setGameID(int gameID) { this.gameID = gameID; }
 }

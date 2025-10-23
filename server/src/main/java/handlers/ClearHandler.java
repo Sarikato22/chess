@@ -3,7 +3,7 @@ package handlers;
 import chess.model.result.ClearResult;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import services.ClearService;
+import service.ClearService;
 import dataaccess.DataAccess;
 
 public class ClearHandler implements Handler {

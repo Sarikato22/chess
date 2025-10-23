@@ -8,11 +8,10 @@ import handlers.UserHandler;
 import handlers.GameHandler;
 import handlers.AdminHandler;
 
-import io.javalin.*;
-import services.ClearService;
-import services.GameService;
-import services.SessionService;
-import services.UserService;
+import service.ClearService;
+import service.GameService;
+import service.SessionService;
+import service.UserService;
 
 public class Server {
 

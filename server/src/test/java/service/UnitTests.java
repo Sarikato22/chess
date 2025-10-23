@@ -1,15 +1,18 @@
-package services;
+package service;
 
+import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
+import chess.ChessGame.TeamColor;
 import chess.model.request.SessionRequest;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.*;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -246,5 +249,20 @@ public class UnitTests {
         assertEquals(0, gameList.size(), "Game list should be empty when no games exist");
         assertNotNull(gameList.getGames(), "Games list should not be null even if empty");
     }
+
+    //
+    @Test
+    void testGameData() {
+        GameData game = new GameData(1, "Debug Game", null, null);
+
+        assertEquals(1, game.getGameId());
+        assertEquals("Debug Game", game.getGameName());
+        assertNull(game.getWhiteUsername());
+        assertNull(game.getBlackUsername());
+    }
+
+
+
+
 
 }//end of class

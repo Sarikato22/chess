@@ -1,7 +1,7 @@
 package handlers;
 
 import io.javalin.http.Context;
-import services.ClearService;
+import service.ClearService;
 import chess.model.result.ClearResult;
 import java.util.Map;
 

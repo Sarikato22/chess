@@ -1,4 +1,4 @@
-package services;
+package service;
 
 import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;

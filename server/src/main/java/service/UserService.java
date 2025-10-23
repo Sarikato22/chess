@@ -1,4 +1,4 @@
-package services;
+package service;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;

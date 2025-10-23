@@ -3,8 +3,7 @@ package handlers;
 import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;
 import io.javalin.http.Context;
-import services.SessionService;
-import services.UserService;
+import service.SessionService;
 
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class SessionHandler {
         if (authToken == null || authToken.isEmpty()) {
             try {
                 Map<String, String> body = ctx.bodyAsClass(Map.class);
-                authToken = body.get("authToken"); // test might send { "authToken": "..." }
+                authToken = body.get("authToken");
             } catch (Exception ignored) {}
         }
 

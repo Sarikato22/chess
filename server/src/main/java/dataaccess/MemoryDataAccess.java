@@ -79,26 +79,12 @@ public class MemoryDataAccess implements DataAccess {
     }
 
         @Override
-    public GameData createGame(GameData game) throws DataAccessException {
-        if (game == null) {
-            throw new DataAccessException("Cannot create null game");
+        public GameData createGame(GameData game) throws DataAccessException {
+            int id = nextGameId++;
+            GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
+            games.put(id, newGame);
+            return newGame;
         }
-
-        int id = nextGameId++;
-
-        GameData newGame = new GameData(
-                id,
-                game.getGameName(),
-                game.getWhiteUsername(),  // usually null
-                game.getBlackUsername()   // usually null
-        );
-
-        // Store it in the map
-        games.put(id, newGame);
-
-        // Return the same object with ID set
-        return newGame;
-    }
 
 
     @Override
@@ -131,7 +117,6 @@ public class MemoryDataAccess implements DataAccess {
             throw new DataAccessException("Game not found");
         }
 
-        // Replace the stored object with the updated one
         games.put(game.getGameId(), game);
     }
 

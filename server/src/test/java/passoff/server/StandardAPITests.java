@@ -318,6 +318,7 @@ public class StandardAPITests {
         //1 as black from A
         String game1Name = "I'm numbah one!";
         TestCreateResult game1 = serverFacade.createGame(new TestCreateRequest(game1Name), authA.getAuthToken());
+        System.out.println("Created game ID: " + game1.getGameID());
         serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.BLACK, game1.getGameID()), authA.getAuthToken());
         expectedList[0] = new TestListEntry(game1.getGameID(), game1Name, null, authA.getUsername());
 
@@ -349,6 +350,23 @@ public class StandardAPITests {
         TestListResult listResult = serverFacade.listGames(existingAuth);
         assertHttpOk(listResult);
         TestListEntry[] returnedList = listResult.getGames();
+//        System.out.println("Returned list:");
+//        for (TestListEntry entry : returnedList) {
+//            System.out.println(
+//                    "ID: " + entry.getGameID() +
+//                            ", Name: " + entry.getGameName() +
+//                            ", White: " + entry.getWhiteUsername() +
+//                            ", Black: " + entry.getBlackUsername()
+//            );
+//        }
+//        for (TestListEntry entry : expectedList) {
+//            System.out.println(
+//                    "ID: " + entry.getGameID() +
+//                            ", Name: " + entry.getGameName() +
+//                            ", White: " + entry.getWhiteUsername() +
+//                            ", Black: " + entry.getBlackUsername()
+//            );
+//        }
         Assertions.assertNotNull(returnedList, "List result did not contain a list of games");
         Comparator<TestListEntry> gameIdComparator = Comparator.comparingInt(TestListEntry::getGameID);
         Arrays.sort(expectedList, gameIdComparator);
