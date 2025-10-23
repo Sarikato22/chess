@@ -1,14 +1,13 @@
 package chess.model.result;
 
 public class SessionResult {
-    private boolean success;
-    private String username;
-    private String authToken;
-    private String message;
 
-    public SessionResult() {} // needed for JSON deserialization
+    private final boolean success;
+    private final String username;
+    private final String authToken;
+    private final String message;
 
-    // Success constructor
+    // Constructor for success
     public SessionResult(String username, String authToken) {
         this.success = true;
         this.username = username;
@@ -16,36 +15,45 @@ public class SessionResult {
         this.message = null;
     }
 
-    // Failure factory
+    // Constructor for failure
+    private SessionResult(String message) {
+        this.success = false;
+        this.username = null;
+        this.authToken = null;
+        this.message = message;
+    }
+
+    // Factory method for failure
     public static SessionResult failure(String message) {
-        SessionResult result = new SessionResult();
-        result.success = false;
-        result.username = null;
-        result.authToken = null;
-        result.message = message;
-        return result;
+        return new SessionResult(message);
     }
 
-    // Optional success factory for messages
+    // Factory method for success (optional)
     public static SessionResult success(String message) {
-        SessionResult result = new SessionResult();
-        result.success = true;
-        result.username = null;
-        result.authToken = null;
-        result.message = message;
-        return result;
+        return new SessionResult(true, null, null, message);
     }
 
-    // Getters and setters
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
+    // Internal constructor used by factory success
+    private SessionResult(boolean success, String username, String authToken, String message) {
+        this.success = success;
+        this.username = username;
+        this.authToken = authToken;
+        this.message = message;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public boolean isSuccess() {
+        return success;
+    }
 
-    public String getAuthToken() { return authToken; }
-    public void setAuthToken(String authToken) { this.authToken = authToken; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

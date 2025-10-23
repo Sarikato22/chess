@@ -7,10 +7,7 @@ import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MemoryDataAccess implements DataAccess {
 
@@ -19,21 +16,6 @@ public class MemoryDataAccess implements DataAccess {
     private final Map<Integer, GameData> games = new HashMap<>();
     private int nextGameId = 1;
 
-    public RegisterResult register(String username, String password, String email) {
-        if (users.containsKey(username)) {
-            return new RegisterResult(username, "Error: Username already taken");
-        }
-
-        // Store the user in memory
-        users.put(username, password);
-
-        // Create fake auth token
-        String token = "token_" + username;
-        authTokens.put(username, token);
-
-        // Return a success result
-        return new RegisterResult(username, token);
-    }
 
     @Override
     public RegisterResult registerUser(RegisterRequest request) {
@@ -47,7 +29,7 @@ public class MemoryDataAccess implements DataAccess {
 
         // Store user
         users.put(username, password);
-        String token = "token_" + username;
+        String token = UUID.randomUUID().toString();
         authTokens.put(username, token);
 
         return new RegisterResult(username, token);
@@ -59,21 +41,37 @@ public class MemoryDataAccess implements DataAccess {
         authTokens.clear();
     }
 
-    //Session Code:
     @Override
     public SessionResult loginUser(SessionRequest request) {
-        if (!users.containsKey(request.getUsername()) ||
-                !users.get(request.getUsername()).equals(request.getPassword())) {
-            return null; // invalid login
+
+        String username = request.getUsername();
+        String password = request.getPassword();
+
+        if (!users.containsKey(username) || !users.get(username).equals(password)) {
+            return null;
         }
-        String token = "token_" + request.getUsername();
-        authTokens.put(request.getUsername(), token);
-        return new SessionResult(request.getUsername(), token);
+
+        String token = UUID.randomUUID().toString();
+        authTokens.put(username, token);
+        System.out.println("Generated token for " + username + ": " + token);
+
+        return new SessionResult(username, token);
     }
 
     @Override
     public boolean invalidateToken(String authToken) {
-        return authTokens.values().remove(authToken);
+        String keyToRemove = null;
+        for (Map.Entry<String, String> entry : authTokens.entrySet()) {
+            if (entry.getValue().equals(authToken)) {
+                keyToRemove = entry.getKey();
+                break;
+            }
+        }
+        if (keyToRemove != null) {
+            authTokens.remove(keyToRemove);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -88,17 +86,27 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
         int id = nextGameId++;
-        GameData newGame = new GameData(id, game.getGameName(), game.getCreatorUsername());
-
+        GameData newGame = new GameData(id, game.getGameName(), null, null);
         games.put(id, newGame);
         return newGame;
+    }
+    public void joinPlayer(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+        GameData game = games.get(gameID);
+        if (game == null) throw new DataAccessException("Game not found");
+
+        if (color == ChessGame.TeamColor.WHITE) {
+            game = new GameData(game.getGameId(), game.getGameName(), username, game.getBlackUsername());
+        } else {
+            game = new GameData(game.getGameId(), game.getGameName(), game.getWhiteUsername(), username);
+        }
+
+        games.put(gameID, game);
     }
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
 
         try {
-
             return new ArrayList<>(games.values());
         } catch (Exception e) {
             throw new DataAccessException("Unable to list games: " + e.getMessage());
@@ -107,6 +115,7 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+
         GameData game = games.get(gameID);
         if (game == null) {
             throw new DataAccessException("Game not found");
@@ -116,10 +125,11 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        if (!games.containsKey(game.getGameId())) {
+        int id = game.getGameId(); // cannot be null
+        if (!games.containsKey(id)) {
             throw new DataAccessException("Game not found");
         }
-        games.put(game.getGameId(), game);
+        games.put(id, game); // use the same object
     }
 
 

@@ -87,7 +87,6 @@ public class GameHandler {
             try {
                 req = ctx.bodyAsClass(JoinGameRequest.class);
             } catch (Exception e) {
-                // JSON could not be parsed (e.g., invalid color)
                 ctx.status(400).json(Map.of("message", "Error: bad request"));
                 return;
             }

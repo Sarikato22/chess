@@ -10,7 +10,9 @@ import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.result.GameResult;
 import dataaccess.DataAccessException;
+import passoff.model.TestListEntry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameService {
@@ -35,24 +37,29 @@ public class GameService {
             return GameResult.failure("Error: bad request");
         }
 
-
-        GameData newGame = dataAccess.createGame(new GameData(1, gameName, username));
+        GameData newGame = dataAccess.createGame(new GameData(1, gameName, null, null));
 
         if (newGame == null) {
             return GameResult.failure("Error: internal failure");
         }
-//        System.out.println("Creating GameResult with ID: " + newGame.getGameId());
+
         return GameResult.success(newGame.getGameId());
     }
+
 
     public GameListResult listGames(String authToken) throws Exception {
         if (authToken == null || authToken.isEmpty()) {
             return GameListResult.failure("Error: unauthorized");
         }
+
         try {
-            dataAccess.getUsernameByToken(authToken);
+            String username = dataAccess.getUsernameByToken(authToken);
+            if (username == null) {
+                return GameListResult.failure("Error: unauthorized");
+            }
 
             List<GameData> games = dataAccess.listGames();
+
             return GameListResult.success(games);
 
         } catch (Exception e) {
@@ -71,30 +78,22 @@ public class GameService {
             return JoinGameResult.failure("Error: unauthorized");
         }
 
-        if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK || gameID <= 0 ) {
+        if ((playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK) || gameID <= 0 ) {
             return JoinGameResult.failure("Error: bad request");
         }
 
         GameData game = dataAccess.getGame(gameID);
-        if (game == null) {
-            return JoinGameResult.failure("Error: bad request");
-        }
 
         if (playerColor == ChessGame.TeamColor.WHITE) {
-            if (game.getWhiteUsername() != null) {
-                return JoinGameResult.failure("Error: already taken");
-            }
+            if (game.getWhiteUsername() != null) return JoinGameResult.failure("Error: already taken");
             game.setWhiteUsername(username);
-        } else if (playerColor == ChessGame.TeamColor.BLACK) {
-            if (game.getBlackUsername() != null) {
-                return JoinGameResult.failure("Error: already taken");
-            }
-            game.setBlackUsername(username);
         } else {
-            return JoinGameResult.failure("Error: bad request");
+            if (game.getBlackUsername() != null) return JoinGameResult.failure("Error: already taken");
+            game.setBlackUsername(username);
         }
 
         dataAccess.updateGame(game);
+
         return JoinGameResult.success("Joined game successfully");
     }
 

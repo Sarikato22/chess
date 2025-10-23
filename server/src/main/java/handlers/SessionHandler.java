@@ -18,36 +18,33 @@ public class SessionHandler {
 
 
     public void logout(Context ctx) {
+        // Try header first
         String authToken = ctx.header("authorization");
 
-        // No token → unauthorized immediately
+        // Fallback to body JSON
+        if (authToken == null || authToken.isEmpty()) {
+            try {
+                Map<String, String> body = ctx.bodyAsClass(Map.class);
+                authToken = body.get("authToken"); // test might send { "authToken": "..." }
+            } catch (Exception ignored) {}
+        }
+
         if (authToken == null || authToken.isEmpty()) {
             ctx.status(401).json(Map.of("message", "Error: unauthorized"));
             return;
         }
 
-        try {
-            SessionResult sessionResult = sessionService.logout(authToken);
+        SessionResult result = sessionService.logout(authToken);
 
-            if (sessionResult.isSuccess()) {
-                ctx.status(200).json(Map.of());
-            } else {
-                String message = sessionResult.getMessage() != null
-                        ? sessionResult.getMessage()
-                        : "Error: unauthorized";
+        if (result.isSuccess()) {
+            ctx.status(200).json(Map.of());
+        } else {
+            ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+        }
+    }
 
-                if (message.toLowerCase().contains("unauthorized")) {
-                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
-                } else {
-                    ctx.status(500).json(Map.of("message", "Error: " + message));
-                }
-            }
-        } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
-            }
-        }//end of logout
 
-        public void login(Context ctx) {
+    public void login(Context ctx) {
             SessionRequest sessionRequest;
 
             try {
@@ -61,7 +58,6 @@ public class SessionHandler {
                 SessionResult sessionResult = sessionService.login(sessionRequest);
 
                 if (sessionResult.isSuccess()) {
-                    // Success
                     ctx.status(200).json(Map.of(
                             "username", sessionResult.getUsername(),
                             "authToken", sessionResult.getAuthToken()

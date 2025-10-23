@@ -6,8 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/DataAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/services/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/services/GameService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/model/data/GameData.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/model/data/GameData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/SessionResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/model/result/SessionResult.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,20 +47,21 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/sarah/OneDrive/Desktop/BYU/CS240/chess&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/sarah/OneDrive/Desktop/BYU/CS240/chess",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server" />
@@ -83,6 +90,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="StandardAPITests.clearData" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="passoff.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="passoff.server" />
+      <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
+      <option name="METHOD_NAME" value="clearData" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="StandardAPITests.joinGameBadColor" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
@@ -99,7 +122,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StandardAPITests.joinGameSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StandardAPITests.listGamesSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -109,13 +132,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="passoff.server" />
       <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
-      <option name="METHOD_NAME" value="joinGameSuccess" />
+      <option name="METHOD_NAME" value="listGamesSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StandardAPITests.listGamesEmpty" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StandardAPITests.uniqueAuthorizationTokens" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -125,23 +148,7 @@
       </extension>
       <option name="PACKAGE_NAME" value="passoff.server" />
       <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
-      <option name="METHOD_NAME" value="listGamesEmpty" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UnitTests.testListGamesUnauthorized" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="services.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="services" />
-      <option name="MAIN_CLASS_NAME" value="services.UnitTests" />
-      <option name="METHOD_NAME" value="testListGamesUnauthorized" />
+      <option name="METHOD_NAME" value="uniqueAuthorizationTokens" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -161,10 +168,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.StandardAPITests" />
+        <item itemvalue="JUnit.StandardAPITests.clearData" />
+        <item itemvalue="JUnit.StandardAPITests.listGamesSuccess" />
+        <item itemvalue="JUnit.StandardAPITests.uniqueAuthorizationTokens" />
         <item itemvalue="JUnit.StandardAPITests.joinGameBadColor" />
-        <item itemvalue="JUnit.StandardAPITests.joinGameSuccess" />
-        <item itemvalue="JUnit.StandardAPITests.listGamesEmpty" />
-        <item itemvalue="JUnit.UnitTests.testListGamesUnauthorized" />
       </list>
     </recent_temporary>
   </component>
@@ -208,7 +215,7 @@
       <workItem from="1761098964299" duration="237000" />
       <workItem from="1761099239140" duration="3826000" />
       <workItem from="1761150790920" duration="8643000" />
-      <workItem from="1761169999525" duration="7826000" />
+      <workItem from="1761169999525" duration="16246000" />
     </task>
     <servers />
   </component>
@@ -232,6 +239,30 @@
           <line>11</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java</url>
+          <line>59</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java</url>
+          <line>108</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java</url>
+          <line>315</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.NullPointerException" package="java.lang" />
+          <option name="timeStamp" value="18" />
+        </breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
@@ -239,5 +270,13 @@
         <PinnedItemInfo parentTag="io.javalin.http.servlet.JavalinServletContext" memberName="isJson" />
       </pinned-members>
     </pin-to-top-manager>
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="request" language="JAVA" />
+        <watch expression="returnedList[3]" />
+        <watch expression="expectedList[0]" />
+        <watch expression="returnedList" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

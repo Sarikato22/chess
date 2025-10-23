@@ -3,14 +3,16 @@ package chess.model.data;
 public class GameData {
     private final int gameId;
     private final String gameName;
-    private final String creatorUsername;
     private String whiteUsername;
     private String blackUsername;
 
-    public GameData(int gameId, String gameName, String creatorUsername) {
+
+    public GameData(int gameId, String gameName, String whiteUsername, String blackUsername) {
         this.gameId = gameId;
         this.gameName = gameName;
-        this.creatorUsername = creatorUsername;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
+
     }
 
     public int getGameId() {
@@ -21,9 +23,6 @@ public class GameData {
         return gameName;
     }
 
-    public String getCreatorUsername() {
-        return creatorUsername;
-    }
     public String getWhiteUsername() { return whiteUsername; }
     public void setWhiteUsername(String whiteUsername) { this.whiteUsername = whiteUsername; }
 
