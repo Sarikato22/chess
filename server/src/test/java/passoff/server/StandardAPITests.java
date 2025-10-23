@@ -405,7 +405,6 @@ public class StandardAPITests {
         Assertions.assertEquals(existingUser.getUsername(), listResult.getGames()[0].getWhiteUsername(),
                 "incorrect username on joined game");
     }
-
     @Test
     @Order(14)
     @DisplayName("Clear Test")
@@ -450,7 +449,6 @@ public class StandardAPITests {
         listResult = serverFacade.listGames(registerResult.getAuthToken());
         assertHttpOk(listResult);
 
-        //check listResult
         Assertions.assertNotNull(listResult.getGames(), "List result did not contain an empty list of games");
         Assertions.assertEquals(0, listResult.getGames().length, "list result did not return 0 games after clear");
     }
@@ -460,17 +458,13 @@ public class StandardAPITests {
     @DisplayName("Multiple Clears")
     public void clearMultipleTimes() {
 
-        //clear multiple times
         serverFacade.clear();
         serverFacade.clear();
         TestResult result = serverFacade.clear();
 
-        //make sure returned good
         assertHttpOk(result);
     }
-
     // ### HELPER ASSERTIONS ###
-
     private void assertHttpOk(TestResult result) {
         Assertions.assertEquals(HttpURLConnection.HTTP_OK, serverFacade.getStatusCode(),
                 "Server response code was not 200 OK (message: %s)".formatted(result.getMessage()));
@@ -490,7 +484,6 @@ public class StandardAPITests {
     private void assertHttpForbidden(TestResult result) {
         assertHttpError(result, HttpURLConnection.HTTP_FORBIDDEN, "Forbidden");
     }
-
     private void assertHttpError(TestResult result, int statusCode, String message) {
         Assertions.assertEquals(statusCode, serverFacade.getStatusCode(),
                 "Server response code was not %d %s (message: %s)".formatted(statusCode, message, result.getMessage()));
@@ -498,7 +491,6 @@ public class StandardAPITests {
         Assertions.assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
                 "Error message didn't contain the word \"Error\"");
     }
-
     private void assertAuthFieldsMissing(TestAuthResult result) {
         Assertions.assertNull(result.getUsername(), "Response incorrectly returned username");
         Assertions.assertNull(result.getAuthToken(), "Response incorrectly return authentication String");
