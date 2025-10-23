@@ -40,7 +40,7 @@ public class Server {
         // Game endpoints
         javalin.get("/game", gameHandler::listGames);
         javalin.post("/game", gameHandler::createGame);
-        javalin.put("/game", GameHandler::joinGame);
+        javalin.put("/game", gameHandler::joinGame);
 
         // Admin endpoint
         javalin.delete("/db", adminHandler::clear);

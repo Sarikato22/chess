@@ -2,6 +2,7 @@ package handlers;
 
 import chess.model.request.JoinGameRequest;
 import chess.model.result.GameListResult;
+import chess.model.result.JoinGameResult;
 import io.javalin.http.Context;
 import java.util.Map;
 import java.util.List;
@@ -77,7 +78,7 @@ public class GameHandler {
     }
 
     // PUT /game
-    public void joinGame(Context ctx) {
+    public void joinGame(Context ctx) throws Exception {
         String authToken = ctx.header("authorization");
         JoinGameRequest req;
         try {
@@ -87,10 +88,11 @@ public class GameHandler {
             return;
         }
 
-        var result = gameService.joinGame(authToken, req);
+        // Call service with proper parameters
+        JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
+
         if (result.isSuccess()) {
-            ctx.status(200).result(""); // or ctx.status(200).json(Map.of()) — tests expect {} body
-            // to send an empty JSON object: ctx.status(200).json(Map.of());
+            ctx.status(200).result("");
         } else {
             String message = result.getMessage() == null ? "" : result.getMessage();
             if (message.contains("unauthorized")) {
@@ -104,6 +106,7 @@ public class GameHandler {
             }
         }
     }
+
 
 
 }

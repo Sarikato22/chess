@@ -1,5 +1,6 @@
 package services;
 
+import chess.ChessGame;
 import chess.model.request.JoinGameRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.JoinGameResult;
@@ -59,8 +60,7 @@ public class GameService {
         }
     }
 
-
-    public JoinGameResult joinGame(String authToken, String playerColor, int gameID) throws Exception {
+    public JoinGameResult joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws Exception {
         // 1. Auth check
         if (authToken == null || authToken.isEmpty()) {
             return JoinGameResult.failure("Error: unauthorized");
@@ -82,12 +82,12 @@ public class GameService {
         }
 
         // 3. Check and assign color
-        if (playerColor.equalsIgnoreCase("WHITE")) {
+        if (playerColor.equals("WHITE")) {
             if (game.getWhiteUsername() != null) {
                 return JoinGameResult.failure("Error: already taken");
             }
             game.setWhiteUsername(username);
-        } else if (playerColor.equalsIgnoreCase("BLACK")) {
+        } else if (playerColor.equals("BLACK")) {
             if (game.getBlackUsername() != null) {
                 return JoinGameResult.failure("Error: already taken");
             }
