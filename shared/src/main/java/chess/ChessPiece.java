@@ -39,7 +39,8 @@ public class ChessPiece {
      * Helper method for pieceMoves method
      * addSlidingMoves works with the pieces whose movements can go as far as possible like rook, bishop and queen
      **/
-    private void addSlidingMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions) {
+    private void addSlidingMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves,
+                                 int[][] directions) {
         for (int[] dir : directions) {
             int row = from.getRow();
             int col = from.getColumn();
@@ -48,7 +49,9 @@ public class ChessPiece {
                 row += dir[0];
                 col += dir[1];
 
-                if (!board.inBounds(row, col)) break;
+                if (!board.inBounds(row, col)) {
+                    break;
+                }
 
                 ChessPosition to = new ChessPosition(row, col);
                 ChessPiece occupant = board.getPiece(to);
@@ -70,7 +73,9 @@ public class ChessPiece {
             int row = from.getRow() + dir[0];
             int col = from.getColumn() + dir[1];
 
-            if (!board.inBounds(row, col)) continue; // skip out-of-bounds
+            if (!board.inBounds(row, col)) {
+                continue; // skip out-of-bounds
+            }
 
             ChessPosition to = new ChessPosition(row, col);
             ChessPiece occupant = board.getPiece(to);
@@ -152,7 +157,9 @@ public class ChessPiece {
         int diagonalRow = row + direction;
 
         for (int i : cols) {
-            if (!board.inBounds(diagonalRow, i)) continue;
+            if (!board.inBounds(diagonalRow, i)) {
+                continue;
+            }
             ChessPosition to = new ChessPosition(diagonalRow, i);
             ChessPiece occupant = board.getPiece(to);
 

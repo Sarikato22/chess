@@ -108,7 +108,9 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> legalMoves = new HashSet<>();
         ChessPiece piece = getBoard().getPiece(startPosition);
-        if (piece == null) return legalMoves;
+        if (piece == null) {
+            return legalMoves;
+        }
 
         Collection<ChessMove> possibleMoves = piece.pieceMoves(getBoard(), startPosition);
 
@@ -117,7 +119,8 @@ public class ChessGame {
 
             // Simulate the move
             if (move.getPromotionPiece() != null) {
-                boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+                boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),
+                        move.getPromotionPiece()));
                 boardCopy.addPiece(startPosition, null);
             } else {
                 boardCopy.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), piece.getPieceType()));
@@ -141,10 +144,14 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
-        if (board.getPiece(startPosition) == null) throw new InvalidMoveException("No piece found");
+        if (board.getPiece(startPosition) == null) {
+            throw new InvalidMoveException("No piece found");
+        }
         ChessPiece piece = board.getPiece(startPosition);
 
-        if (piece.getTeamColor() != getTeamTurn()) throw new InvalidMoveException("Not your turn");
+        if (piece.getTeamColor() != getTeamTurn()) {
+            throw new InvalidMoveException("Not your turn");
+        }
 
         Collection<ChessMove> legalMoves = validMoves(startPosition);
         if (legalMoves.contains(move)) {

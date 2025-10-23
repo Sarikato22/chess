@@ -85,7 +85,8 @@ public class WebSocketTests {
     @Order(3)
     @DisplayName("Connect Bad AuthToken")
     public void connectBadAuthToken() {
-        connectToGame(new WebsocketUser("didn't register", "badAuth"), gameID, false, Set.of(), Set.of(), "connect with bad auth");
+        connectToGame(new WebsocketUser("didn't register", "badAuth"), gameID, false, Set.of(), Set.of(), "connect " +
+                "with bad auth");
     }
 
     @Test
@@ -262,15 +263,19 @@ public class WebSocketTests {
         joinGame(otherGameID, white2, ChessGame.TeamColor.WHITE);
         joinGame(otherGameID, black2, ChessGame.TeamColor.BLACK);
         connectToGame(white2, otherGameID, true, Set.of(), Set.of(white, black, observer), "connect 1 to other game");
-        connectToGame(black2, otherGameID, true, Set.of(white2), Set.of(white, black, observer), "connect 2 to other game");
-        connectToGame(observer2, otherGameID, true, Set.of(white2, black2), Set.of(white, black, observer), "connect 3 to other game");
+        connectToGame(black2, otherGameID, true, Set.of(white2), Set.of(white, black, observer), "connect 2 to other " +
+                "game");
+        connectToGame(observer2, otherGameID, true, Set.of(white2, black2), Set.of(white, black, observer), "connect " +
+                "3 to other game");
 
         //make move in first game - only users in first game should be notified
         ChessMove move = new ChessMove(new ChessPosition(2, 5), new ChessPosition(3, 5), null);
-        makeMove(white, gameID, move, true, false, Set.of(black, observer), Set.of(white2, black2, observer2), "move from game 1");
+        makeMove(white, gameID, move, true, false, Set.of(black, observer), Set.of(white2, black2, observer2), "move " +
+                "from game 1");
 
         //resign in second game - only users in second game should be notified
-        resign(white2, otherGameID, true, Set.of(black2, observer2), Set.of(white, black, observer), "resign from game 2");
+        resign(white2, otherGameID, true, Set.of(black2, observer2), Set.of(white, black, observer), "resign from " +
+                "game 2");
 
         //player leave in first game - only users remaining in first game should be notified
         leave(white, gameID, Set.of(black, observer), Set.of(white2, black2, observer2), "leave from game 1");
@@ -308,17 +313,23 @@ public class WebSocketTests {
     private void connectToGame(WebsocketUser sender, int gameID, boolean expectSuccess,
                                Set<WebsocketUser> inGame, Set<WebsocketUser> otherClients, String description) {
         TestCommand connectCommand = new TestCommand(UserGameCommand.CommandType.CONNECT, sender.authToken(), gameID);
-        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 1 : 0), otherClients);
-        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), connectCommand, numExpectedMessages, waitTime);
+        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 1 : 0),
+                otherClients);
+        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), connectCommand,
+                numExpectedMessages, waitTime);
 
-        assertCommandMessages(actualMessages, expectSuccess, sender, types(LOAD_GAME), inGame, types(NOTIFICATION), otherClients, description);
+        assertCommandMessages(actualMessages, expectSuccess, sender, types(LOAD_GAME), inGame, types(NOTIFICATION),
+                otherClients, description);
     }
 
-    private void makeMove(WebsocketUser sender, int gameID, ChessMove move, boolean expectSuccess, boolean extraNotification,
+    private void makeMove(WebsocketUser sender, int gameID, ChessMove move, boolean expectSuccess,
+                          boolean extraNotification,
                           Set<WebsocketUser> inGame, Set<WebsocketUser> otherClients, String description) {
         TestCommand moveCommand = new TestCommand(sender.authToken(), gameID, move);
-        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 2 : 0), otherClients);
-        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), moveCommand, numExpectedMessages, waitTime);
+        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 2 : 0),
+                otherClients);
+        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), moveCommand,
+                numExpectedMessages, waitTime);
 
         if (extraNotification && actualMessages.get(sender.username()).size() > 1) {
             assertCommandMessages(actualMessages, expectSuccess, sender, types(LOAD_GAME, NOTIFICATION),
@@ -332,26 +343,33 @@ public class WebSocketTests {
     private void resign(WebsocketUser sender, int gameID, boolean expectSuccess,
                         Set<WebsocketUser> inGame, Set<WebsocketUser> otherClients, String description) {
         TestCommand resignCommand = new TestCommand(UserGameCommand.CommandType.RESIGN, sender.authToken(), gameID);
-        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 1 : 0), otherClients);
-        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), resignCommand, numExpectedMessages, waitTime);
+        Map<String, Integer> numExpectedMessages = expectedMessages(sender, 1, inGame, (expectSuccess ? 1 : 0),
+                otherClients);
+        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), resignCommand,
+                numExpectedMessages, waitTime);
 
         assertCommandMessages(actualMessages, expectSuccess, sender, types(NOTIFICATION),
                 inGame, types(NOTIFICATION), otherClients, description);
     }
 
-    private void leave(WebsocketUser sender, int gameID, Set<WebsocketUser> inGame, Set<WebsocketUser> otherClients, String description) {
+    private void leave(WebsocketUser sender, int gameID, Set<WebsocketUser> inGame, Set<WebsocketUser> otherClients,
+                       String description) {
         TestCommand leaveCommand = new TestCommand(UserGameCommand.CommandType.LEAVE, sender.authToken(), gameID);
         Map<String, Integer> numExpectedMessages = expectedMessages(sender, 0, inGame, 1, otherClients);
-        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), leaveCommand, numExpectedMessages, waitTime);
+        Map<String, List<TestMessage>> actualMessages = environment.exchange(sender.username(), leaveCommand,
+                numExpectedMessages, waitTime);
 
-        assertCommandMessages(actualMessages, true, sender, types(), inGame, types(NOTIFICATION), otherClients, description);
+        assertCommandMessages(actualMessages, true, sender, types(), inGame, types(NOTIFICATION), otherClients,
+                description);
     }
 
     private Map<String, Integer> expectedMessages(WebsocketUser sender, int senderExpected,
-                                                  Set<WebsocketUser> inGame, int inGameExpected, Set<WebsocketUser> otherClients) {
+                                                  Set<WebsocketUser> inGame, int inGameExpected,
+                                                  Set<WebsocketUser> otherClients) {
         Map<String, Integer> expectedMessages = new HashMap<>();
         expectedMessages.put(sender.username(), senderExpected);
-        expectedMessages.putAll(inGame.stream().collect(Collectors.toMap(WebsocketUser::username, s -> inGameExpected)));
+        expectedMessages.putAll(inGame.stream().collect(Collectors.toMap(WebsocketUser::username,
+                s -> inGameExpected)));
         expectedMessages.putAll(otherClients.stream().collect(Collectors.toMap(WebsocketUser::username, s -> 0)));
         return expectedMessages;
     }
@@ -366,16 +384,21 @@ public class WebSocketTests {
         }
         assertMessages(user.username(), userExpectedTypes, messages.get(user.username()), description);
         for (WebsocketUser inGameUser : inGame) {
-            assertMessages(inGameUser.username(), inGameExpectedTypes, messages.get(inGameUser.username()), description);
+            assertMessages(inGameUser.username(), inGameExpectedTypes, messages.get(inGameUser.username()),
+                    description);
         }
         for (WebsocketUser otherUser : otherClients) {
-            assertMessages(otherUser.username(), new ServerMessage.ServerMessageType[0], messages.get(otherUser.username()), description);
+            assertMessages(otherUser.username(), new ServerMessage.ServerMessageType[0],
+                    messages.get(otherUser.username()), description);
         }
     }
 
-    private void assertMessages(String username, ServerMessage.ServerMessageType[] expectedTypes, List<TestMessage> messages, String description) {
-        Assertions.assertEquals(expectedTypes.length, messages.size(), "For command '%s' user '%s' expected %d messages with types %s, got %d: %s"
-                .formatted(description, username, expectedTypes.length, Arrays.toString(expectedTypes), messages.size(), messages));
+    private void assertMessages(String username, ServerMessage.ServerMessageType[] expectedTypes,
+                                List<TestMessage> messages, String description) {
+        Assertions.assertEquals(expectedTypes.length, messages.size(), ("For command '%s' user '%s' expected %d " +
+                "messages with types %s, got %d: %s")
+                .formatted(description, username, expectedTypes.length, Arrays.toString(expectedTypes),
+                        messages.size(), messages));
         Arrays.sort(expectedTypes);
         messages.sort(Comparator.comparing(TestMessage::getServerMessageType));
         try {
@@ -411,14 +434,16 @@ public class WebSocketTests {
         Assertions.assertNull(message.getGame(),
                 "%s's NOTIFICATION message contained a game: %s".formatted(username, message.getGame()));
         Assertions.assertNull(message.getErrorMessage(),
-                "%s's NOTIFICATION message contained an error message: %s".formatted(username, message.getErrorMessage()));
+                "%s's NOTIFICATION message contained an error message: %s".formatted(username,
+                        message.getErrorMessage()));
     }
 
     private void assertError(String username, TestMessage message) {
         Assertions.assertEquals(ServerMessage.ServerMessageType.ERROR, message.getServerMessageType(),
                 "Message for %s was not an ERROR message: %s".formatted(username, message));
         Assertions.assertNotNull(message.getErrorMessage(),
-                "%s's ERROR message did not contain an error message (Make sure it's specifically called 'errorMessage')".formatted(username));
+                ("%s's ERROR message did not contain an error message (Make sure it's specifically called " +
+                        "'errorMessage')").formatted(username));
         Assertions.assertNull(message.getGame(),
                 "%s's ERROR message contained a game: %s".formatted(username, message.getGame()));
         Assertions.assertNull(message.getMessage(),

@@ -119,7 +119,8 @@ public class DatabaseTests {
                 () -> serverFacade.logout(UUID.randomUUID().toString()),
                 () -> serverFacade.createGame(new TestCreateRequest("inaccessible"), UUID.randomUUID().toString()),
                 () -> serverFacade.listGames(UUID.randomUUID().toString()),
-                () -> serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, 1), UUID.randomUUID().toString())
+                () -> serverFacade.joinPlayer(new TestJoinRequest(ChessGame.TeamColor.WHITE, 1),
+                        UUID.randomUUID().toString())
         );
 
         try {

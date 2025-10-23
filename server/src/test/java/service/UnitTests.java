@@ -57,7 +57,8 @@ public class UnitTests {
         RegisterResult result = userService.register(request2); // second registration should fail
 
         assertFalse(result.isSuccess(), "Duplicate username should fail");
-        assertEquals("Bob", result.getUsername(), "Username field may still be returned or null depending on implementation");
+        assertEquals("Bob", result.getUsername(), "Username field may still be returned or null depending on " +
+                "implementation");
         assertNull(result.getAuthToken(), "No auth token should be returned on failure");
         assertTrue(result.getMessage().contains("already taken"), "Error message should indicate username conflict");
     }
@@ -147,7 +148,8 @@ public class UnitTests {
 
         // Assert
         assertTrue(logoutResult.isSuccess(), "Logout should succeed");
-        assertNull(sessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated"); // instance
+        assertNull(sessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated"); //
+        // instance
     }
 
     //tests for create game

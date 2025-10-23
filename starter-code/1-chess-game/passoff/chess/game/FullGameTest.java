@@ -93,8 +93,11 @@ public class FullGameTest {
         Assertions.assertTrue(game.isInCheck(ChessGame.TeamColor.BLACK), GameStatusTests.MISSING_BLACK_CHECK);
         Assertions.assertFalse(game.isInCheck(ChessGame.TeamColor.WHITE), GameStatusTests.INCORRECT_WHITE_CHECK);
         Assertions.assertTrue(game.isInCheckmate(ChessGame.TeamColor.BLACK), GameStatusTests.MISSING_BLACK_CHECKMATE);
-        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE), GameStatusTests.INCORRECT_WHITE_CHECKMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK), GameStatusTests.INCORRECT_BLACK_STALEMATE);
-        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE), GameStatusTests.INCORRECT_WHITE_STALEMATE);
+        Assertions.assertFalse(game.isInCheckmate(ChessGame.TeamColor.WHITE),
+                GameStatusTests.INCORRECT_WHITE_CHECKMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.BLACK),
+                GameStatusTests.INCORRECT_BLACK_STALEMATE);
+        Assertions.assertFalse(game.isInStalemate(ChessGame.TeamColor.WHITE),
+                GameStatusTests.INCORRECT_WHITE_STALEMATE);
     }
 }

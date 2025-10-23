@@ -61,7 +61,9 @@ public class MemoryDataAccess implements DataAccess {
     public boolean invalidateToken(String authToken) {
         for (Map.Entry<String, Set<String>> entry : authTokens.entrySet()) {
             if (entry.getValue().remove(authToken)) { // remove token from set
-                if (entry.getValue().isEmpty()) authTokens.remove(entry.getKey()); // cleanup empty set
+                if (entry.getValue().isEmpty()) {
+                    authTokens.remove(entry.getKey()); // cleanup empty set
+                }
                 return true;
             }
         }

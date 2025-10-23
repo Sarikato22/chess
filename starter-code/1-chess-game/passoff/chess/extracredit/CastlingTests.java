@@ -21,12 +21,16 @@ public class CastlingTests {
     private static final String INCORRECT_BOARD = "Wrong board after castle move made";
 
     private static final ChessPosition WHITE_KING_POSITION = new ChessPosition(1, 5);
-    private static final ChessMove WHITE_QUEENSIDE_CASTLE = new ChessMove(WHITE_KING_POSITION, new ChessPosition(1, 3), null);
-    private static final ChessMove WHITE_KINGSIDE_CASTLE = new ChessMove(WHITE_KING_POSITION, new ChessPosition(1, 7), null);
+    private static final ChessMove WHITE_QUEENSIDE_CASTLE = new ChessMove(WHITE_KING_POSITION, new ChessPosition(1,
+            3), null);
+    private static final ChessMove WHITE_KINGSIDE_CASTLE = new ChessMove(WHITE_KING_POSITION, new ChessPosition(1, 7)
+            , null);
 
     private static final ChessPosition BLACK_KING_POSITION = new ChessPosition(8, 5);
-    private static final ChessMove BLACK_QUEENSIDE_CASTLE = new ChessMove(BLACK_KING_POSITION, new ChessPosition(8, 3), null);
-    private static final ChessMove BLACK_KINGSIDE_CASTLE = new ChessMove(BLACK_KING_POSITION, new ChessPosition(8, 7), null);
+    private static final ChessMove BLACK_QUEENSIDE_CASTLE = new ChessMove(BLACK_KING_POSITION, new ChessPosition(8,
+            3), null);
+    private static final ChessMove BLACK_KINGSIDE_CASTLE = new ChessMove(BLACK_KING_POSITION, new ChessPosition(8, 7)
+            , null);
 
 
     @Test
@@ -320,7 +324,8 @@ public class CastlingTests {
      * </ul>
      */
     private void assertWhiteCanCastle(ChessGame game, boolean allowQueensideCastle, boolean allowKingsideCastle) {
-        assertCanCastle(game, allowQueensideCastle, allowKingsideCastle, WHITE_KING_POSITION, WHITE_QUEENSIDE_CASTLE, WHITE_KINGSIDE_CASTLE);
+        assertCanCastle(game, allowQueensideCastle, allowKingsideCastle, WHITE_KING_POSITION, WHITE_QUEENSIDE_CASTLE,
+                WHITE_KINGSIDE_CASTLE);
     }
 
     /**
@@ -333,11 +338,13 @@ public class CastlingTests {
      * </ul>
      */
     private void assertBlackCanCastle(ChessGame game, boolean allowKingsideCastle, boolean allowQueensideCastle) {
-        assertCanCastle(game, allowQueensideCastle, allowKingsideCastle, BLACK_KING_POSITION, BLACK_QUEENSIDE_CASTLE, BLACK_KINGSIDE_CASTLE);
+        assertCanCastle(game, allowQueensideCastle, allowKingsideCastle, BLACK_KING_POSITION, BLACK_QUEENSIDE_CASTLE,
+                BLACK_KINGSIDE_CASTLE);
     }
 
     private void assertCanCastle(ChessGame game, boolean allowQueensideCastle, boolean allowKingsideCastle,
-                                 ChessPosition kingPosition, ChessMove queensideCastleMove, ChessMove kingsideCastleMove) {
+                                 ChessPosition kingPosition, ChessMove queensideCastleMove,
+                                 ChessMove kingsideCastleMove) {
         Assertions.assertEquals(allowQueensideCastle,
                 game.validMoves(kingPosition).contains(queensideCastleMove),
                 allowQueensideCastle ? VALID_CASTLE_MISSING : INVALID_CASTLE_PRESENT);
