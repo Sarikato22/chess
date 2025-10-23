@@ -71,7 +71,7 @@ public class GameService {
             return JoinGameResult.failure("Error: unauthorized");
         }
 
-        if (playerColor == null || gameID <= 0) {
+        if (playerColor != ChessGame.TeamColor.WHITE && playerColor != ChessGame.TeamColor.BLACK || gameID <= 0 ) {
             return JoinGameResult.failure("Error: bad request");
         }
 

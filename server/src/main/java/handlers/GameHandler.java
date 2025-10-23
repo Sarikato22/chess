@@ -79,30 +79,40 @@ public class GameHandler {
     }
 
     // PUT /game
-    public void joinGame(Context ctx) throws Exception {
-        String authToken = ctx.header("authorization");
-        JoinGameRequest req;
+    public void joinGame(Context ctx) {
+        try {
+            String authToken = ctx.header("authorization");
 
-        req = ctx.bodyAsClass(JoinGameRequest.class);
-//        System.out.println("Parsed request: " + req.getPlayerColor() + ", " + req.getGameID());
-        JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
-
-
-
-        if (result.isSuccess()) {
-            ctx.status(200).result("");
-        } else {
-            String message = result.getMessage() == null ? "" : result.getMessage();
-            if (message.contains("unauthorized")) {
-                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
-            } else if (message.contains("already taken")) {
-                ctx.status(403).json(Map.of("message", "Error: already taken"));
-            } else if (message.contains("bad request")) {
+            JoinGameRequest req;
+            try {
+                req = ctx.bodyAsClass(JoinGameRequest.class);
+            } catch (Exception e) {
+                // JSON could not be parsed (e.g., invalid color)
                 ctx.status(400).json(Map.of("message", "Error: bad request"));
-            } else {
-                ctx.status(500).json(Map.of("message", "Error: " + message));
+                return;
             }
+
+            JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
+
+            if (result.isSuccess()) {
+                ctx.status(200).result("");
+            } else {
+                String message = result.getMessage() == null ? "" : result.getMessage();
+                if (message.contains("unauthorized")) {
+                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                } else if (message.contains("already taken")) {
+                    ctx.status(403).json(Map.of("message", "Error: already taken"));
+                } else if (message.contains("bad request")) {
+                    ctx.status(400).json(Map.of("message", "Error: bad request"));
+                } else {
+                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                }
+            }
+
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
 
 }
