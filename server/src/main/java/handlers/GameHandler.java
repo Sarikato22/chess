@@ -25,6 +25,7 @@ public class GameHandler {
         }
         try {
            GameListResult gameList =  gameService.listGames(authToken);
+
             if (gameList.isSuccess()){
                 ctx.status(200).json(Map.of("games", gameList.getGames()));
             } else {
@@ -81,15 +82,12 @@ public class GameHandler {
     public void joinGame(Context ctx) throws Exception {
         String authToken = ctx.header("authorization");
         JoinGameRequest req;
-        try {
-            req = ctx.bodyAsClass(JoinGameRequest.class);
-        } catch (Exception e) {
-            ctx.status(400).json(Map.of("message", "Error: bad request"));
-            return;
-        }
 
-        // Call service with proper parameters
+        req = ctx.bodyAsClass(JoinGameRequest.class);
+//        System.out.println("Parsed request: " + req.getPlayerColor() + ", " + req.getGameID());
         JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
+
+
 
         if (result.isSuccess()) {
             ctx.status(200).result("");
@@ -106,7 +104,5 @@ public class GameHandler {
             }
         }
     }
-
-
 
 }

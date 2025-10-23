@@ -62,6 +62,7 @@ public class ChessGame {
         BLACK
     }
 
+
     /**
      * Simulates whether the specified team would be in check after a move on a given board state.
      *

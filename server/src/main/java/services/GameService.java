@@ -61,7 +61,7 @@ public class GameService {
     }
 
     public JoinGameResult joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws Exception {
-        // 1. Auth check
+
         if (authToken == null || authToken.isEmpty()) {
             return JoinGameResult.failure("Error: unauthorized");
         }
@@ -71,7 +71,6 @@ public class GameService {
             return JoinGameResult.failure("Error: unauthorized");
         }
 
-        // 2. Input validation
         if (playerColor == null || gameID <= 0) {
             return JoinGameResult.failure("Error: bad request");
         }
@@ -81,13 +80,12 @@ public class GameService {
             return JoinGameResult.failure("Error: bad request");
         }
 
-        // 3. Check and assign color
-        if (playerColor.equals("WHITE")) {
+        if (playerColor == ChessGame.TeamColor.WHITE) {
             if (game.getWhiteUsername() != null) {
                 return JoinGameResult.failure("Error: already taken");
             }
             game.setWhiteUsername(username);
-        } else if (playerColor.equals("BLACK")) {
+        } else if (playerColor == ChessGame.TeamColor.BLACK) {
             if (game.getBlackUsername() != null) {
                 return JoinGameResult.failure("Error: already taken");
             }
@@ -96,10 +94,7 @@ public class GameService {
             return JoinGameResult.failure("Error: bad request");
         }
 
-        // 4. Save changes
         dataAccess.updateGame(game);
-
-        // 5. Success
         return JoinGameResult.success("Joined game successfully");
     }
 
