@@ -13,21 +13,10 @@ import java.util.Objects;
 public class ChessPiece {
     private ChessGame.TeamColor pieceColor;
     private PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-    }
-
-    /**
-     * The various different chess piece options
-     */
-    public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
     }
 
     /**
@@ -45,8 +34,11 @@ public class ChessPiece {
 
         return type;
     }
-    /** Helper method for pieceMoves method
-     * addSlidingMoves works with the pieces whose movements can go as far as possible like rook, bishop and queen **/
+
+    /**
+     * Helper method for pieceMoves method
+     * addSlidingMoves works with the pieces whose movements can go as far as possible like rook, bishop and queen
+     **/
     private void addSlidingMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions) {
         for (int[] dir : directions) {
             int row = from.getRow();
@@ -72,8 +64,9 @@ public class ChessPiece {
             }
         }
     }
-    private void addStepMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions){
-        for (int[] dir: directions) {
+
+    private void addStepMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves, int[][] directions) {
+        for (int[] dir : directions) {
             int row = from.getRow() + dir[0];
             int col = from.getColumn() + dir[1];
 
@@ -90,12 +83,14 @@ public class ChessPiece {
         }
 
     }
+
     private void addPromotions(Collection<ChessMove> moves, ChessPosition from, ChessPosition to) {
         moves.add(new ChessMove(from, to, ChessPiece.PieceType.QUEEN));
         moves.add(new ChessMove(from, to, ChessPiece.PieceType.ROOK));
         moves.add(new ChessMove(from, to, ChessPiece.PieceType.BISHOP));
         moves.add(new ChessMove(from, to, ChessPiece.PieceType.KNIGHT));
     }
+
     public void pawnMoves(ChessBoard board, ChessPosition from, Collection<ChessMove> moves) {
         int direction;
         int startRow;
@@ -133,7 +128,8 @@ public class ChessPiece {
             }
         }
     }
-    private void pawnCaptures(ChessBoard board, ChessPosition from, Collection<ChessMove> moves){
+
+    private void pawnCaptures(ChessBoard board, ChessPosition from, Collection<ChessMove> moves) {
         int direction;
         int startRow;
         int promotionRow;
@@ -152,17 +148,17 @@ public class ChessPiece {
         int row = from.getRow();
 
         //diagonal capture
-        int cols[] = {col-1, col+1};
+        int cols[] = {col - 1, col + 1};
         int diagonalRow = row + direction;
 
-        for(int i:cols){
+        for (int i : cols) {
             if (!board.inBounds(diagonalRow, i)) continue;
             ChessPosition to = new ChessPosition(diagonalRow, i);
             ChessPiece occupant = board.getPiece(to);
 
             //checking if they are the enemy
-            if(occupant!= null && occupant.getTeamColor() != this.getTeamColor()){
-                if (diagonalRow == promotionRow){
+            if (occupant != null && occupant.getTeamColor() != this.getTeamColor()) {
+                if (diagonalRow == promotionRow) {
                     addPromotions(moves, from, to);
                 } else {
                     moves.add(new ChessMove(from, to, null));
@@ -172,24 +168,24 @@ public class ChessPiece {
 
     }
 
-        /**
-         * Calculates all the positions a chess piece can move to
-         * Does not take into account moves that are illegal due to leaving the king in
-         * danger
-         *
-         * @return Collection of valid moves
-         */
+    /**
+     * Calculates all the positions a chess piece can move to
+     * Does not take into account moves that are illegal due to leaving the king in
+     * danger
+     *
+     * @return Collection of valid moves
+     */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new HashSet<>();
 
         switch (this.type) {
             case ROOK: {
-                int[][] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+                int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
                 addSlidingMoves(board, myPosition, moves, directions);
                 break;
             }
             case BISHOP: {
-                int[][] directions = { {1,1}, {1,-1}, {-1,1}, {-1,-1} };
+                int[][] directions = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 addSlidingMoves(board, myPosition, moves, directions);
                 break;
             }
@@ -202,14 +198,14 @@ public class ChessPiece {
                 int[][] directions = {
                         {-2, -1}, {-2, 1},
                         {-1, -2}, {-1, 2},
-                        {1, -2},  {1, 2},
-                        {2, -1},  {2, 1}
+                        {1, -2}, {1, 2},
+                        {2, -1}, {2, 1}
                 };
                 addStepMoves(board, myPosition, moves, directions);
                 break;
             }
             case KING: {
-                int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1,1}, {1,-1}, {-1,1}, {-1,-1}};
+                int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 addStepMoves(board, myPosition, moves, directions);
                 break;
             }
@@ -221,7 +217,6 @@ public class ChessPiece {
 
         return moves;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -246,5 +241,17 @@ public class ChessPiece {
                 "pieceColor=" + pieceColor +
                 ", type=" + type +
                 '}';
+    }
+
+    /**
+     * The various different chess piece options
+     */
+    public enum PieceType {
+        KING,
+        QUEEN,
+        BISHOP,
+        KNIGHT,
+        ROOK,
+        PAWN
     }
 }

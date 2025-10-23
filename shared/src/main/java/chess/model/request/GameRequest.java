@@ -4,7 +4,8 @@ public class GameRequest {
     private String gameName;
 
     // Required for JSON deserialization
-    public GameRequest() {}
+    public GameRequest() {
+    }
 
     public GameRequest(String gameName) {
         this.gameName = gameName;

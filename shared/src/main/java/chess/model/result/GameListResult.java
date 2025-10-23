@@ -23,24 +23,25 @@ public class GameListResult {
     public static GameListResult failure(String message) {
         return new GameListResult(false, message, null);
     }
+
     public boolean isSuccess() {
         return success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public List<GameData> getGames() {
-        return games;
     }
 
     public void setSuccess(boolean success) {
         this.success = success;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<GameData> getGames() {
+        return games;
     }
 
     public void setGames(List<GameData> games) {

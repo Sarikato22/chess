@@ -1,11 +1,11 @@
 package service;
 
 import chess.ChessGame;
+import chess.model.data.GameData;
 import chess.model.result.GameListResult;
+import chess.model.result.GameResult;
 import chess.model.result.JoinGameResult;
 import dataaccess.DataAccess;
-import chess.model.data.GameData;
-import chess.model.result.GameResult;
 
 import java.util.List;
 
@@ -57,7 +57,6 @@ public class GameService {
     }
 
 
-
     public JoinGameResult joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws Exception {
 
         if (authToken == null || authToken.isEmpty()) {
@@ -93,7 +92,6 @@ public class GameService {
 
         return JoinGameResult.success("Joined game successfully");
     }
-
 
 
 }//end of class

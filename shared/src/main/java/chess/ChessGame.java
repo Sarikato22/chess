@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -55,19 +54,10 @@ public class ChessGame {
     }
 
     /**
-     * Enum identifying the 2 possible teams in a chess game
-     */
-    public enum TeamColor {
-        WHITE,
-        BLACK
-    }
-
-
-    /**
      * Simulates whether the specified team would be in check after a move on a given board state.
      *
-     * @param board      the board state to check
-     * @param teamColor  the team to check for check
+     * @param board     the board state to check
+     * @param teamColor the team to check for check
      * @return true if the team would be in check
      */
     private boolean wouldBeInCheck(ChessBoard board, ChessGame.TeamColor teamColor) {
@@ -274,21 +264,21 @@ public class ChessGame {
     }
 
     /**
-     * Sets this game's chessboard with a given board
-     *
-     * @param board the new board to use
-     */
-    public void setBoard(ChessBoard board) {
-        this.board = board;
-    }
-
-    /**
      * Gets the current chessboard
      *
      * @return the chessboard
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    /**
+     * Sets this game's chessboard with a given board
+     *
+     * @param board the new board to use
+     */
+    public void setBoard(ChessBoard board) {
+        this.board = board;
     }
 
     @Override
@@ -313,5 +303,13 @@ public class ChessGame {
         return "ChessGame{" +
                 "teamTurn=" + teamTurn +
                 '}';
+    }
+
+    /**
+     * Enum identifying the 2 possible teams in a chess game
+     */
+    public enum TeamColor {
+        WHITE,
+        BLACK
     }
 }

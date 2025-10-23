@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.DataAccess;
 import chess.model.result.ClearResult;
+import dataaccess.DataAccess;
 
 public class ClearService {
 

@@ -1,16 +1,15 @@
 package handlers;
 
+import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
 import chess.model.result.GameListResult;
+import chess.model.result.GameResult;
 import chess.model.result.JoinGameResult;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
-import java.util.Map;
-import com.google.gson.Gson;
-
-import chess.model.request.GameRequest;
-import chess.model.result.GameResult;
 import service.GameService;
+
+import java.util.Map;
 
 public class GameHandler {
     private final GameService gameService;
@@ -36,21 +35,20 @@ public class GameHandler {
             System.out.println("[DEBUG] JSON sent to test:");
             System.out.println(json);
 
-            if (gameList.isSuccess()){
+            if (gameList.isSuccess()) {
                 ctx.status(200).json(Map.of("games", gameList.getGames()));
             } else {
                 String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";
-                if (message.contains ("unauthorized")) {
+                if (message.contains("unauthorized")) {
                     ctx.status(401).json(Map.of("message", "Error: unauthorized"));
                 } else {
                     ctx.status(500).json(Map.of("message", "Error: " + message));
                 }
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
             ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
         }
     }
-
 
 
     // POST /game
@@ -59,7 +57,7 @@ public class GameHandler {
         GameRequest request;
 
         try {
-           request = ctx.bodyAsClass(GameRequest.class);
+            request = ctx.bodyAsClass(GameRequest.class);
         } catch (Exception e) {
             ctx.status(400).json(Map.of("message", "Error: bad request"));
             return;

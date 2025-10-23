@@ -1,8 +1,9 @@
 package handlers;
 
+import chess.model.result.ClearResult;
 import io.javalin.http.Context;
 import service.ClearService;
-import chess.model.result.ClearResult;
+
 import java.util.Map;
 
 public class AdminHandler {

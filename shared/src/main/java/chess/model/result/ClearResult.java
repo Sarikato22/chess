@@ -4,7 +4,8 @@ public class ClearResult {
     private boolean success;
     private String message;
 
-    public ClearResult() {}
+    public ClearResult() {
+    }
 
     public ClearResult(boolean success, String message) {
         this.success = success;

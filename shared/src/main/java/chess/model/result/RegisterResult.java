@@ -6,7 +6,8 @@ public class RegisterResult {
     private String authToken;
     private String message;
 
-    public RegisterResult() {} // required for JSON parsing
+    public RegisterResult() {
+    } // required for JSON parsing
 
     // Success constructor
     public RegisterResult(String username, String authToken) {
@@ -27,13 +28,35 @@ public class RegisterResult {
     }
 
     // Getters and setters
-    public boolean isSuccess() { return success; }
-    public String getUsername() { return username; }
-    public String getAuthToken() { return authToken; }
-    public String getMessage() { return message; }
+    public boolean isSuccess() {
+        return success;
+    }
 
-    public void setSuccess(boolean success) { this.success = success; }
-    public void setUsername(String username) { this.username = username; }
-    public void setAuthToken(String authToken) { this.authToken = authToken; }
-    public void setMessage(String message) { this.message = message; }
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

@@ -16,6 +16,7 @@ public class GameData {
         this.blackUsername = blackUsername;
 
     }
+
     @SerializedName("gameID")
     public int getGameId() {
         return gameID;
@@ -25,10 +26,20 @@ public class GameData {
         return gameName;
     }
 
-    public String getWhiteUsername() { return whiteUsername; }
-    public void setWhiteUsername(String whiteUsername) { this.whiteUsername = whiteUsername; }
+    public String getWhiteUsername() {
+        return whiteUsername;
+    }
 
-    public String getBlackUsername() { return blackUsername; }
-    public void setBlackUsername(String blackUsername) { this.blackUsername = blackUsername; }
+    public void setWhiteUsername(String whiteUsername) {
+        this.whiteUsername = whiteUsername;
+    }
+
+    public String getBlackUsername() {
+        return blackUsername;
+    }
+
+    public void setBlackUsername(String blackUsername) {
+        this.blackUsername = blackUsername;
+    }
 
 }

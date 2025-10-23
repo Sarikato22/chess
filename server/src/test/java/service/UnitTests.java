@@ -3,16 +3,15 @@ package service;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
-import chess.ChessGame.TeamColor;
-import chess.model.request.SessionRequest;
 import dataaccess.MemoryDataAccess;
-import org.junit.jupiter.api.*;
-
-import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,6 +20,8 @@ public class UnitTests {
     private UserService userService;
     private SessionService sessionService;
     private GameService gameService;
+    //Tests for clear:
+    private ClearService clearService;
 
     @BeforeEach
     public void setup() {
@@ -60,62 +61,62 @@ public class UnitTests {
         assertNull(result.getAuthToken(), "No auth token should be returned on failure");
         assertTrue(result.getMessage().contains("already taken"), "Error message should indicate username conflict");
     }
-        //Missing Username, should fail
-        @Test
-        void testRegisterMissingUsername() {
-            RegisterRequest request = new RegisterRequest(null, "pass", "email@example.com");
-            RegisterResult result = userService.register(request);
 
-            assertFalse(result.isSuccess(), "Missing username should fail");
-            assertTrue(result.getMessage().toLowerCase().contains("username"));
-        }
-        //Missing password, should fail
-        @Test
-        void testRegisterMissingPassword() {
-            RegisterRequest request = new RegisterRequest("Charlie", null, "email@example.com");
-            RegisterResult result = userService.register(request);
+    //Missing Username, should fail
+    @Test
+    void testRegisterMissingUsername() {
+        RegisterRequest request = new RegisterRequest(null, "pass", "email@example.com");
+        RegisterResult result = userService.register(request);
 
-            assertFalse(result.isSuccess(), "Missing password should fail");
-            assertTrue(result.getMessage().toLowerCase().contains("password"));
-        }
+        assertFalse(result.isSuccess(), "Missing username should fail");
+        assertTrue(result.getMessage().toLowerCase().contains("username"));
+    }
 
-        //Tests for clear:
-        private ClearService clearService;
+    //Missing password, should fail
+    @Test
+    void testRegisterMissingPassword() {
+        RegisterRequest request = new RegisterRequest("Charlie", null, "email@example.com");
+        RegisterResult result = userService.register(request);
 
-        @Test
-        @DisplayName("Clear database successfully removes all users")
-        public void testClearSuccess() {
-            RegisterRequest request = new RegisterRequest("Diana", "secret", "diana@email.com");
-            RegisterResult result = userService.register(request);
-            assertTrue(result.isSuccess(), "Registration should succeed before clear");
+        assertFalse(result.isSuccess(), "Missing password should fail");
+        assertTrue(result.getMessage().toLowerCase().contains("password"));
+    }
 
-            clearService.clear();
+    @Test
+    @DisplayName("Clear database successfully removes all users")
+    public void testClearSuccess() {
+        RegisterRequest request = new RegisterRequest("Diana", "secret", "diana@email.com");
+        RegisterResult result = userService.register(request);
+        assertTrue(result.isSuccess(), "Registration should succeed before clear");
 
-            RegisterResult resultAfterClear = userService.register(request);
-            assertTrue(resultAfterClear.isSuccess(), "After clear, registration should succeed again");
-        }
-        @Test
-        @DisplayName("Clear on empty database should not throw")
-        public void testClearEmptyDatabase() {
-            assertDoesNotThrow(() -> clearService.clear(), "Clearing an empty database should not throw an exception");
-        }
+        clearService.clear();
 
-        //Session tests:
-        @Test
-        @DisplayName("Login success with valid credentials")
-        void testLoginSuccess() {
-            RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
-            userService.register(register);
+        RegisterResult resultAfterClear = userService.register(request);
+        assertTrue(resultAfterClear.isSuccess(), "After clear, registration should succeed again");
+    }
 
-            // Act: attempt to login
-            SessionRequest login = new SessionRequest("Alice", "password123");
-            SessionResult result = sessionService.login(login); // use instance, not static
+    @Test
+    @DisplayName("Clear on empty database should not throw")
+    public void testClearEmptyDatabase() {
+        assertDoesNotThrow(() -> clearService.clear(), "Clearing an empty database should not throw an exception");
+    }
 
-            // Assert
-            assertTrue(result.isSuccess(), "Login should succeed with correct credentials");
-            assertEquals("Alice", result.getUsername());
-            assertNotNull(result.getAuthToken(), "Auth token should be returned on successful login");
-        }
+    //Session tests:
+    @Test
+    @DisplayName("Login success with valid credentials")
+    void testLoginSuccess() {
+        RegisterRequest register = new RegisterRequest("Alice", "password123", "alice@email.com");
+        userService.register(register);
+
+        // Act: attempt to login
+        SessionRequest login = new SessionRequest("Alice", "password123");
+        SessionResult result = sessionService.login(login); // use instance, not static
+
+        // Assert
+        assertTrue(result.isSuccess(), "Login should succeed with correct credentials");
+        assertEquals("Alice", result.getUsername());
+        assertNotNull(result.getAuthToken(), "Auth token should be returned on successful login");
+    }
 
     @Test
     @DisplayName("Login fails with wrong password")
@@ -148,6 +149,7 @@ public class UnitTests {
         assertTrue(logoutResult.isSuccess(), "Logout should succeed");
         assertNull(sessionService.getUserByToken(loginResult.getAuthToken()), "Auth token should be invalidated"); // instance
     }
+
     //tests for create game
     @Test
     @DisplayName("Create game succeeds with valid auth token and name")
@@ -198,6 +200,7 @@ public class UnitTests {
         assertFalse(result.isSuccess(), "Should fail with missing game name");
         assertTrue(result.getMessage().toLowerCase().contains("bad request"));
     }
+
     // list games tests
     @Test
     @DisplayName("List games succeeds with valid auth")
@@ -260,9 +263,6 @@ public class UnitTests {
         assertNull(game.getWhiteUsername());
         assertNull(game.getBlackUsername());
     }
-
-
-
 
 
 }//end of class

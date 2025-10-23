@@ -25,7 +25,8 @@ public class SessionHandler {
             try {
                 Map<String, String> body = ctx.bodyAsClass(Map.class);
                 authToken = body.get("authToken");
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         if (authToken == null || authToken.isEmpty()) {
@@ -44,35 +45,35 @@ public class SessionHandler {
 
 
     public void login(Context ctx) {
-            SessionRequest sessionRequest;
+        SessionRequest sessionRequest;
 
-            try {
-                sessionRequest = ctx.bodyAsClass(SessionRequest.class);
-            } catch (Exception e) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
-                return;
-            }
+        try {
+            sessionRequest = ctx.bodyAsClass(SessionRequest.class);
+        } catch (Exception e) {
+            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            return;
+        }
 
-            try {
-                SessionResult sessionResult = sessionService.login(sessionRequest);
+        try {
+            SessionResult sessionResult = sessionService.login(sessionRequest);
 
-                if (sessionResult.isSuccess()) {
-                    ctx.status(200).json(Map.of(
-                            "username", sessionResult.getUsername(),
-                            "authToken", sessionResult.getAuthToken()
-                    ));
-                } else {
-                    // Failure
-                    String message = sessionResult.getMessage() != null ? sessionResult.getMessage() : "Error: Bad request";
+            if (sessionResult.isSuccess()) {
+                ctx.status(200).json(Map.of(
+                        "username", sessionResult.getUsername(),
+                        "authToken", sessionResult.getAuthToken()
+                ));
+            } else {
+                // Failure
+                String message = sessionResult.getMessage() != null ? sessionResult.getMessage() : "Error: Bad request";
 
-                    if (message.contains("Invalid")) {
-                        ctx.status(401).json(Map.of("message", "Error: unauthorized"));
-                    } else if (message.contains("Bad request") || (message.contains("required"))) {
-                        ctx.status(400).json(Map.of("message", "Error: bad request"));
-                    }
+                if (message.contains("Invalid")) {
+                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                } else if (message.contains("Bad request") || (message.contains("required"))) {
+                    ctx.status(400).json(Map.of("message", "Error: bad request"));
                 }
-            } catch (Exception e) {
-                ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
             }
+        } catch (Exception e) {
+            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+        }
     }//end of method
 } //end of class

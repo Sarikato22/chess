@@ -12,8 +12,9 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-        
+
     }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -21,7 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow() -1 ][position.getColumn() -1] = piece;
+        board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -32,7 +33,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()- 1][position.getColumn()- 1];
+        return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -41,21 +42,21 @@ public class ChessBoard {
      */
     public void resetBoard() {
         //clearing board
-        for(int row = 0; row < 8; row++) {
-            for(int col = 0; col < 8; col ++) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
                 this.board[row][col] = null;
             }
         }
 
         //setting pawns, indexes are different because addPiece accounts for it:
-        for(int col = 1; col <= 8; col++){
-            addPiece(new ChessPosition(2,col),new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-            addPiece(new ChessPosition(7,col),new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        for (int col = 1; col <= 8; col++) {
+            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
 
         //setting other pieces
         ChessPiece.PieceType[] backRow =
-                {       ChessPiece.PieceType.ROOK,
+                {ChessPiece.PieceType.ROOK,
                         ChessPiece.PieceType.KNIGHT,
                         ChessPiece.PieceType.BISHOP,
                         ChessPiece.PieceType.QUEEN,
@@ -65,9 +66,9 @@ public class ChessBoard {
                         ChessPiece.PieceType.ROOK
 
                 };
-        for (int col=1; col <=8; col++){
-            addPiece(new ChessPosition(1,col),new ChessPiece(ChessGame.TeamColor.WHITE, backRow[col-1]));
-            addPiece(new ChessPosition(8,col),new ChessPiece(ChessGame.TeamColor.BLACK, backRow[col-1]));
+        for (int col = 1; col <= 8; col++) {
+            addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, backRow[col - 1]));
+            addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, backRow[col - 1]));
         }
     }//end of reset board
 
@@ -94,6 +95,7 @@ public class ChessBoard {
                 "board=" + Arrays.deepToString(board) +
                 '}';
     }
+
     public boolean inBounds(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }

@@ -9,14 +9,19 @@ public class JoinGameResult {
         this.message = message;
     }
 
-    public boolean isSuccess() { return success; }
-    public String getMessage() { return message; }
-
     public static JoinGameResult success(String message) {
         return new JoinGameResult(true, message);
     }
 
     public static JoinGameResult failure(String message) {
         return new JoinGameResult(false, message);
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

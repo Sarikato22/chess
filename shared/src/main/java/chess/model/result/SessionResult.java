@@ -23,6 +23,14 @@ public class SessionResult {
         this.message = message;
     }
 
+    // Internal constructor used by factory success
+    private SessionResult(boolean success, String username, String authToken, String message) {
+        this.success = success;
+        this.username = username;
+        this.authToken = authToken;
+        this.message = message;
+    }
+
     // Factory method for failure
     public static SessionResult failure(String message) {
         return new SessionResult(message);
@@ -31,14 +39,6 @@ public class SessionResult {
     // Factory method for success (optional)
     public static SessionResult success(String message) {
         return new SessionResult(true, null, null, message);
-    }
-
-    // Internal constructor used by factory success
-    private SessionResult(boolean success, String username, String authToken, String message) {
-        this.success = success;
-        this.username = username;
-        this.authToken = authToken;
-        this.message = message;
     }
 
     public boolean isSuccess() {

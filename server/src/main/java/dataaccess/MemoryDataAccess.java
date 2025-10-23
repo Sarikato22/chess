@@ -1,6 +1,5 @@
 package dataaccess;
 
-import chess.ChessGame;
 import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
@@ -78,13 +77,13 @@ public class MemoryDataAccess implements DataAccess {
                 .orElse(null);
     }
 
-        @Override
-        public GameData createGame(GameData game) throws DataAccessException {
-            int id = nextGameId++;
-            GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
-            games.put(id, newGame);
-            return newGame;
-        }
+    @Override
+    public GameData createGame(GameData game) throws DataAccessException {
+        int id = nextGameId++;
+        GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
+        games.put(id, newGame);
+        return newGame;
+    }
 
 
     @Override
@@ -119,7 +118,6 @@ public class MemoryDataAccess implements DataAccess {
 
         games.put(game.getGameId(), game);
     }
-
 
 
 }

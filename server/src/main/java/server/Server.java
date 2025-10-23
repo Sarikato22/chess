@@ -2,12 +2,11 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
-import handlers.SessionHandler;
-import io.javalin.Javalin;
-import handlers.UserHandler;
-import handlers.GameHandler;
 import handlers.AdminHandler;
-
+import handlers.GameHandler;
+import handlers.SessionHandler;
+import handlers.UserHandler;
+import io.javalin.Javalin;
 import service.ClearService;
 import service.GameService;
 import service.SessionService;
@@ -24,7 +23,7 @@ public class Server {
         AdminHandler adminHandler = new AdminHandler(clearService);
         UserHandler userHandler = new UserHandler(userService);
         //
-        SessionService sessionService  = new SessionService(dao);
+        SessionService sessionService = new SessionService(dao);
         SessionHandler sessionHandler = new SessionHandler(sessionService);
         //
         GameService gameService = new GameService(dao);
@@ -46,6 +45,11 @@ public class Server {
 
     }
 
+    public static void main(String[] args) {
+        var server = new Server();
+        server.run(8080);
+        System.out.println("Server running on port 8080");
+    }
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
@@ -54,12 +58,6 @@ public class Server {
 
     public void stop() {
         javalin.stop();
-    }
-
-    public static void main(String[] args) {
-        var server = new Server();
-        server.run(8080);
-        System.out.println("Server running on port 8080");
     }
 }
 

@@ -30,6 +30,7 @@ public class GameResult {
     public String getMessage() {
         return message;
     }
+
     @SerializedName("gameID")
     public Integer getGameID() {
         return gameID;

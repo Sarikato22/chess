@@ -2,8 +2,9 @@ package handlers;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;
-import service.UserService;
 import io.javalin.http.Context;
+import service.UserService;
+
 import java.util.Map;
 
 public class UserHandler {
