@@ -11,7 +11,7 @@ import java.util.*;
 public class MemoryDataAccess implements DataAccess {
 
     private final Map<String, String> users = new HashMap<>();
-    private final Map<String, Set<String>> authTokens = new HashMap<>();
+    private final Map<String, String> authTokens = new HashMap<>();
     private final Map<Integer, GameData> games = new HashMap<>();
     private int nextGameId = 1;
 
@@ -30,7 +30,7 @@ public class MemoryDataAccess implements DataAccess {
         users.put(username, password);
 
         String token = UUID.randomUUID().toString();
-        authTokens.computeIfAbsent(username, k -> new HashSet<>()).add(token);
+        authTokens.put(token, username);
 
         return new RegisterResult(username, token);
     }
@@ -52,31 +52,25 @@ public class MemoryDataAccess implements DataAccess {
         }
 
         String token = UUID.randomUUID().toString();
-        authTokens.computeIfAbsent(username, k -> new HashSet<>()).add(token);
+        authTokens.put(token, username);
         System.out.println("Generated token for " + username + ": " + token);
 
         return new SessionResult(username, token);
+
     }
 
     public boolean invalidateToken(String authToken) {
-        for (Map.Entry<String, Set<String>> entry : authTokens.entrySet()) {
-            if (entry.getValue().remove(authToken)) { // remove token from set
-                if (entry.getValue().isEmpty()) {
-                    authTokens.remove(entry.getKey()); // cleanup empty set
-                }
-                return true;
-            }
+
+        if (authTokens.containsKey(authToken) == false) {
+            return false;
         }
-        return false;
+        authTokens.remove(authToken);
+        return true;
     }
 
     @Override
     public String getUsernameByToken(String token) {
-        return authTokens.entrySet().stream()
-                .filter(e -> e.getValue().contains(token))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
+        return authTokens.get(token);
     }
 
     @Override

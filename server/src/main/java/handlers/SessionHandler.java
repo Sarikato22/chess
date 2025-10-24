@@ -21,13 +21,13 @@ public class SessionHandler {
         String authToken = ctx.header("authorization");
 
         // Fallback to body JSON
-        if (authToken == null || authToken.isEmpty()) {
-            try {
-                Map<String, String> body = ctx.bodyAsClass(Map.class);
-                authToken = body.get("authToken");
-            } catch (Exception ignored) {
-            }
-        }
+//        if (authToken == null || authToken.isEmpty()) {
+//            try {
+//                Map<String, String> body = ctx.bodyAsClass(Map.class);
+//                authToken = body.get("authToken");
+//            } catch (Exception ignored) {
+//            }
+//        }
 
         if (authToken == null || authToken.isEmpty()) {
             ctx.status(401).json(Map.of("message", "Error: unauthorized"));

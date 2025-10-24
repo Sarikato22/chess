@@ -25,17 +25,19 @@ public class GameHandler {
     public void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
         if (authToken == null || authToken.isEmpty()) {
-            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            ctx.status(401).json(Map.of("message", "Error: bad request"));
             return;
         }
         try {
             GameListResult gameList = gameService.listGames(authToken);
 
             // Peek at JSON
-            Gson gson = new Gson();
-            String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
+//            Gson gson = new Gson();
+//            String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
 
             if (gameList.isSuccess()) {
+                Gson gson = new Gson();
+                String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
                 ctx.status(200).json(json);
             } else {
                 String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";

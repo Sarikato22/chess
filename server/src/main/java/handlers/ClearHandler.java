@@ -6,6 +6,8 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import service.ClearService;
 
+import java.util.Map;
+
 public class ClearHandler implements Handler {
 
     private final ClearService clearService;
@@ -17,6 +19,13 @@ public class ClearHandler implements Handler {
     @Override
     public void handle(Context ctx) {
         try {
+            String authToken = ctx.header("authorization");
+
+            if (authToken == null || authToken.isEmpty()) {
+                ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                return;
+            }
+
             ClearResult result = clearService.clear();
 
             if (result.isSuccess()) {
@@ -29,4 +38,6 @@ public class ClearHandler implements Handler {
             ctx.status(500).json(new ClearResult(false, "Error: " + e.getMessage()));
         }
     }
+
 }
+
