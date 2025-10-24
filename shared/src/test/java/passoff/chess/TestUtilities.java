@@ -9,14 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 public class TestUtilities {
-    private static final Map<Character, ChessPiece.PieceType> CHAR_TO_TYPE_MAP = Map.of(
-            'p', ChessPiece.PieceType.PAWN,
-            'n', ChessPiece.PieceType.KNIGHT,
-            'r', ChessPiece.PieceType.ROOK,
-            'q', ChessPiece.PieceType.QUEEN,
-            'k', ChessPiece.PieceType.KING,
-            'b', ChessPiece.PieceType.BISHOP);
-
     public static void validateMoves(String boardText, ChessPosition startPosition, int[][] endPositions) {
         var board = loadBoard(boardText);
         var testPiece = board.getPiece(startPosition);
@@ -39,6 +31,15 @@ public class TestUtilities {
 
         Assertions.assertEquals(expected, actual, "Wrong moves");
     }
+
+
+    private static final Map<Character, ChessPiece.PieceType> CHAR_TO_TYPE_MAP = Map.of(
+            'p', ChessPiece.PieceType.PAWN,
+            'n', ChessPiece.PieceType.KNIGHT,
+            'r', ChessPiece.PieceType.ROOK,
+            'q', ChessPiece.PieceType.QUEEN,
+            'k', ChessPiece.PieceType.KING,
+            'b', ChessPiece.PieceType.BISHOP);
 
     public static ChessBoard loadBoard(String boardText) {
         var board = new ChessBoard();
@@ -83,7 +84,8 @@ public class TestUtilities {
     public static List<ChessMove> loadMoves(ChessPosition startPosition, int[][] endPositions) {
         var validMoves = new ArrayList<ChessMove>();
         for (var endPosition : endPositions) {
-            validMoves.add(new ChessMoveBuilder().setStartPosition(startPosition).setEndPosition(new ChessPosition(endPosition[0], endPosition[1])).setPromotionPiece(null).createChessMove());
+            validMoves.add(new ChessMove(startPosition,
+                    new ChessPosition(endPosition[0], endPosition[1]), null));
         }
         return validMoves;
     }
