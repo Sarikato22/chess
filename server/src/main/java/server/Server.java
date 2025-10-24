@@ -2,11 +2,8 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
-import server.handlers.AdminHandler;
-import server.handlers.GameHandler;
-import server.handlers.SessionHandler;
-import server.handlers.UserHandler;
 import io.javalin.Javalin;
+import server.handlers.*;
 import service.ClearService;
 import service.GameService;
 import service.SessionService;
