@@ -10,48 +10,43 @@ import com.google.gson.Gson;
 import io.javalin.http.Context;
 import service.GameService;
 
-import java.util.List;
 import java.util.Map;
 
 public class GameHandler {
+
     private final GameService gameService;
+    private final Gson gson; // Gson serializer
 
     public GameHandler(GameService gameService) {
         this.gameService = gameService;
+        this.gson = new Gson(); // initialize Gson
     }
 
     // GET /game
-
     public void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
         if (authToken == null || authToken.isEmpty()) {
-            ctx.status(401).json(Map.of("message", "Error: bad request"));
+            ctx.status(401).result(gson.toJson(Map.of("message", "Error: bad request")));
             return;
         }
+
         try {
             GameListResult gameList = gameService.listGames(authToken);
 
-            // Peek at JSON
-//            Gson gson = new Gson();
-//            String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
-
             if (gameList.isSuccess()) {
-                Gson gson = new Gson();
-                String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
-                ctx.status(200).json(json);
+                ctx.status(200).result(gson.toJson(Map.of("games", gameList.getGames())));
             } else {
                 String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";
                 if (message.contains("unauthorized")) {
-                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
                 } else {
-                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + message)));
                 }
             }
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
         }
     }
-
 
     // POST /game
     public void createGame(Context ctx) {
@@ -59,9 +54,9 @@ public class GameHandler {
         GameRequest request;
 
         try {
-            request = ctx.bodyAsClass(GameRequest.class);
+            request = gson.fromJson(ctx.body(), GameRequest.class);
         } catch (Exception e) {
-            ctx.status(400).json(Map.of("message", "Error: bad request"));
+            ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
             return;
         }
 
@@ -69,60 +64,54 @@ public class GameHandler {
             GameResult result = gameService.createGame(authToken, request.getGameName());
 
             if (result.isSuccess()) {
-                // Success
-                ctx.status(200).json(Map.of("gameID", result.getGameID()));
-
+                ctx.status(200).result(gson.toJson(Map.of("gameID", result.getGameID())));
             } else {
-                // Failure
                 String message = result.getMessage() != null ? result.getMessage() : "Internal error";
 
                 if (message.contains("unauthorized")) {
-                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
                 } else if (message.contains("bad request")) {
-                    ctx.status(400).json(Map.of("message", "Error: bad request"));
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
                 } else {
-                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + message)));
                 }
             }
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
         }
     }
 
     // PUT /game
     public void joinGame(Context ctx) {
+        String authToken = ctx.header("authorization");
+        JoinGameRequest req;
+
         try {
-            String authToken = ctx.header("authorization");
+            req = gson.fromJson(ctx.body(), JoinGameRequest.class);
+        } catch (Exception e) {
+            ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
+            return;
+        }
 
-            JoinGameRequest req;
-            try {
-                req = ctx.bodyAsClass(JoinGameRequest.class);
-            } catch (Exception e) {
-                ctx.status(400).json(Map.of("message", "Error: bad request"));
-                return;
-            }
-
+        try {
             JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
 
             if (result.isSuccess()) {
-                ctx.status(200).result("");
+                ctx.status(200).result(""); // empty response
             } else {
-                String message = result.getMessage() == null ? "" : result.getMessage();
+                String message = result.getMessage() != null ? result.getMessage() : "";
                 if (message.contains("unauthorized")) {
-                    ctx.status(401).json(Map.of("message", "Error: unauthorized"));
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
                 } else if (message.contains("already taken")) {
-                    ctx.status(403).json(Map.of("message", "Error: already taken"));
+                    ctx.status(403).result(gson.toJson(Map.of("message", "Error: already taken")));
                 } else if (message.contains("bad request")) {
-                    ctx.status(400).json(Map.of("message", "Error: bad request"));
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
                 } else {
-                    ctx.status(500).json(Map.of("message", "Error: " + message));
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + message)));
                 }
             }
-
         } catch (Exception e) {
-            ctx.status(500).json(Map.of("message", "Error: " + e.getMessage()));
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
         }
     }
-
-
 }

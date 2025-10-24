@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +205,7 @@
       <workItem from="1761099239140" duration="3826000" />
       <workItem from="1761150790920" duration="8643000" />
       <workItem from="1761169999525" duration="21203000" />
-      <workItem from="1761277602215" duration="808000" />
+      <workItem from="1761277602215" duration="1421000" />
     </task>
     <servers />
   </component>
@@ -230,7 +231,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java</url>
-          <line>58</line>
+          <line>51</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -240,7 +241,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/server/handlers/GameHandler.java</url>
-          <line>34</line>
+          <line>36</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
