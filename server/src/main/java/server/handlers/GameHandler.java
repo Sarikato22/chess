@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;

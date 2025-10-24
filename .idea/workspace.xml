@@ -6,10 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MemoryDataAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/ClearHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/ClearHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/AdminHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/AdminHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/ClearHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/ClearHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/GameHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/handlers/UserHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/UserHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/server/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/Server.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -232,7 +234,7 @@
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server/src/main/java/handlers/SessionHandler.java</url>
+          <url>file://$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java</url>
           <line>58</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
@@ -242,7 +244,7 @@
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/server/src/main/java/handlers/GameHandler.java</url>
+          <url>file://$PROJECT_DIR$/server/src/main/java/server/handlers/GameHandler.java</url>
           <line>34</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>

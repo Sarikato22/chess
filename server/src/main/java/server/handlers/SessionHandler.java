@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;

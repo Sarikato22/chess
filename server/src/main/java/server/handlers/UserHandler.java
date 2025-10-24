@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;

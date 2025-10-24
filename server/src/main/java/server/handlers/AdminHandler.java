@@ -1,4 +1,4 @@
-package handlers;
+package server.handlers;
 
 import chess.model.result.ClearResult;
 import io.javalin.http.Context;
