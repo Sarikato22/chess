@@ -1,5 +1,6 @@
 package handlers;
 
+import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
 import chess.model.result.GameListResult;
@@ -9,6 +10,7 @@ import com.google.gson.Gson;
 import io.javalin.http.Context;
 import service.GameService;
 
+import java.util.List;
 import java.util.Map;
 
 public class GameHandler {
@@ -31,12 +33,10 @@ public class GameHandler {
 
             // Peek at JSON
             Gson gson = new Gson();
-            String json = gson.toJson(gameList.getGames());  // serialize the games list
-            System.out.println("[DEBUG] JSON sent to test:");
-            System.out.println(json);
+            String json = gson.toJson(Map.of("games",gameList.getGames()));  // serialize the games list
 
             if (gameList.isSuccess()) {
-                ctx.status(200).json(Map.of("games", gameList.getGames()));
+                ctx.status(200).json(json);
             } else {
                 String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";
                 if (message.contains("unauthorized")) {

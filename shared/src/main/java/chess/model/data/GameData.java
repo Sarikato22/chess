@@ -1,15 +1,14 @@
 package chess.model.data;
 
-import com.google.gson.annotations.SerializedName;
 
 public class GameData {
-    @SerializedName("gameID")
-    private final int gameID;
+
+    private final Integer gameID;
     private final String gameName;
     private String whiteUsername;
     private String blackUsername;
 
-    public GameData(int gameID, String gameName, String whiteUsername, String blackUsername) {
+    public GameData(Integer gameID, String gameName, String whiteUsername, String blackUsername) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;
@@ -17,8 +16,7 @@ public class GameData {
 
     }
 
-    @SerializedName("gameID")
-    public int getGameId() {
+    public Integer getGameId() {
         return gameID;
     }
 

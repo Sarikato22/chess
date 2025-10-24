@@ -1,6 +1,5 @@
 package chess.model.result;
 
-import com.google.gson.annotations.SerializedName;
 
 public class GameResult {
     private boolean success;
@@ -31,7 +30,6 @@ public class GameResult {
         return message;
     }
 
-    @SerializedName("gameID")
     public Integer getGameID() {
         return gameID;
     }
