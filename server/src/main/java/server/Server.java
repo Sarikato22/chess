@@ -45,11 +45,7 @@ public class Server {
 
     }
 
-    public static void main(String[] args) {
-        var server = new Server();
-        server.run(8080);
-        System.out.println("Server running on port 8080");
-    }
+
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);
