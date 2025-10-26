@@ -21,7 +21,6 @@ public class SessionHandler {
     public void logout(Context ctx) {
         // Try header first
         String authToken = ctx.header("authorization");
-
         if (authToken == null || authToken.isEmpty()) {
             ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
             return;
