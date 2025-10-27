@@ -117,9 +117,11 @@ public class MySqlDataAccess implements DataAccess{
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
 
+            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 0;");
             for (String table : tables) {
                 stmt.executeUpdate("TRUNCATE TABLE " + table + ";");
             }
+            stmt.executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
         } catch (DataAccessException | SQLException ex) {
             throw new RuntimeException("Failed to initialize MySQL DataAccess", ex);
         }

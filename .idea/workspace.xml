@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +76,7 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.DatabaseTests">
+  <component name="RunManager" selected="JUnit.UnitTests (1)">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="server" />
@@ -161,8 +159,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.DatabaseTests" />
         <item itemvalue="JUnit.UnitTests (1)" />
+        <item itemvalue="JUnit.DatabaseTests" />
         <item itemvalue="JUnit.UnitTests.testRegisterUser_DuplicateUsername" />
         <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.DatabaseTests.bcrypt" />
@@ -212,7 +210,7 @@
       <workItem from="1761169999525" duration="21203000" />
       <workItem from="1761277602215" duration="1673000" />
       <workItem from="1761445058006" duration="2641000" />
-      <workItem from="1761596760895" duration="9315000" />
+      <workItem from="1761596760895" duration="9618000" />
     </task>
     <servers />
   </component>
