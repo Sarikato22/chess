@@ -1,7 +1,9 @@
 package server;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import io.javalin.Javalin;
 import server.handlers.*;
 import service.ClearService;
@@ -14,7 +16,7 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        DataAccess dao = new MemoryDataAccess();
+        DataAccess dao = new MySqlDataAccess();
         UserService userService = new UserService(dao);
         ClearService clearService = new ClearService(dao);
         AdminHandler adminHandler = new AdminHandler(clearService);

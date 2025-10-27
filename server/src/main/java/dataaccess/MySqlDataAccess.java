@@ -16,8 +16,12 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 public class MySqlDataAccess implements DataAccess{
 
-    public MySqlDataAccess() throws Exception {
-        configureDatabase();
+    public MySqlDataAccess() {
+        try {
+            configureDatabase();
+        } catch (DataAccessException ex) {
+            throw new RuntimeException("Failed to initialize MySQL DataAccess", ex);
+        }
     }
 
     private static String[] createStatements= {
@@ -49,7 +53,7 @@ public class MySqlDataAccess implements DataAccess{
     );
     """
     };
-    private void configureDatabase() throws Exception {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -62,6 +66,11 @@ public class MySqlDataAccess implements DataAccess{
         }
     }
 
+
+    @Override
+    public RegisterResult registerUser(RegisterRequest request) throws Exception {
+        return null;
+    }
 
     @Override
     public void clear() {
