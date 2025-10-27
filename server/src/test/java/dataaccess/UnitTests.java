@@ -1,16 +1,34 @@
 package dataaccess;
 
+import chess.model.request.RegisterRequest;
+import chess.model.result.RegisterResult;
 import dataaccess.DatabaseManager;
 import org.junit.jupiter.api.*;
+import service.ClearService;
+import service.GameService;
+import service.SessionService;
+import service.UserService;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
+import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UnitTests {
+
+    private UserService userService;
+    private SessionService sessionService;
+    private GameService gameService;
+    private ClearService clearService;
+
+    @BeforeEach
+    public void setup() {
+        MySqlDataAccess dao = new MySqlDataAccess();
+        userService = new UserService(dao);
+        clearService = new ClearService(dao);
+        sessionService = new SessionService(dao);
+        gameService = new GameService(dao);
+    }
 
     private static String[] createStatements = {
             """
@@ -76,4 +94,79 @@ public class UnitTests {
             }
         }
     }
+
+    @Test
+    public void testRegisterUser_Success() throws DataAccessException {
+        // Arrange
+        RegisterRequest request = new RegisterRequest("alice", "password123", "alice@example.com");
+
+        // Act
+        RegisterResult result = userService.register(request);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("alice", result.getUsername());
+        assertNotNull(result.getAuthToken());
+        assertTrue(result.isSuccess());
+    }
+
+    @Test
+    public void testRegisterUser_DuplicateUsername() throws DataAccessException {
+        // Arrange
+        RegisterRequest request1 = new RegisterRequest("bob", "pass1", "bob@example.com");
+        RegisterRequest request2 = new RegisterRequest("bob", "pass2", "bob2@example.com");
+
+        // Act
+        userService.register(request1);
+        RegisterResult result = userService.register(request2);
+
+        // Assert
+        assertFalse(result.isSuccess());
+        assertEquals("bob", result.getUsername());
+        assertEquals("Error: already taken", result.getMessage());
+    }
+
+    @Test
+    public void testRegisterUser_PasswordIsHashed() throws DataAccessException, SQLException {
+        // Arrange
+        String rawPassword = "mySecretPass";
+        RegisterRequest request = new RegisterRequest("charlie", rawPassword, "charlie@example.com");
+
+        // Act
+        userService.register(request);
+
+        // Verify directly from DB
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
+            stmt.setString(1, "charlie");
+            ResultSet rs = stmt.executeQuery();
+
+            assertTrue(rs.next());
+            String storedPassword = rs.getString("password");
+            assertNotEquals(rawPassword, storedPassword); // raw password should NOT be stored
+            assertTrue(storedPassword.startsWith("$2a$")); // bcrypt hashes start with $2a$, $2b$ or $2y$
+        }
+    }
+
+    @Test
+    public void testRegisterUser_AuthTokenCreated() throws DataAccessException, SQLException {
+        // Arrange
+        RegisterRequest request = new RegisterRequest("dave", "pass123", "dave@example.com");
+
+        // Act
+        RegisterResult result = userService.register(request);
+
+        // Verify token in DB
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT token FROM auth_tokens WHERE username = ?")) {
+            stmt.setString(1, "dave");
+            ResultSet rs = stmt.executeQuery();
+
+            assertTrue(rs.next());
+            String tokenInDb = rs.getString("token");
+            assertEquals(result.getAuthToken(), tokenInDb);
+        }
+    }
+
+
 }

@@ -69,7 +69,42 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public RegisterResult registerUser(RegisterRequest request) throws Exception {
-        return null;
+        String username = request.getUsername();
+        String password = request.getPassword();
+        String email = request.getEmail();
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+
+            String checkUserSql = "SELECT username FROM users WHERE username = ?";
+            try (PreparedStatement checkStatement = conn.prepareStatement(checkUserSql)) {
+                checkStatement.setString(1, username);
+                ResultSet result = checkStatement.executeQuery();
+                if (result.next()) {
+                    return RegisterResult.failure(username, "Error: already taken");
+                }
+            }
+
+            String hashedPassword = PasswordUtil.hashPassword(password);
+            String insertUserSql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertUserSql)) {
+                insertStmt.setString(1, username);
+                insertStmt.setString(2, hashedPassword);
+                insertStmt.setString(3, email);
+                insertStmt.executeUpdate();
+            }
+            String token = UUID.randomUUID().toString();
+            String insertAuthSql = "INSERT INTO auth_tokens (token, username) VALUES (?, ?)";
+            try (PreparedStatement authStmt = conn.prepareStatement(insertAuthSql)) {
+                authStmt.setString(1, token);
+                authStmt.setString(2, username);
+                authStmt.executeUpdate();
+            }
+
+            return new RegisterResult(username, token);
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to register user: " + e.getMessage(), e);
+        }
     }
 
     @Override
