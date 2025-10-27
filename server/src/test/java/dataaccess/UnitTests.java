@@ -97,7 +97,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testRegisterUser_Success() throws DataAccessException {
+    public void testRegisterUser_Success() throws DataAccessException, SQLException {
         // Arrange
         RegisterRequest request = new RegisterRequest("alice", "password123", "alice@example.com");
 
@@ -105,11 +105,31 @@ public class UnitTests {
         RegisterResult result = userService.register(request);
 
         // Assert
-        assertNotNull(result);
-        assertEquals("alice", result.getUsername());
-        assertNotNull(result.getAuthToken());
-        assertTrue(result.isSuccess());
+        assertNotNull(result, "RegisterResult should not be null");
+
+        // Debug: if null, fail fast
+        if (result == null) {
+            fail("registerUser returned null, check the DAO or DB setup");
+        }
+
+        assertEquals("alice", result.getUsername(), "Username should match request");
+        assertNotNull(result.getAuthToken(), "Auth token should be generated");
+        assertFalse(result.getAuthToken().isEmpty(), "Auth token should not be empty");
+        assertTrue(result.isSuccess(), "Registration should be successful");
+
+        // Optional: verify directly from DB that token exists
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT authToken FROM auth_tokens WHERE username = ?")) {
+            stmt.setString(1, "alice");
+            ResultSet rs = stmt.executeQuery();
+
+            assertTrue(rs.next(), "Auth token should exist in DB for 'alice'");
+            String tokenInDb = rs.getString("authToken");
+            assertEquals(result.getAuthToken(), tokenInDb, "Token in DB should match returned token");
+        }
     }
+
 
     @Test
     public void testRegisterUser_DuplicateUsername() throws DataAccessException {
@@ -148,7 +168,6 @@ public class UnitTests {
             assertTrue(storedPassword.startsWith("$2a$")); // bcrypt hashes start with $2a$, $2b$ or $2y$
         }
     }
-
     @Test
     public void testRegisterUser_AuthTokenExists() throws DataAccessException, SQLException {
         // Arrange
@@ -158,17 +177,22 @@ public class UnitTests {
         userService.register(request);
 
         // Verify token exists in DB
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT authToken FROM auth_tokens WHERE username = ?")) {
-            stmt.setString(1, "dave");
-            ResultSet rs = stmt.executeQuery();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(true); // ensure we see committed data from other connections
 
-            assertTrue(rs.next(), "Auth token should exist for the user");
-            String tokenInDb = rs.getString("authToken");
-            assertNotNull(tokenInDb, "Auth token should not be null");
-            assertFalse(tokenInDb.isEmpty(), "Auth token should not be empty");
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT authToken FROM auth_tokens WHERE username = ?")) {
+                stmt.setString(1, "dave");
+                ResultSet rs = stmt.executeQuery();
+
+                assertTrue(rs.next(), "Auth token should exist for the user");
+                String tokenInDb = rs.getString("authToken");
+                assertNotNull(tokenInDb, "Auth token should not be null");
+                assertFalse(tokenInDb.isEmpty(), "Auth token should not be empty");
+            }
         }
     }
+
 
 
 

@@ -74,13 +74,16 @@ public class MySqlDataAccess implements DataAccess{
         String password = request.getPassword();
         String email = request.getEmail();
 
-        try (Connection conn = getConnection()) {
 
+        try (Connection conn = getConnection()) {
+            System.out.println("Catalog: " + conn.getCatalog());
+            System.out.println("URL: " + conn.getMetaData().getURL());
             String checkUserSql = "SELECT username FROM users WHERE username = ?";
             try (PreparedStatement checkStatement = conn.prepareStatement(checkUserSql)) {
                 checkStatement.setString(1, username);
                 ResultSet result = checkStatement.executeQuery();
                 if (result.next()) {
+                    System.out.println("Duplicate username found: " + result.getString(1));
                     return RegisterResult.failure(username, "Error: already taken");
                 }
             }
