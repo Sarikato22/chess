@@ -6,9 +6,11 @@ import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
 import com.google.gson.Gson;
+import service.PasswordUtil;
 
 import java.sql.*;
 import java.util.List;
+import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -60,10 +62,6 @@ public class MySqlDataAccess implements DataAccess{
         }
     }
 
-    @Override
-    public RegisterResult registerUser(RegisterRequest request) throws Exception {
-        return null;
-    }
 
     @Override
     public void clear() {
