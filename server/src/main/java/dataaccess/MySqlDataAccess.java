@@ -46,6 +46,7 @@ public class MySqlDataAccess implements DataAccess{
         FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
     );
     """
+    };
     private void configureDatabase() throws Exception {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
