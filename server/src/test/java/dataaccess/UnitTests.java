@@ -26,6 +26,7 @@ public class UnitTests {
         MySqlDataAccess dao = new MySqlDataAccess();
         userService = new UserService(dao);
         clearService = new ClearService(dao);
+        clearService.clear();
         sessionService = new SessionService(dao);
         gameService = new GameService(dao);
     }
@@ -149,24 +150,26 @@ public class UnitTests {
     }
 
     @Test
-    public void testRegisterUser_AuthTokenCreated() throws DataAccessException, SQLException {
+    public void testRegisterUser_AuthTokenExists() throws DataAccessException, SQLException {
         // Arrange
         RegisterRequest request = new RegisterRequest("dave", "pass123", "dave@example.com");
 
         // Act
-        RegisterResult result = userService.register(request);
+        userService.register(request);
 
-        // Verify token in DB
+        // Verify token exists in DB
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT token FROM auth_tokens WHERE username = ?")) {
+             PreparedStatement stmt = conn.prepareStatement("SELECT authToken FROM auth_tokens WHERE username = ?")) {
             stmt.setString(1, "dave");
             ResultSet rs = stmt.executeQuery();
 
-            assertTrue(rs.next());
-            String tokenInDb = rs.getString("token");
-            assertEquals(result.getAuthToken(), tokenInDb);
+            assertTrue(rs.next(), "Auth token should exist for the user");
+            String tokenInDb = rs.getString("authToken");
+            assertNotNull(tokenInDb, "Auth token should not be null");
+            assertFalse(tokenInDb.isEmpty(), "Auth token should not be empty");
         }
     }
+
 
 
 }

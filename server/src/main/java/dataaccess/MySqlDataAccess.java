@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.UUID;
 
+import static dataaccess.DatabaseManager.getConnection;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 public class MySqlDataAccess implements DataAccess{
@@ -55,7 +56,7 @@ public class MySqlDataAccess implements DataAccess{
     };
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
             for (String statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
@@ -73,7 +74,7 @@ public class MySqlDataAccess implements DataAccess{
         String password = request.getPassword();
         String email = request.getEmail();
 
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection conn = getConnection()) {
 
             String checkUserSql = "SELECT username FROM users WHERE username = ?";
             try (PreparedStatement checkStatement = conn.prepareStatement(checkUserSql)) {
@@ -93,7 +94,7 @@ public class MySqlDataAccess implements DataAccess{
                 insertStmt.executeUpdate();
             }
             String token = UUID.randomUUID().toString();
-            String insertAuthSql = "INSERT INTO auth_tokens (token, username) VALUES (?, ?)";
+            String insertAuthSql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
             try (PreparedStatement authStmt = conn.prepareStatement(insertAuthSql)) {
                 authStmt.setString(1, token);
                 authStmt.setString(2, username);
@@ -109,7 +110,16 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void clear() {
+        String[] tables = { "auth_tokens", "games", "users" }; // child → parent order
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
 
+            for (String table : tables) {
+                stmt.executeUpdate("TRUNCATE TABLE " + table + ";");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new RuntimeException("Failed to initialize MySQL DataAccess", ex);
+        }
     }
 
     @Override
