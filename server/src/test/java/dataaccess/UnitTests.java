@@ -11,6 +11,7 @@ import service.GameService;
 import service.SessionService;
 import service.UserService;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,10 +23,11 @@ public class UnitTests {
     private SessionService sessionService;
     private GameService gameService;
     private ClearService clearService;
+    private MySqlDataAccess dao;
 
     @BeforeEach
     public void setup() {
-        MySqlDataAccess dao = new MySqlDataAccess();
+        dao = new MySqlDataAccess();
         userService = new UserService(dao);
         clearService = new ClearService(dao);
         clearService.clear();
@@ -228,5 +230,72 @@ public class UnitTests {
         assertNotNull(result);
         assertFalse(result.isSuccess());
         assertEquals("Error: Username not found", result.getMessage());
+    }
+    //Invalidate Token tests
+
+    @Test
+    @DisplayName("Invalidate existing token succeeds")
+    void testInvalidateToken_Existing() throws Exception {
+        String token = "test-token-123";
+        String username = "alice";
+
+        // insert token
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)")) {
+            stmt.setString(1, token);
+            stmt.setString(2, username);
+            stmt.executeUpdate();
+        }
+
+        boolean result = dao.invalidateToken(token);
+        assertTrue(result, "invalidateToken should return true for existing token");
+
+        // verify it's gone
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT * FROM auth_tokens WHERE authToken = ?")) {
+            stmt.setString(1, token);
+            ResultSet rs = stmt.executeQuery();
+            assertFalse(rs.next(), "Token should be removed from DB");
+        }
+    }
+
+    @Test
+    @DisplayName("Invalidate non-existent token returns false")
+    void testInvalidateToken_NonExistent() throws Exception {
+        boolean result = dao.invalidateToken("non-existent-token");
+        assertFalse(result, "invalidateToken should return false for non-existent token");
+    }
+
+    @Test
+    @DisplayName("Multiple tokens remain unaffected")
+    void testInvalidateToken_OtherTokensRemain() throws Exception {
+        String token1 = "token1";
+        String token2 = "token2";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)")) {
+            stmt.setString(1, token1);
+            stmt.setString(2, "alice");
+            stmt.executeUpdate();
+
+            stmt.setString(1, token2);
+            stmt.setString(2, "bob");
+            stmt.executeUpdate();
+        }
+
+        boolean result = dao.invalidateToken(token1);
+        assertTrue(result, "invalidateToken should return true for token1");
+
+        // token2 should still exist
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT * FROM auth_tokens WHERE authToken = ?")) {
+            stmt.setString(1, token2);
+            ResultSet rs = stmt.executeQuery();
+            assertTrue(rs.next(), "Other tokens should remain in the table");
+        }
     }
 }
