@@ -135,15 +135,13 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Unable to get DB connection");
             }
 
-            String checkUserSql = "SELECT username, password FROM users WHERE username = ?";
+            String checkUserSql = "SELECT password FROM users WHERE username = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)) {
                 checkStmt.setString(1, username);
-
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
                         return SessionResult.failure("Error: Username not found");
                     }
-
                     String storedHash = rs.getString("password");
 
                     if (!PasswordUtil.verifyPassword(password, storedHash)) {

@@ -1,7 +1,9 @@
 package dataaccess;
 
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
+import chess.model.result.SessionResult;
 import dataaccess.DatabaseManager;
 import org.junit.jupiter.api.*;
 import service.ClearService;
@@ -156,7 +158,6 @@ public class UnitTests {
         // Act
         userService.register(request);
 
-        // Verify directly from DB
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
             stmt.setString(1, "charlie");
@@ -193,8 +194,39 @@ public class UnitTests {
         }
     }
     //// Tests for login
+    @Test
+    public void testLoginUser_Success() throws Exception {
+        // Arrange: register user first
+        userService.register(new RegisterRequest("alice", "password123", "alice@example.com"));
 
+        // Act: login with correct credentials
+        SessionRequest loginReq = new SessionRequest("alice", "password123");
+        SessionResult result = sessionService.login(loginReq);
 
+        // Assert
+        assertNotNull(result, "Result should not be null");
+        assertEquals("alice", result.getUsername());
+        assertNotNull(result.getAuthToken(), "Auth token should be generated");
+    }
 
+    @Test
+    public void testLoginUser_WrongPassword() throws Exception {
+        userService.register(new RegisterRequest("alice", "correctpassword", "alice@example.com"));
+        SessionRequest loginReq = new SessionRequest("alice", "wrongpassword");
+        SessionResult result = sessionService.login(loginReq);
 
+        assertNotNull(result);
+        assertFalse(result.isSuccess());
+        assertEquals("Error: Incorrect password", result.getMessage());
+    }
+
+    @Test
+    public void testLoginUser_NonExistentUser() throws Exception {
+        SessionRequest loginReq = new SessionRequest("bob", "password123");
+        SessionResult result = sessionService.login(loginReq);
+
+        assertNotNull(result);
+        assertFalse(result.isSuccess());
+        assertEquals("Error: Username not found", result.getMessage());
+    }
 }
