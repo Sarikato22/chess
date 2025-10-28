@@ -138,6 +138,7 @@ public class UnitTests {
             assertTrue(storedPassword.startsWith("$2a$")); // bcrypt hashes start with $2a$, $2b$ or $2y$
         }
     }
+
     @Test
     @DisplayName("Verify authToken gets generated on register")
     public void testRegisterUser_AuthTokenExists() throws DataAccessException, SQLException {
@@ -163,6 +164,7 @@ public class UnitTests {
             }
         }
     }
+
     //// Tests for login
     @Test
     @DisplayName("Attempt to sucesfully log in")
@@ -239,6 +241,7 @@ public class UnitTests {
         boolean result = dao.invalidateToken("non-existent-token");
         assertFalse(result, "invalidateToken should return false for non-existent token");
     }
+
     @Test
     @DisplayName("Multiple tokens remain unaffected")
     void testInvalidateToken_OtherTokensRemain() throws Exception {
@@ -272,5 +275,20 @@ public class UnitTests {
             ResultSet rs = stmt.executeQuery();
             assertTrue(rs.next(), "Other tokens should remain in the table");
         }
+    }
+
+    //getUsernamebyToken
+    @Test
+    @DisplayName("getUsernameByToken returns correct username for valid token")
+    void testGetUsernameByToken_Valid() throws Exception {
+        String username = "alice";
+
+        RegisterResult result = userService.register(new RegisterRequest("alice", "password1", "alice@example.com"));
+        String token = result.getAuthToken();
+
+        //attempt to get the username
+        String retrieved_username = dao.getUsernameByToken(token);
+        assertNotNull(retrieved_username);
+        assertEquals(username, retrieved_username);
     }
 }
