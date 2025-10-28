@@ -76,8 +76,6 @@ public class MySqlDataAccess implements DataAccess{
 
 
         try (Connection conn = getConnection()) {
-            System.out.println("Catalog: " + conn.getCatalog());
-            System.out.println("URL: " + conn.getMetaData().getURL());
             String checkUserSql = "SELECT username FROM users WHERE username = ?";
             try (PreparedStatement checkStatement = conn.prepareStatement(checkUserSql)) {
                 checkStatement.setString(1, username);
@@ -129,7 +127,47 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public SessionResult loginUser(SessionRequest request) throws Exception {
-        return null;
+        String username = request.getUsername();
+        String password = request.getPassword();
+
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+
+            String checkUserSql = "SELECT username, password FROM users WHERE username = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)) {
+                checkStmt.setString(1, username);
+
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (!rs.next()) {
+                        return SessionResult.failure("Error: Username not found");
+                    }
+
+                    String storedHash = rs.getString("password");
+
+                    if (!PasswordUtil.verifyPassword(password, storedHash)) {
+                        return SessionResult.failure("Error: Incorrect password");
+                    }
+                }
+            }
+
+            String token = UUID.randomUUID().toString();
+            System.out.println("Generated token for " + username + ": " + token);
+
+            String insertAuthSql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
+            try (PreparedStatement authStmt = conn.prepareStatement(insertAuthSql)) {
+                authStmt.setString(1, token);
+                authStmt.setString(2, username);
+                authStmt.executeUpdate();
+            }
+
+            return new SessionResult(username, token);
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during login: " + e.getMessage(), e);
+        }
+
     }
 
     @Override
