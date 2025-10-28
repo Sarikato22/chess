@@ -48,7 +48,6 @@ public class MySqlDataAccess implements DataAccess{
         whiteUsername VARCHAR(50),
         blackUsername VARCHAR(50),
         gameName VARCHAR(100) NOT NULL,
-        game TEXT,
         FOREIGN KEY (whiteUsername) REFERENCES users(username) ON DELETE SET NULL,
         FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
     );
@@ -228,13 +227,12 @@ public class MySqlDataAccess implements DataAccess{
             if (getUsernameByToken(game.getBlackUsername()) == null) {
                 throw new DataAccessException("Black player does not exist");
             }
-            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName) VALUES (?, ?, ?, ?)";
             try (PreparedStatement Stmt = conn.prepareStatement(insertQuery)) {
                 Stmt.setString(1, String.valueOf(id));
-                Stmt.setString(2, newGame.getGameName());
-                Stmt.setString(3, newGame.getWhiteUsername());
-                Stmt.setString(4, newGame.getBlackUsername());
-                Stmt.setString(5, "empty for now");
+                Stmt.setString(2, newGame.getWhiteUsername());
+                Stmt.setString(3, newGame.getBlackUsername());
+                Stmt.setString(4, newGame.getGameName());
                 Stmt.executeUpdate();
             }
             return newGame;
