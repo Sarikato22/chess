@@ -189,7 +189,26 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public String getUsernameByToken(String authToken) throws Exception {
-        return null;
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+
+            String getQuery = "SELECT * FROM auth_tokens WHERE authToken = ?";
+            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
+                Stmt.setString(1,authToken);
+                try (ResultSet rs = Stmt.executeQuery()) {
+                    if (!rs.next()) {
+                        return ("Could not find Username associated to given token");
+                    } else {
+                    return rs.getString("username");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+        }
     }
 
     @Override
