@@ -170,8 +170,22 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public boolean invalidateToken(String authToken) throws Exception {
-        return false;
-    }
+            try (Connection conn = getConnection()) {
+                if (conn == null) {
+                    throw new DataAccessException("Unable to get DB connection");
+                }
+
+                String deleteQuery = "DELETE FROM auth_tokens WHERE authToken = ?";
+                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+                    deleteStmt.setString(1, authToken);
+                    int rowsDeleted = deleteStmt.executeUpdate();
+                    return rowsDeleted > 0;
+                }
+
+            } catch (SQLException e) {
+                throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+            }
+        }
 
     @Override
     public String getUsernameByToken(String authToken) throws Exception {
