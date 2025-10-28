@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import service.PasswordUtil;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -246,7 +247,32 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
-        return null;
+        List<GameData> result = new ArrayList<>();;
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+
+            String getQuery = "SELECT * FROM games";
+            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
+                try (ResultSet rs = Stmt.executeQuery()) {
+                    while (rs.next()) {
+                        int gameID = rs.getInt("gameID");
+                        String gameName = rs.getString("gameName");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+
+                        GameData game = new GameData(gameID, gameName, whiteUsername, blackUsername);
+
+                        result.add(game);
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+        }
+        return result;
     }
 
     @Override
@@ -256,6 +282,28 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        return null;
+
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+
+            String getQuery = "DELETE FROM games WHERE gameID = ?";
+            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
+                Stmt.setString(1, String.valueOf(gameID));
+                try (ResultSet rs = Stmt.executeQuery()) {
+                    int gameIdentificator = rs.getInt("gameID");
+                    String gameName = rs.getString("gameName");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+
+                    GameData result = new GameData(gameIdentificator, gameName, whiteUsername, blackUsername);
+                    return result;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+        }
+        }
     }
-}
