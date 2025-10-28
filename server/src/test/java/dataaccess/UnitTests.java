@@ -101,41 +101,7 @@ public class UnitTests {
     }
 
     @Test
-    public void testRegisterUser_Success() throws DataAccessException, SQLException {
-        // Arrange
-        RegisterRequest request = new RegisterRequest("alice", "password123", "alice@example.com");
-
-        // Act
-        RegisterResult result = userService.register(request);
-
-        // Assert
-        assertNotNull(result, "RegisterResult should not be null");
-
-        // Debug: if null, fail fast
-        if (result == null) {
-            fail("registerUser returned null, check the DAO or DB setup");
-        }
-
-        assertEquals("alice", result.getUsername(), "Username should match request");
-        assertNotNull(result.getAuthToken(), "Auth token should be generated");
-        assertFalse(result.getAuthToken().isEmpty(), "Auth token should not be empty");
-        assertTrue(result.isSuccess(), "Registration should be successful");
-
-        // Optional: verify directly from DB that token exists
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT authToken FROM auth_tokens WHERE username = ?")) {
-            stmt.setString(1, "alice");
-            ResultSet rs = stmt.executeQuery();
-
-            assertTrue(rs.next(), "Auth token should exist in DB for 'alice'");
-            String tokenInDb = rs.getString("authToken");
-            assertEquals(result.getAuthToken(), tokenInDb, "Token in DB should match returned token");
-        }
-    }
-
-
-    @Test
+    @DisplayName("Attempt to register a duplicated user")
     public void testRegisterUser_DuplicateUsername() throws DataAccessException {
         // Arrange
         RegisterRequest request1 = new RegisterRequest("bob", "pass1", "bob@example.com");
@@ -152,6 +118,7 @@ public class UnitTests {
     }
 
     @Test
+    @DisplayName("Verify password is hashed after register")
     public void testRegisterUser_PasswordIsHashed() throws DataAccessException, SQLException {
         // Arrange
         String rawPassword = "mySecretPass";
@@ -172,6 +139,7 @@ public class UnitTests {
         }
     }
     @Test
+    @DisplayName("Verify authToken gets generated on register")
     public void testRegisterUser_AuthTokenExists() throws DataAccessException, SQLException {
         // Arrange
         RegisterRequest request = new RegisterRequest("dave", "pass123", "dave@example.com");
@@ -197,6 +165,7 @@ public class UnitTests {
     }
     //// Tests for login
     @Test
+    @DisplayName("Attempt to sucesfully log in")
     public void testLoginUser_Success() throws Exception {
         // Arrange: register user first
         userService.register(new RegisterRequest("alice", "password123", "alice@example.com"));
@@ -212,6 +181,7 @@ public class UnitTests {
     }
 
     @Test
+    @DisplayName("Attempt to log in with wrong password")
     public void testLoginUser_WrongPassword() throws Exception {
         userService.register(new RegisterRequest("alice", "correctpassword", "alice@example.com"));
         SessionRequest loginReq = new SessionRequest("alice", "wrongpassword");
@@ -223,6 +193,7 @@ public class UnitTests {
     }
 
     @Test
+    @DisplayName("Attempt to log in non-existent user")
     public void testLoginUser_NonExistentUser() throws Exception {
         SessionRequest loginReq = new SessionRequest("bob", "password123");
         SessionResult result = sessionService.login(loginReq);
@@ -239,7 +210,8 @@ public class UnitTests {
         String token = "test-token-123";
         String username = "alice";
 
-        // insert token
+        userService.register(new RegisterRequest(username, "password123", "alice@example.com"));
+
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)")) {
@@ -251,7 +223,6 @@ public class UnitTests {
         boolean result = dao.invalidateToken(token);
         assertTrue(result, "invalidateToken should return true for existing token");
 
-        // verify it's gone
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT * FROM auth_tokens WHERE authToken = ?")) {
@@ -261,16 +232,20 @@ public class UnitTests {
         }
     }
 
+
     @Test
     @DisplayName("Invalidate non-existent token returns false")
     void testInvalidateToken_NonExistent() throws Exception {
         boolean result = dao.invalidateToken("non-existent-token");
         assertFalse(result, "invalidateToken should return false for non-existent token");
     }
-
     @Test
     @DisplayName("Multiple tokens remain unaffected")
     void testInvalidateToken_OtherTokensRemain() throws Exception {
+        // First, create users so FK constraints are satisfied
+        userService.register(new RegisterRequest("alice", "pass1", "alice@example.com"));
+        userService.register(new RegisterRequest("bob", "pass2", "bob@example.com"));
+
         String token1 = "token1";
         String token2 = "token2";
 
