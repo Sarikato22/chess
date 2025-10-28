@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
@@ -291,4 +292,61 @@ public class UnitTests {
         assertNotNull(retrieved_username);
         assertEquals(username, retrieved_username);
     }
+
+    @Test
+    @DisplayName("createGame successfully inserts new game into database")
+    void testCreateGame_Success() throws Exception {
+        GameData game = new GameData(0, "Epic Match", "alice", "bob");
+
+        GameData result = dao.createGame(game);
+
+        assertNotNull(result, "createGame should return a non-null GameData");
+        assertEquals("Epic Match", result.getGameName());
+        assertEquals("alice", result.getWhiteUsername());
+        assertEquals("bob", result.getBlackUsername());
+
+        // Verify it was inserted into the DB
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
+            stmt.setInt(1, result.getGameId());
+            ResultSet rs = stmt.executeQuery();
+
+            assertTrue(rs.next(), "Game should exist in DB");
+            assertEquals("Epic Match", rs.getString("gameName"));
+            assertEquals("alice", rs.getString("whiteUsername"));
+            assertEquals("bob", rs.getString("blackUsername"));
+        }
+    }
+    @Test
+    @DisplayName("createGame allows null usernames for open slots")
+    void testCreateGame_NullPlayers() throws Exception {
+        GameData game = new GameData(0, "Open Game", null, null);
+
+        GameData result = dao.createGame(game);
+
+        assertNotNull(result);
+        assertEquals("Open Game", result.getGameName());
+
+        // Check in DB
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
+            stmt.setInt(1, result.getGameId());
+            ResultSet rs = stmt.executeQuery();
+
+            assertTrue(rs.next());
+            assertNull(rs.getString("whiteUsername"));
+            assertNull(rs.getString("blackUsername"));
+        }
+    }
+    @Test
+    @DisplayName("createGame assigns unique gameIDs")
+    void testCreateGame_UniqueIDs() throws Exception {
+        GameData g1 = dao.createGame(new GameData(0, "Game1", "alice", "bob"));
+        GameData g2 = dao.createGame(new GameData(0, "Game2", "charlie", "dave"));
+
+        assertNotEquals(g1.getGameId(), g2.getGameId(), "Each game should have a unique ID");
+    }
+
+
+
 }

@@ -220,14 +220,14 @@ public class MySqlDataAccess implements DataAccess{
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
             }
-            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game)";
+            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement Stmt = conn.prepareStatement(insertQuery)) {
                 Stmt.setString(1, String.valueOf(id));
                 Stmt.setString(2, newGame.getGameName());
                 Stmt.setString(3, newGame.getWhiteUsername());
                 Stmt.setString(4, newGame.getBlackUsername());
                 Stmt.setString(5, "empty for now");
-
+                Stmt.executeUpdate();
             }
             return newGame;
 
