@@ -220,6 +220,14 @@ public class MySqlDataAccess implements DataAccess{
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
             }
+            if (getUsernameByToken(game.getWhiteUsername()) == null) {
+                throw new DataAccessException("White player does not exist");
+            }
+
+            // Check blackUsername exists
+            if (getUsernameByToken(game.getBlackUsername()) == null) {
+                throw new DataAccessException("Black player does not exist");
+            }
             String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement Stmt = conn.prepareStatement(insertQuery)) {
                 Stmt.setString(1, String.valueOf(id));
@@ -233,6 +241,8 @@ public class MySqlDataAccess implements DataAccess{
 
         } catch (SQLException e) {
             throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

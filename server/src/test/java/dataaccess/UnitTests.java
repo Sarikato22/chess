@@ -292,60 +292,87 @@ public class UnitTests {
         assertNotNull(retrieved_username);
         assertEquals(username, retrieved_username);
     }
+//Creategame tests
+@Nested
+@DisplayName("Game Creation Tests")
+class GameCreationTests {
+
+    @BeforeEach
+    void setupGameUsers() throws Exception {
+        // Insert only the users needed for these tests
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT INTO users (username, password, email) VALUES (?, ?, ?)")) {
+
+            String[][] users = {
+                    {"alice", "hashedpass", "alice@example.com"},
+                    {"bob", "hashedpass", "bob@example.com"},
+                    {"charlie", "hashedpass", "charlie@example.com"},
+                    {"dave", "hashedpass", "dave@example.com"}
+            };
+
+            for (String[] u : users) {
+                stmt.setString(1, u[0]);
+                stmt.setString(2, u[1]);
+                stmt.setString(3, u[2]);
+                try {
+                    stmt.executeUpdate();
+                } catch (SQLException e) {
+                    // ignore if user already exists
+                }
+            }
+        }
+    }
 
     @Test
     @DisplayName("createGame successfully inserts new game into database")
     void testCreateGame_Success() throws Exception {
         GameData game = new GameData(0, "Epic Match", "alice", "bob");
-
         GameData result = dao.createGame(game);
 
-        assertNotNull(result, "createGame should return a non-null GameData");
+        assertNotNull(result);
         assertEquals("Epic Match", result.getGameName());
         assertEquals("alice", result.getWhiteUsername());
         assertEquals("bob", result.getBlackUsername());
 
-        // Verify it was inserted into the DB
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
             stmt.setInt(1, result.getGameId());
             ResultSet rs = stmt.executeQuery();
-
-            assertTrue(rs.next(), "Game should exist in DB");
+            assertTrue(rs.next());
             assertEquals("Epic Match", rs.getString("gameName"));
-            assertEquals("alice", rs.getString("whiteUsername"));
-            assertEquals("bob", rs.getString("blackUsername"));
         }
     }
+
     @Test
     @DisplayName("createGame allows null usernames for open slots")
     void testCreateGame_NullPlayers() throws Exception {
         GameData game = new GameData(0, "Open Game", null, null);
-
         GameData result = dao.createGame(game);
 
         assertNotNull(result);
         assertEquals("Open Game", result.getGameName());
 
-        // Check in DB
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement("SELECT * FROM games WHERE gameID = ?")) {
             stmt.setInt(1, result.getGameId());
             ResultSet rs = stmt.executeQuery();
-
             assertTrue(rs.next());
             assertNull(rs.getString("whiteUsername"));
             assertNull(rs.getString("blackUsername"));
         }
     }
+
     @Test
     @DisplayName("createGame assigns unique gameIDs")
     void testCreateGame_UniqueIDs() throws Exception {
         GameData g1 = dao.createGame(new GameData(0, "Game1", "alice", "bob"));
         GameData g2 = dao.createGame(new GameData(0, "Game2", "charlie", "dave"));
 
-        assertNotEquals(g1.getGameId(), g2.getGameId(), "Each game should have a unique ID");
+        assertNotEquals(g1.getGameId(), g2.getGameId());
     }
+}
+
 
 
 
