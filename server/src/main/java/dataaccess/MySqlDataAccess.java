@@ -16,7 +16,7 @@ import static dataaccess.DatabaseManager.getConnection;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 public class MySqlDataAccess implements DataAccess{
-
+    private int nextGameId = 1;
     public MySqlDataAccess() {
         try {
             configureDatabase();
@@ -213,7 +213,27 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public GameData createGame(GameData game) throws DataAccessException {
-        return null;
+        int id = nextGameId++;
+        GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
+
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game)";
+            try (PreparedStatement Stmt = conn.prepareStatement(insertQuery)) {
+                Stmt.setString(1, String.valueOf(id));
+                Stmt.setString(2, newGame.getGameName());
+                Stmt.setString(3, newGame.getWhiteUsername());
+                Stmt.setString(4, newGame.getBlackUsername());
+                Stmt.setString(5, "empty for now");
+
+            }
+            return newGame;
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+        }
     }
 
     @Override
