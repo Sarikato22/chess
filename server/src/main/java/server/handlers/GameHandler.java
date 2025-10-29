@@ -55,7 +55,6 @@ public class GameHandler {
             GameRequest request;
 
             try {
-                // Deserialize using Gson
                 request = gson.fromJson(ctx.body(), GameRequest.class);
             } catch (Exception e) {
                 ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
@@ -63,13 +62,11 @@ public class GameHandler {
             }
 
             try {
-                // Try to create the game
                 GameResult result = gameService.createGame(authToken, request.getGameName());
 
                 if (result.isSuccess()) {
                     ctx.status(200).result(gson.toJson(Map.of("gameID", result.getGameID())));
                 } else {
-                    // Handle game creation failure
                     String message = result.getMessage() != null ? result.getMessage() : "Internal error";
 
                     if (message.contains("Unauthorized")) {

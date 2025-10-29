@@ -234,19 +234,16 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Unable to get DB connection");
             }
 
-            // Check the white player's authToken and ensure it's valid
-            String whiteUsername = getUsernameByToken(authToken);  // pass authToken, not username
+            String whiteUsername = getUsernameByToken(authToken);
             if (whiteUsername == null) {
                 throw new UnauthorizedException("Unauthorized: White player is not authorized");
             }
 
-            // Check the black player's authToken and ensure it's valid
-            String blackUsername = getUsernameByToken(authToken);  // pass authToken, not username
+            String blackUsername = getUsernameByToken(authToken);
             if (blackUsername == null) {
                 throw new UnauthorizedException("Unauthorized: Black player is not authorized");
             }
 
-            // Proceed with game creation
             String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName) VALUES (?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
                 stmt.setString(1, String.valueOf(id));
@@ -298,8 +295,54 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+            String getGameQuery = "SELECT * FROM games WHERE gameID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(getGameQuery)) {
+                stmt.setInt(1, game.getGameId());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new DataAccessException("Game with ID " + game.getGameId() + " not found.");
+                    }
+                }
+            }
 
+            // Prepare the query to update the game based on which color the player is joining as
+            String updateGameQuery = "UPDATE games SET whiteUsername = ?, blackUsername = ? WHERE gameID = ?";
+
+            try (PreparedStatement stmt = conn.prepareStatement(updateGameQuery)) {
+                // Set the appropriate username based on the color
+                if (game.getWhiteUsername() != null) {
+                    stmt.setString(1, game.getWhiteUsername());
+                } else {
+                    stmt.setNull(1, Types.VARCHAR);  // If whiteUsername is null, set it to SQL null
+                }
+
+                if (game.getBlackUsername() != null) {
+                    stmt.setString(2, game.getBlackUsername());
+                } else {
+                    stmt.setNull(2, Types.VARCHAR);  // If blackUsername is null, set it to SQL null
+                }
+
+                // Set the gameID to ensure the correct game is updated
+                stmt.setInt(3, game.getGameId());
+
+                // Execute the update
+                int rowsUpdated = stmt.executeUpdate();
+                if (rowsUpdated == 0) {
+                    throw new DataAccessException("Failed to update the game with ID: " + game.getGameId());
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during game update: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error during game update: " + e.getMessage(), e);
+        }
     }
+
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {

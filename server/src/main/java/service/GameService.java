@@ -19,12 +19,12 @@ public class GameService {
 
     public GameResult createGame(String authToken, String gameName) throws Exception {
         if (authToken == null || authToken.isEmpty()) {
-            return GameResult.failure("Error: unauthorized");
+            return GameResult.failure("Unauthorized");
         }
 
         String username = dataAccess.getUsernameByToken(authToken);
         if (username == null) {
-            return GameResult.failure("Error: unauthorized");
+            return GameResult.failure("Unauthorized");
         }
 
         if (gameName == null || gameName.isEmpty()) {
