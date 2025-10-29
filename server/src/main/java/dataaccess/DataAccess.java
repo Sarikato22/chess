@@ -19,7 +19,7 @@ public interface DataAccess {
 
     String getUsernameByToken(String authToken) throws Exception;
 
-    GameData createGame(GameData game) throws DataAccessException;
+    GameData createGame(GameData game, String authToken) throws DataAccessException;
 
     List<GameData> listGames() throws DataAccessException;
 

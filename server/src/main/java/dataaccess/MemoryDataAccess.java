@@ -74,7 +74,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData createGame(GameData game) throws DataAccessException {
+    public GameData createGame(GameData game, String authToken) throws DataAccessException {
         int id = nextGameId++;
         GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
         games.put(id, newGame);

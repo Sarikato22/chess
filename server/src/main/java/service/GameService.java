@@ -31,7 +31,7 @@ public class GameService {
             return GameResult.failure("Error: bad request");
         }
 
-        GameData newGame = dataAccess.createGame(new GameData(1, gameName, null, null));
+        GameData newGame = dataAccess.createGame(new GameData(1, gameName, null, null), authToken);
 
         if (newGame == null) {
             return GameResult.failure("Error: internal failure");

@@ -5,6 +5,7 @@ import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
+import dataaccess.UnauthorizedException;
 import com.google.gson.Gson;
 import service.PasswordUtil;
 
@@ -14,8 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static dataaccess.DatabaseManager.getConnection;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
+
 public class MySqlDataAccess implements DataAccess{
     private int nextGameId = 1;
     public MySqlDataAccess() {
@@ -135,24 +135,29 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Unable to get DB connection");
             }
 
+            // Check if the user exists by querying the database
             String checkUserSql = "SELECT password FROM users WHERE username = ?";
             try (PreparedStatement checkStmt = conn.prepareStatement(checkUserSql)) {
                 checkStmt.setString(1, username);
                 try (ResultSet rs = checkStmt.executeQuery()) {
                     if (!rs.next()) {
-                        return SessionResult.failure("Error: Username not found");
+                        return SessionResult.failure("Invalid Request: Username not found");
                     }
+
+                    // If user found, check password
                     String storedHash = rs.getString("password");
 
                     if (!PasswordUtil.verifyPassword(password, storedHash)) {
-                        return SessionResult.failure("Error: Incorrect password");
+                        return SessionResult.failure("Invalid Request: Incorrect password");
                     }
                 }
             }
 
+            // If the username exists and password is correct, generate an auth token
             String token = UUID.randomUUID().toString();
             System.out.println("Generated token for " + username + ": " + token);
 
+            // Insert token into the database
             String insertAuthSql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
             try (PreparedStatement authStmt = conn.prepareStatement(insertAuthSql)) {
                 authStmt.setString(1, token);
@@ -160,50 +165,27 @@ public class MySqlDataAccess implements DataAccess{
                 authStmt.executeUpdate();
             }
 
+            // Return the session result with the username and token
             return new SessionResult(username, token);
 
         } catch (SQLException e) {
+            // If any SQL error happens, throw a DataAccessException, which will be handled by the service layer
             throw new DataAccessException("Database error during login: " + e.getMessage(), e);
         }
-
     }
 
     @Override
     public boolean invalidateToken(String authToken) throws Exception {
-            try (Connection conn = getConnection()) {
-                if (conn == null) {
-                    throw new DataAccessException("Unable to get DB connection");
-                }
-
-                String deleteQuery = "DELETE FROM auth_tokens WHERE authToken = ?";
-                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
-                    deleteStmt.setString(1, authToken);
-                    int rowsDeleted = deleteStmt.executeUpdate();
-                    return rowsDeleted > 0;
-                }
-
-            } catch (SQLException e) {
-                throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
-            }
-        }
-
-    @Override
-    public String getUsernameByToken(String authToken) throws Exception {
         try (Connection conn = getConnection()) {
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
             }
 
-            String getQuery = "SELECT * FROM auth_tokens WHERE authToken = ?";
-            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
-                Stmt.setString(1,authToken);
-                try (ResultSet rs = Stmt.executeQuery()) {
-                    if (!rs.next()) {
-                        return ("Could not find Username associated to given token");
-                    } else {
-                    return rs.getString("username");
-                    }
-                }
+            String deleteQuery = "DELETE FROM auth_tokens WHERE authToken = ?";
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+                deleteStmt.setString(1, authToken);
+                int rowsDeleted = deleteStmt.executeUpdate();  // Correct method for DELETE queries
+                return rowsDeleted > 0;  // If rowsDeleted > 0, it means the token was invalidated
             }
 
         } catch (SQLException e) {
@@ -212,7 +194,38 @@ public class MySqlDataAccess implements DataAccess{
     }
 
     @Override
-    public GameData createGame(GameData game) throws DataAccessException {
+    public String getUsernameByToken(String authToken) throws Exception {
+        if (authToken == null || authToken.isEmpty()) {
+
+        }
+
+        try (Connection conn = getConnection()) {
+            if (conn == null) {
+                throw new DataAccessException("Unable to get DB connection");
+            }
+
+            String getQuery = "SELECT username FROM auth_tokens WHERE authToken = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(getQuery)) {
+                stmt.setString(1, authToken);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("username");
+                    } else {
+                        // Log if the token does not exist in the database
+                        System.out.println("No username found for token: " + authToken);
+                        return null; // Explicitly return null if not found
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Database error during token lookup: " + e.getMessage(), e);
+        }
+    }
+
+
+
+    @Override
+    public GameData createGame(GameData game, String authToken) throws DataAccessException {
         int id = nextGameId++;
         GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
 
@@ -220,30 +233,38 @@ public class MySqlDataAccess implements DataAccess{
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
             }
-            if (getUsernameByToken(game.getWhiteUsername()) == null) {
-                throw new DataAccessException("White player does not exist");
+
+            // Check the white player's authToken and ensure it's valid
+            String whiteUsername = getUsernameByToken(authToken);  // pass authToken, not username
+            if (whiteUsername == null) {
+                throw new UnauthorizedException("Unauthorized: White player is not authorized");
             }
 
-            // Check blackUsername exists
-            if (getUsernameByToken(game.getBlackUsername()) == null) {
-                throw new DataAccessException("Black player does not exist");
+            // Check the black player's authToken and ensure it's valid
+            String blackUsername = getUsernameByToken(authToken);  // pass authToken, not username
+            if (blackUsername == null) {
+                throw new UnauthorizedException("Unauthorized: Black player is not authorized");
             }
+
+            // Proceed with game creation
             String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement Stmt = conn.prepareStatement(insertQuery)) {
-                Stmt.setString(1, String.valueOf(id));
-                Stmt.setString(2, newGame.getWhiteUsername());
-                Stmt.setString(3, newGame.getBlackUsername());
-                Stmt.setString(4, newGame.getGameName());
-                Stmt.executeUpdate();
+            try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+                stmt.setString(1, String.valueOf(id));
+                stmt.setString(2, newGame.getWhiteUsername());
+                stmt.setString(3, newGame.getBlackUsername());
+                stmt.setString(4, newGame.getGameName());
+                stmt.executeUpdate();
             }
+
             return newGame;
 
         } catch (SQLException e) {
-            throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
+            throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
@@ -288,17 +309,21 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Unable to get DB connection");
             }
 
-            String getQuery = "DELETE FROM games WHERE gameID = ?";
+            String getQuery = "SELECT * FROM games WHERE gameID = ?";
             try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
                 Stmt.setString(1, String.valueOf(gameID));
                 try (ResultSet rs = Stmt.executeQuery()) {
-                    int gameIdentificator = rs.getInt("gameID");
-                    String gameName = rs.getString("gameName");
-                    String whiteUsername = rs.getString("whiteUsername");
-                    String blackUsername = rs.getString("blackUsername");
+                    if (rs.next()) {
+                        int gameIdentificator = rs.getInt("gameID");
+                        String gameName = rs.getString("gameName");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
 
-                    GameData result = new GameData(gameIdentificator, gameName, whiteUsername, blackUsername);
-                    return result;
+                        GameData result = new GameData(gameIdentificator, gameName, whiteUsername, blackUsername);
+                        return result;
+                    } else {
+                        return null; // Return null if no game is found
+                    }
                 }
             }
 
