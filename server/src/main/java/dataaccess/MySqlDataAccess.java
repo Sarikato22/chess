@@ -164,12 +164,9 @@ public class MySqlDataAccess implements DataAccess{
                 authStmt.setString(2, username);
                 authStmt.executeUpdate();
             }
-
-            // Return the session result with the username and token
             return new SessionResult(username, token);
 
         } catch (SQLException e) {
-            // If any SQL error happens, throw a DataAccessException, which will be handled by the service layer
             throw new DataAccessException("Database error during login: " + e.getMessage(), e);
         }
     }
@@ -187,11 +184,10 @@ public class MySqlDataAccess implements DataAccess{
                 int rowsDeleted = deleteStmt.executeUpdate();
 
                 if (rowsDeleted == 0) {
-                    // If no rows are deleted, it means the token was not found
-                    throw new DataAccessException("Token not found in the database");
+                    throw new UnauthorizedException("Token not found in the database");
                 }
 
-                return true; // Successful invalidation
+                return true;
             }
 
         } catch (SQLException e) {

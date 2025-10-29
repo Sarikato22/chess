@@ -8,6 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/SessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/SessionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +80,7 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.DatabaseTests">
+  <component name="RunManager" selected="JUnit.UnitTests.testLoginUser_NonExistentUser">
     <configuration name="DatabaseTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
@@ -94,23 +96,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DatabaseTests.databaseErrorHandling" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="passoff.server.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="passoff.server" />
-      <option name="MAIN_CLASS_NAME" value="passoff.server.DatabaseTests" />
-      <option name="METHOD_NAME" value="databaseErrorHandling" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="StandardAPITests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="StandardAPITests.logoutTwice" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -120,39 +106,49 @@
       </extension>
       <option name="PACKAGE_NAME" value="passoff.server" />
       <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
+      <option name="METHOD_NAME" value="logoutTwice" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UnitTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dataaccess.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dataaccess" />
+      <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
       <option name="TEST_OBJECT" value="class" />
+      <dir value="$PROJECT_DIR$/server/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StandardAPITests.createGameUnauthorized" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UnitTests.testLoginUser_NonExistentUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="passoff.server.*" />
+          <option name="PATTERN" value="dataaccess.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="passoff.server" />
-      <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
-      <option name="METHOD_NAME" value="createGameUnauthorized" />
+      <option name="PACKAGE_NAME" value="dataaccess" />
+      <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
+      <option name="METHOD_NAME" value="testLoginUser_NonExistentUser" />
       <option name="TEST_OBJECT" value="method" />
+      <dir value="$PROJECT_DIR$/server/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StandardAPITests.uniqueAuthorizationTokens" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="java in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="passoff.server.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="passoff.server" />
-      <option name="MAIN_CLASS_NAME" value="passoff.server.StandardAPITests" />
-      <option name="METHOD_NAME" value="uniqueAuthorizationTokens" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/server/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -170,11 +166,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UnitTests.testLoginUser_NonExistentUser" />
+        <item itemvalue="JUnit.UnitTests" />
+        <item itemvalue="JUnit.java in server" />
         <item itemvalue="JUnit.DatabaseTests" />
-        <item itemvalue="JUnit.DatabaseTests.databaseErrorHandling" />
-        <item itemvalue="JUnit.StandardAPITests" />
-        <item itemvalue="JUnit.StandardAPITests.createGameUnauthorized" />
-        <item itemvalue="JUnit.StandardAPITests.uniqueAuthorizationTokens" />
+        <item itemvalue="JUnit.StandardAPITests.logoutTwice" />
       </list>
     </recent_temporary>
   </component>
@@ -256,7 +252,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/server/handlers/SessionHandler.java</url>
-          <line>68</line>
+          <line>59</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -303,6 +299,11 @@
           <url>file://$PROJECT_DIR$/server/src/test/java/passoff/server/DatabaseTests.java</url>
           <line>121</line>
           <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/test/java/passoff/server/StandardAPITests.java</url>
+          <line>159</line>
+          <option name="timeStamp" value="39" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.NullPointerException" package="java.lang" />

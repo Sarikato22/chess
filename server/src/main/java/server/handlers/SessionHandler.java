@@ -4,6 +4,7 @@ import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import service.SessionService;
 
@@ -12,11 +13,11 @@ import java.util.Map;
 public class SessionHandler {
 
     private final SessionService sessionService;
-    private final Gson gson; // Gson serializer
+    private final Gson gson;
 
     public SessionHandler(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.gson = new Gson(); // initialize Gson
+        this.gson = new Gson();
     }
 
     public void logout(Context ctx) {
@@ -36,11 +37,10 @@ public class SessionHandler {
             }
 
         } catch (DataAccessException e) {
-            System.err.println("Database error during logout: " + e.getMessage());
+//            System.err.println("Database error during logout: " + e.getMessage());
             ctx.status(500).result(gson.toJson(Map.of("message", "Error: internal server error during logout")));
-        } catch (Exception e) {
-            System.err.println("Unexpected error during logout: " + e.getMessage());
-            ctx.status(500).result(gson.toJson(Map.of("message", "Error: unexpected internal error during logout")));
+        } catch (UnauthorizedException e) {
+            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unexpected internal error during logout")));
         }
     }
 

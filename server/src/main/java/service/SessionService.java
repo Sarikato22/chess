@@ -4,6 +4,7 @@ import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 
 public class SessionService {
 
@@ -36,21 +37,18 @@ public class SessionService {
     // Logout user
     public SessionResult logout(String authToken) throws DataAccessException {
         try {
-            // Attempt to invalidate the token
             boolean success = dao.invalidateToken(authToken);
 
-            // If successful, return a success result
             if (success) {
                 return SessionResult.success("Logged out successfully");
             } else {
-                // If the token wasn't found or could not be invalidated, return failure
                 return SessionResult.failure("Unauthorized");
             }
         } catch (DataAccessException e) {
-            // Propagate the database error back to the handler
             throw new DataAccessException("Error during token invalidation: " + e.getMessage(), e);
+        }catch (UnauthorizedException e){
+            throw new UnauthorizedException("Error: debug");
         } catch (Exception e) {
-            // Catch any other unexpected errors and rethrow them
             throw new RuntimeException("Unexpected error during logout: " + e.getMessage(), e);
         }
     }
