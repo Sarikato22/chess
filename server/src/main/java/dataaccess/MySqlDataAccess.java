@@ -184,14 +184,21 @@ public class MySqlDataAccess implements DataAccess{
             String deleteQuery = "DELETE FROM auth_tokens WHERE authToken = ?";
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
                 deleteStmt.setString(1, authToken);
-                int rowsDeleted = deleteStmt.executeUpdate();  // Correct method for DELETE queries
-                return rowsDeleted > 0;  // If rowsDeleted > 0, it means the token was invalidated
+                int rowsDeleted = deleteStmt.executeUpdate();
+
+                if (rowsDeleted == 0) {
+                    // If no rows are deleted, it means the token was not found
+                    throw new DataAccessException("Token not found in the database");
+                }
+
+                return true; // Successful invalidation
             }
 
         } catch (SQLException e) {
             throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
         }
     }
+
 
     @Override
     public String getUsernameByToken(String authToken) throws Exception {

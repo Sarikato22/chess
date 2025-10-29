@@ -3,6 +3,7 @@ package server.handlers;
 import chess.model.request.SessionRequest;
 import chess.model.result.SessionResult;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.SessionService;
 
@@ -19,27 +20,35 @@ public class SessionHandler {
     }
 
     public void logout(Context ctx) {
-        // Try header first
         String authToken = ctx.header("authorization");
+
         if (authToken == null || authToken.isEmpty()) {
             ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
             return;
         }
 
-        SessionResult result = sessionService.logout(authToken);
+        try {
+            SessionResult result = sessionService.logout(authToken);
+            if (result.isSuccess()) {
+                ctx.status(200).result(gson.toJson(Map.of()));
+            } else {
+                ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
+            }
 
-        if (result.isSuccess()) {
-            ctx.status(200).result(gson.toJson(Map.of()));
-        } else {
-            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
+        } catch (DataAccessException e) {
+            System.err.println("Database error during logout: " + e.getMessage());
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: internal server error during logout")));
+        } catch (Exception e) {
+            System.err.println("Unexpected error during logout: " + e.getMessage());
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: unexpected internal error during logout")));
         }
     }
+
 
     public void login(Context ctx) {
         SessionRequest sessionRequest;
 
         try {
-            // Deserialize using Gson
             sessionRequest = gson.fromJson(ctx.body(), SessionRequest.class);
         } catch (Exception e) {
             ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
