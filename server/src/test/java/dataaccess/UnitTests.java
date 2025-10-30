@@ -24,7 +24,7 @@ public class UnitTests {
 
     @Test
     @Order(1)
-    void registerUser_positive() throws Exception {
+    void registerUserPositive() throws Exception {
         RegisterRequest request = new RegisterRequest("alice", "password123", "alice@example.com");
         RegisterResult result = dao.registerUser(request);
         assertNotNull(result);
@@ -34,7 +34,7 @@ public class UnitTests {
 
     @Test
     @Order(2)
-    void registerUser_negative_duplicateUsername() throws Exception {
+    void registerUserNegativeDuplicateUsername() throws Exception {
         RegisterRequest request = new RegisterRequest("alice", "newpass", "alice2@example.com");
         RegisterResult result = dao.registerUser(request);
         assertTrue(result.getMessage().contains("already taken"));
@@ -42,7 +42,7 @@ public class UnitTests {
 
     @Test
     @Order(3)
-    void loginUser_positive() throws Exception {
+    void loginUserPositive() throws Exception {
         SessionRequest req = new SessionRequest("alice", "password123");
         SessionResult result = dao.loginUser(req);
         assertEquals("alice", result.getUsername());
@@ -51,16 +51,15 @@ public class UnitTests {
 
     @Test
     @Order(4)
-    void loginUser_negative_wrongPassword() throws Exception {
+    void loginUserNegativeWrongPassword() throws Exception {
         SessionRequest req = new SessionRequest("alice", "wrongpass");
         SessionResult result = dao.loginUser(req);
         assertTrue(result.getMessage().contains("Incorrect password"));
     }
 
-
     @Test
     @Order(5)
-    void invalidateToken_positive() throws Exception {
+    void invalidateTokenPositive() throws Exception {
         SessionRequest req = new SessionRequest("alice", "password123");
         SessionResult result = dao.loginUser(req);
         assertTrue(dao.invalidateToken(result.getAuthToken()));
@@ -68,12 +67,13 @@ public class UnitTests {
 
     @Test
     @Order(6)
-    void invalidateToken_negative_invalidToken() {
+    void invalidateTokenNegativeInvalidToken() {
         assertThrows(UnauthorizedException.class, () -> dao.invalidateToken("nonexistent-token"));
     }
+
     @Test
     @Order(7)
-    void getUsernameByToken_positive() throws Exception {
+    void getUsernameByTokenPositive() throws Exception {
         SessionRequest req = new SessionRequest("alice", "password123");
         SessionResult result = dao.loginUser(req);
         String username = dao.getUsernameByToken(result.getAuthToken());
@@ -82,14 +82,14 @@ public class UnitTests {
 
     @Test
     @Order(8)
-    void getUsernameByToken_negative_invalidToken() throws Exception {
+    void getUsernameByTokenNegativeInvalidToken() throws Exception {
         String username = dao.getUsernameByToken("fake-token");
         assertNull(username);
     }
 
     @Test
     @Order(9)
-    void createGame_positive() throws Exception {
+    void createGamePositive() throws Exception {
         SessionRequest req = new SessionRequest("alice", "password123");
         SessionResult result = dao.loginUser(req);
 
@@ -104,7 +104,7 @@ public class UnitTests {
     @Test
     @Order(10)
     @DisplayName("Test createGame with invalid token (Unauthorized)")
-    void createGame_negative_unauthorized() {
+    void createGameNegativeUnauthorized() {
         // Create the GameData object
         GameData game = new GameData(0, "Unauthorized Game", "bob", "charlie");
 
@@ -117,11 +117,9 @@ public class UnitTests {
         });
     }
 
-
-
     @Test
     @Order(11)
-    void listGames_positive() throws Exception {
+    void listGamesPositive() throws Exception {
         List<GameData> games = dao.listGames();
         assertNotNull(games);
         assertFalse(games.isEmpty());
@@ -129,7 +127,7 @@ public class UnitTests {
 
     @Test
     @Order(12)
-    void listGames_negative_emptyDatabase() throws DataAccessException {
+    void listGamesNegativeEmptyDatabase() throws DataAccessException {
         dao.clear();
         List<GameData> games = dao.listGames();
         assertTrue(games.isEmpty());
@@ -137,7 +135,7 @@ public class UnitTests {
 
     @Test
     @Order(13)
-    void updateGame_positive() throws Exception {
+    void updateGamePositive() throws Exception {
         dao.registerUser(new RegisterRequest("bob", "bobpass", "bob@example.com"));
         SessionResult session = dao.loginUser(new SessionRequest("bob", "bobpass"));
         GameData game = new GameData(0, "Match1", "bob", null);
@@ -152,17 +150,16 @@ public class UnitTests {
         assertEquals("alice", updated.getBlackUsername());
     }
 
-
     @Test
     @Order(14)
-    void updateGame_negative_notFound() {
+    void updateGameNegativeNotFound() {
         GameData nonexistent = new GameData(999, "Ghost Game", null, null);
         assertThrows(DataAccessException.class, () -> dao.updateGame(nonexistent));
     }
 
     @Test
     @Order(15)
-    void getGame_positive() throws Exception {
+    void getGamePositive() throws Exception {
         List<GameData> games = dao.listGames();
         assertFalse(games.isEmpty());
         GameData first = games.get(0);
@@ -173,15 +170,26 @@ public class UnitTests {
 
     @Test
     @Order(16)
-    void getGame_negative_notFound() throws Exception {
+    void getGameNegativeNotFound() throws Exception {
         GameData result = dao.getGame(9999);
         assertNull(result);
     }
+
     @Test
     @Order(17)
-    void clear_positive() throws DataAccessException {
+    void clearPositive() throws DataAccessException {
         dao.clear();
         List<GameData> games = dao.listGames();
         assertTrue(games.isEmpty());
     }
+
+    @Test
+    @Order(18)
+    void updateGameNegativeInvalidGameId() {
+
+        GameData nonexistentGame = new GameData(9999, "Non-existent Game", "bob", "alice");
+
+        assertThrows(DataAccessException.class, () -> dao.updateGame(nonexistentGame));
+    }
+
 }

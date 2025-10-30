@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java" afterDir="false" />
-    </list>
+    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -78,7 +74,7 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.server in server">
+  <component name="RunManager" selected="JUnit.UnitTests.updateGameNegativeInvalidGameId">
     <configuration name="UnitTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
@@ -95,7 +91,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UnitTests.createGame_negative_unauthorized" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UnitTests.updateGameNegativeInvalidGameId" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -105,7 +101,7 @@
       </extension>
       <option name="PACKAGE_NAME" value="dataaccess" />
       <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
-      <option name="METHOD_NAME" value="createGame_negative_unauthorized" />
+      <option name="METHOD_NAME" value="updateGameNegativeInvalidGameId" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -166,11 +162,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UnitTests.updateGameNegativeInvalidGameId" />
+        <item itemvalue="JUnit.UnitTests" />
         <item itemvalue="JUnit.server in server" />
         <item itemvalue="JUnit.UnitTests.updateGame_positive" />
-        <item itemvalue="JUnit.UnitTests" />
         <item itemvalue="JUnit.UnitTests.updateGame_negative_notFound" />
-        <item itemvalue="JUnit.UnitTests.createGame_negative_unauthorized" />
       </list>
     </recent_temporary>
   </component>
