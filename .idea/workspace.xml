@@ -78,7 +78,7 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\main\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UnitTests">
+  <component name="RunManager" selected="JUnit.server in server">
     <configuration name="UnitTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
@@ -95,7 +95,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UnitTests.testCreateGame_InvalidWhiteToken" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UnitTests.createGame_negative_unauthorized" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -105,13 +105,13 @@
       </extension>
       <option name="PACKAGE_NAME" value="dataaccess" />
       <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
-      <option name="METHOD_NAME" value="testCreateGame_InvalidWhiteToken" />
+      <option name="METHOD_NAME" value="createGame_negative_unauthorized" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UnitTests.testGetUsernameByToken_Invalid" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UnitTests.updateGame_negative_notFound" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <extension name="coverage">
         <pattern>
@@ -121,33 +121,34 @@
       </extension>
       <option name="PACKAGE_NAME" value="dataaccess" />
       <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
-      <option name="METHOD_NAME" value="testGetUsernameByToken_Invalid" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UnitTests.testLoginUser_NonExistentUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dataaccess.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="dataaccess" />
-      <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
-      <option name="METHOD_NAME" value="testLoginUser_NonExistentUser" />
+      <option name="METHOD_NAME" value="updateGame_negative_notFound" />
       <option name="TEST_OBJECT" value="method" />
       <dir value="$PROJECT_DIR$/server/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="java in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UnitTests.updateGame_positive" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="dataaccess.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="dataaccess" />
+      <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
+      <option name="METHOD_NAME" value="updateGame_positive" />
+      <option name="TEST_OBJECT" value="method" />
+      <dir value="$PROJECT_DIR$/server/src/test/java" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="server in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
       <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/server/src/test/java" />
+      <dir value="$PROJECT_DIR$/server/src/test/java/passoff/server" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -165,11 +166,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.server in server" />
+        <item itemvalue="JUnit.UnitTests.updateGame_positive" />
         <item itemvalue="JUnit.UnitTests" />
-        <item itemvalue="JUnit.UnitTests.testCreateGame_InvalidWhiteToken" />
-        <item itemvalue="JUnit.UnitTests.testGetUsernameByToken_Invalid" />
-        <item itemvalue="JUnit.UnitTests.testLoginUser_NonExistentUser" />
-        <item itemvalue="JUnit.java in server" />
+        <item itemvalue="JUnit.UnitTests.updateGame_negative_notFound" />
+        <item itemvalue="JUnit.UnitTests.createGame_negative_unauthorized" />
       </list>
     </recent_temporary>
   </component>
@@ -301,13 +302,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java</url>
-          <line>236</line>
+          <line>180</line>
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java</url>
-          <line>241</line>
+          <line>184</line>
           <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java</url>
+          <line>227</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/server/src/test/java/dataaccess/UnitTests.java</url>
+          <line>115</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.NullPointerException" package="java.lang" />

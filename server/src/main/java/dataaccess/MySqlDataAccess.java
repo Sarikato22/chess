@@ -251,6 +251,8 @@ public class MySqlDataAccess implements DataAccess{
 
         } catch (SQLException e) {
             throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
+        } catch (UnauthorizedException e){
+            throw new UnauthorizedException("Unauthorized");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -266,8 +268,8 @@ public class MySqlDataAccess implements DataAccess{
             }
 
             String getQuery = "SELECT * FROM games";
-            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
-                try (ResultSet rs = Stmt.executeQuery()) {
+            try (PreparedStatement stmt = conn.prepareStatement(getQuery)) {
+                try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         int gameID = rs.getInt("gameID");
                         String gameName = rs.getString("gameName");
@@ -326,8 +328,9 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (DataAccessException e) {
             throw new DataAccessException("Database error during game update: " + e.getMessage(), e);
+
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error during game update: " + e.getMessage(), e);
         }
@@ -343,9 +346,9 @@ public class MySqlDataAccess implements DataAccess{
             }
 
             String getQuery = "SELECT * FROM games WHERE gameID = ?";
-            try (PreparedStatement Stmt = conn.prepareStatement(getQuery)) {
-                Stmt.setString(1, String.valueOf(gameID));
-                try (ResultSet rs = Stmt.executeQuery()) {
+            try (PreparedStatement stmt = conn.prepareStatement(getQuery)) {
+                stmt.setString(1, String.valueOf(gameID));
+                try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         int gameIdentificator = rs.getInt("gameID");
                         String gameName = rs.getString("gameName");

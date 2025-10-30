@@ -103,10 +103,21 @@ public class UnitTests {
 
     @Test
     @Order(10)
+    @DisplayName("Test createGame with invalid token (Unauthorized)")
     void createGame_negative_unauthorized() {
+        // Create the GameData object
         GameData game = new GameData(0, "Unauthorized Game", "bob", "charlie");
-        assertThrows(UnauthorizedException.class, () -> dao.createGame(game, "invalid-token"));
+
+        // Ensure the invalid token is passed
+        String invalidToken = "invalid-token";
+
+        // You should see logging in createGame indicating entry
+        assertThrows(UnauthorizedException.class, () -> {
+            dao.createGame(game, invalidToken);  // Test target
+        });
     }
+
+
 
     @Test
     @Order(11)
@@ -127,11 +138,12 @@ public class UnitTests {
     @Test
     @Order(13)
     void updateGame_positive() throws Exception {
-        // re-register and create new game
         dao.registerUser(new RegisterRequest("bob", "bobpass", "bob@example.com"));
         SessionResult session = dao.loginUser(new SessionRequest("bob", "bobpass"));
         GameData game = new GameData(0, "Match1", "bob", null);
         GameData created = dao.createGame(game, session.getAuthToken());
+
+        dao.registerUser(new RegisterRequest("alice", "alicepass", "alice@example.com"));
 
         created.setBlackUsername("alice");
         dao.updateGame(created);
@@ -139,6 +151,7 @@ public class UnitTests {
         GameData updated = dao.getGame(created.getGameId());
         assertEquals("alice", updated.getBlackUsername());
     }
+
 
     @Test
     @Order(14)
