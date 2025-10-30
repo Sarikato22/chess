@@ -5,285 +5,170 @@ import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.RegisterResult;
 import chess.model.result.SessionResult;
-import dataaccess.DatabaseManager;
 import org.junit.jupiter.api.*;
-import service.ClearService;
-import service.GameService;
-import service.SessionService;
-import service.UserService;
 
-import javax.xml.crypto.Data;
-import java.sql.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UnitTests {
 
-    private UserService userService;
-    private SessionService sessionService;
-    private GameService gameService;
-    private ClearService clearService;
-    private MySqlDataAccess dao;
-
-    @BeforeEach
-    public void setup() {
-        dao = new MySqlDataAccess();
-        userService = new UserService(dao);
-        clearService = new ClearService(dao);
-        clearService.clear();
-        sessionService = new SessionService(dao);
-        gameService = new GameService(dao);
-    }
-
-    private static String[] createStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                username VARCHAR(50) PRIMARY KEY,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(100) NOT NULL
-            );
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS auth_tokens (
-                authToken CHAR(36) PRIMARY KEY,
-                username VARCHAR(50) NOT NULL,
-                FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
-            );
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS games (
-                gameID INT AUTO_INCREMENT PRIMARY KEY,
-                whiteUsername VARCHAR(50),
-                blackUsername VARCHAR(50),
-                gameName VARCHAR(100) NOT NULL,
-                game TEXT,
-                FOREIGN KEY (whiteUsername) REFERENCES users(username) ON DELETE SET NULL,
-                FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
-            );
-            """
-    };
+    private static MySqlDataAccess dao;
 
     @BeforeAll
-    static void setupDatabase() throws Exception {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String stmt : createStatements) {
-                conn.createStatement().executeUpdate(stmt);
-            }
-        }
+    static void setup() {
+        dao = new MySqlDataAccess();
+        dao.clear(); // start clean
     }
 
     @Test
-    @DisplayName("Check if 'users' table exists")
-    void testUsersTableExists() throws Exception {
-        assertTrue(tableExists("users"), "Table 'users' should exist");
-    }
-
-    @Test
-    @DisplayName("Check if 'auth_tokens' table exists")
-    void testAuthTokensTableExists() throws Exception {
-        assertTrue(tableExists("auth_tokens"), "Table 'auth_tokens' should exist");
-    }
-
-    @Test
-    @DisplayName("Check if 'games' table exists")
-    void testGamesTableExists() throws Exception {
-        assertTrue(tableExists("games"), "Table 'games' should exist");
-    }
-
-    private boolean tableExists(String tableName) throws Exception {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            DatabaseMetaData metaData = conn.getMetaData();
-            try (ResultSet rs = metaData.getTables(null, null, tableName, new String[]{"TABLE"})) {
-                return rs.next();
-            }
-        }
-    }
-
-    @Test
-    @DisplayName("Attempt to register a duplicated user")
-    public void testRegisterUser_DuplicateUsername() throws DataAccessException {
-        // Arrange
-        RegisterRequest request1 = new RegisterRequest("bob", "pass1", "bob@example.com");
-        RegisterRequest request2 = new RegisterRequest("bob", "pass2", "bob2@example.com");
-
-        // Act
-        userService.register(request1);
-        RegisterResult result = userService.register(request2);
-
-        // Assert
-        assertFalse(result.isSuccess());
-        assertEquals("bob", result.getUsername());
-        assertEquals("Error: already taken", result.getMessage());
-    }
-
-    @Test
-    @DisplayName("Verify password is hashed after register")
-    public void testRegisterUser_PasswordIsHashed() throws DataAccessException, SQLException {
-        // Arrange
-        String rawPassword = "mySecretPass";
-        RegisterRequest request = new RegisterRequest("charlie", rawPassword, "charlie@example.com");
-
-        // Act
-        userService.register(request);
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
-            stmt.setString(1, "charlie");
-            ResultSet rs = stmt.executeQuery();
-
-            assertTrue(rs.next());
-            String storedPassword = rs.getString("password");
-            assertNotEquals(rawPassword, storedPassword); // raw password should NOT be stored
-            assertTrue(storedPassword.startsWith("$2a$")); // bcrypt hashes start with $2a$, $2b$ or $2y$
-        }
-    }
-
-    @Test
-    @DisplayName("Verify authToken gets generated on register")
-    public void testRegisterUser_AuthTokenExists() throws DataAccessException, SQLException {
-        // Arrange
-        RegisterRequest request = new RegisterRequest("dave", "pass123", "dave@example.com");
-
-        // Act
-        userService.register(request);
-
-        // Verify token exists in DB
-        try (Connection conn = DatabaseManager.getConnection()) {
-            conn.setAutoCommit(true); // ensure we see committed data from other connections
-
-            try (PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT authToken FROM auth_tokens WHERE username = ?")) {
-                stmt.setString(1, "dave");
-                ResultSet rs = stmt.executeQuery();
-
-                assertTrue(rs.next(), "Auth token should exist for the user");
-                String tokenInDb = rs.getString("authToken");
-                assertNotNull(tokenInDb, "Auth token should not be null");
-                assertFalse(tokenInDb.isEmpty(), "Auth token should not be empty");
-            }
-        }
-    }
-
-    //// Tests for login
-    @Test
-    @DisplayName("Attempt to sucesfully log in")
-    public void testLoginUser_Success() throws Exception {
-        // Arrange: register user first
-        userService.register(new RegisterRequest("alice", "password123", "alice@example.com"));
-
-        // Act: login with correct credentials
-        SessionRequest loginReq = new SessionRequest("alice", "password123");
-        SessionResult result = sessionService.login(loginReq);
-
-        // Assert
-        assertNotNull(result, "Result should not be null");
+    @Order(1)
+    void registerUser_positive() throws Exception {
+        RegisterRequest request = new RegisterRequest("alice", "password123", "alice@example.com");
+        RegisterResult result = dao.registerUser(request);
+        assertNotNull(result);
         assertEquals("alice", result.getUsername());
-        assertNotNull(result.getAuthToken(), "Auth token should be generated");
+        assertNotNull(result.getAuthToken());
     }
 
     @Test
-    @DisplayName("Attempt to log in with wrong password")
-    public void testLoginUser_WrongPassword() throws Exception {
-        userService.register(new RegisterRequest("alice", "correctpassword", "alice@example.com"));
-        SessionRequest loginReq = new SessionRequest("alice", "wrongpassword");
-        SessionResult result = sessionService.login(loginReq);
+    @Order(2)
+    void registerUser_negative_duplicateUsername() throws Exception {
+        RegisterRequest request = new RegisterRequest("alice", "newpass", "alice2@example.com");
+        RegisterResult result = dao.registerUser(request);
+        assertTrue(result.getMessage().contains("already taken"));
+    }
 
+    @Test
+    @Order(3)
+    void loginUser_positive() throws Exception {
+        SessionRequest req = new SessionRequest("alice", "password123");
+        SessionResult result = dao.loginUser(req);
+        assertEquals("alice", result.getUsername());
+        assertNotNull(result.getAuthToken());
+    }
+
+    @Test
+    @Order(4)
+    void loginUser_negative_wrongPassword() throws Exception {
+        SessionRequest req = new SessionRequest("alice", "wrongpass");
+        SessionResult result = dao.loginUser(req);
+        assertTrue(result.getMessage().contains("Incorrect password"));
+    }
+
+
+    @Test
+    @Order(5)
+    void invalidateToken_positive() throws Exception {
+        SessionRequest req = new SessionRequest("alice", "password123");
+        SessionResult result = dao.loginUser(req);
+        assertTrue(dao.invalidateToken(result.getAuthToken()));
+    }
+
+    @Test
+    @Order(6)
+    void invalidateToken_negative_invalidToken() {
+        assertThrows(UnauthorizedException.class, () -> dao.invalidateToken("nonexistent-token"));
+    }
+    @Test
+    @Order(7)
+    void getUsernameByToken_positive() throws Exception {
+        SessionRequest req = new SessionRequest("alice", "password123");
+        SessionResult result = dao.loginUser(req);
+        String username = dao.getUsernameByToken(result.getAuthToken());
+        assertEquals("alice", username);
+    }
+
+    @Test
+    @Order(8)
+    void getUsernameByToken_negative_invalidToken() throws Exception {
+        String username = dao.getUsernameByToken("fake-token");
+        assertNull(username);
+    }
+
+    @Test
+    @Order(9)
+    void createGame_positive() throws Exception {
+        SessionRequest req = new SessionRequest("alice", "password123");
+        SessionResult result = dao.loginUser(req);
+
+        GameData game = new GameData(0, "Chess Battle", "alice", null);
+        GameData created = dao.createGame(game, result.getAuthToken());
+
+        assertNotNull(created);
+        assertEquals("Chess Battle", created.getGameName());
+        assertEquals("alice", created.getWhiteUsername());
+    }
+
+    @Test
+    @Order(10)
+    void createGame_negative_unauthorized() {
+        GameData game = new GameData(0, "Unauthorized Game", "bob", "charlie");
+        assertThrows(UnauthorizedException.class, () -> dao.createGame(game, "invalid-token"));
+    }
+
+    @Test
+    @Order(11)
+    void listGames_positive() throws Exception {
+        List<GameData> games = dao.listGames();
+        assertNotNull(games);
+        assertFalse(games.isEmpty());
+    }
+
+    @Test
+    @Order(12)
+    void listGames_negative_emptyDatabase() throws DataAccessException {
+        dao.clear();
+        List<GameData> games = dao.listGames();
+        assertTrue(games.isEmpty());
+    }
+
+    @Test
+    @Order(13)
+    void updateGame_positive() throws Exception {
+        // re-register and create new game
+        dao.registerUser(new RegisterRequest("bob", "bobpass", "bob@example.com"));
+        SessionResult session = dao.loginUser(new SessionRequest("bob", "bobpass"));
+        GameData game = new GameData(0, "Match1", "bob", null);
+        GameData created = dao.createGame(game, session.getAuthToken());
+
+        created.setBlackUsername("alice");
+        dao.updateGame(created);
+
+        GameData updated = dao.getGame(created.getGameId());
+        assertEquals("alice", updated.getBlackUsername());
+    }
+
+    @Test
+    @Order(14)
+    void updateGame_negative_notFound() {
+        GameData nonexistent = new GameData(999, "Ghost Game", null, null);
+        assertThrows(DataAccessException.class, () -> dao.updateGame(nonexistent));
+    }
+
+    @Test
+    @Order(15)
+    void getGame_positive() throws Exception {
+        List<GameData> games = dao.listGames();
+        assertFalse(games.isEmpty());
+        GameData first = games.get(0);
+        GameData result = dao.getGame(first.getGameId());
         assertNotNull(result);
-        assertFalse(result.isSuccess());
-        assertEquals("Invalid Request: Incorrect password", result.getMessage());
+        assertEquals(first.getGameId(), result.getGameId());
     }
 
     @Test
-    @DisplayName("Attempt to log in non-existent user")
-    public void testLoginUser_NonExistentUser() throws Exception {
-        SessionRequest loginReq = new SessionRequest("bob", "password123");
-        SessionResult result = sessionService.login(loginReq);
-
-        assertNotNull(result);
-        assertFalse(result.isSuccess());
-        assertEquals("Invalid Request: Username not found", result.getMessage());
+    @Order(16)
+    void getGame_negative_notFound() throws Exception {
+        GameData result = dao.getGame(9999);
+        assertNull(result);
     }
-    //Invalidate Token tests
-
     @Test
-    @DisplayName("Invalidate existing token succeeds")
-    void testInvalidateToken_Existing() throws Exception {
-        String token = "test-token-123";
-        String username = "alice";
-
-        userService.register(new RegisterRequest(username, "password123", "alice@example.com"));
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)")) {
-            stmt.setString(1, token);
-            stmt.setString(2, username);
-            stmt.executeUpdate();
-        }
-
-        boolean result = dao.invalidateToken(token);
-        assertTrue(result, "invalidateToken should return true for existing token");
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM auth_tokens WHERE authToken = ?")) {
-            stmt.setString(1, token);
-            ResultSet rs = stmt.executeQuery();
-            assertFalse(rs.next(), "Token should be removed from DB");
-        }
+    @Order(17)
+    void clear_positive() throws DataAccessException {
+        dao.clear();
+        List<GameData> games = dao.listGames();
+        assertTrue(games.isEmpty());
     }
-
-    @Test
-    @DisplayName("Multiple tokens remain unaffected")
-    void testInvalidateToken_OtherTokensRemain() throws Exception {
-        // First, create users so FK constraints are satisfied
-        userService.register(new RegisterRequest("alice", "pass1", "alice@example.com"));
-        userService.register(new RegisterRequest("bob", "pass2", "bob@example.com"));
-
-        String token1 = "token1";
-        String token2 = "token2";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)")) {
-            stmt.setString(1, token1);
-            stmt.setString(2, "alice");
-            stmt.executeUpdate();
-
-            stmt.setString(1, token2);
-            stmt.setString(2, "bob");
-            stmt.executeUpdate();
-        }
-
-        boolean result = dao.invalidateToken(token1);
-        assertTrue(result, "invalidateToken should return true for token1");
-
-        // token2 should still exist
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM auth_tokens WHERE authToken = ?")) {
-            stmt.setString(1, token2);
-            ResultSet rs = stmt.executeQuery();
-            assertTrue(rs.next(), "Other tokens should remain in the table");
-        }
-    }
-
-    //getUsernamebyToken
-    @Test
-    @DisplayName("getUsernameByToken returns correct username for valid token")
-    void testGetUsernameByToken_Valid() throws Exception {
-        String username = "alice";
-
-        RegisterResult result = userService.register(new RegisterRequest("alice", "password1", "alice@example.com"));
-        String token = result.getAuthToken();
-
-        //attempt to get the username
-        String retrieved_username = dao.getUsernameByToken(token);
-        assertNotNull(retrieved_username);
-        assertEquals(username, retrieved_username);
-    }
-
-
 }

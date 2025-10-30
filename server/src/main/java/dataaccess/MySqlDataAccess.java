@@ -143,8 +143,6 @@ public class MySqlDataAccess implements DataAccess{
                     if (!rs.next()) {
                         return SessionResult.failure("Invalid Request: Username not found");
                     }
-
-                    // If user found, check password
                     String storedHash = rs.getString("password");
 
                     if (!PasswordUtil.verifyPassword(password, storedHash)) {
@@ -152,12 +150,9 @@ public class MySqlDataAccess implements DataAccess{
                     }
                 }
             }
-
-            // If the username exists and password is correct, generate an auth token
             String token = UUID.randomUUID().toString();
             System.out.println("Generated token for " + username + ": " + token);
 
-            // Insert token into the database
             String insertAuthSql = "INSERT INTO auth_tokens (authToken, username) VALUES (?, ?)";
             try (PreparedStatement authStmt = conn.prepareStatement(insertAuthSql)) {
                 authStmt.setString(1, token);
@@ -195,11 +190,9 @@ public class MySqlDataAccess implements DataAccess{
         }
     }
 
-
     @Override
     public String getUsernameByToken(String authToken) throws Exception {
         if (authToken == null || authToken.isEmpty()) {
-
         }
 
         try (Connection conn = getConnection()) {
@@ -214,9 +207,7 @@ public class MySqlDataAccess implements DataAccess{
                     if (rs.next()) {
                         return rs.getString("username");
                     } else {
-                        // Log if the token does not exist in the database
-                        System.out.println("No username found for token: " + authToken);
-                        return null; // Explicitly return null if not found
+                        return null;
                     }
                 }
             }
@@ -312,7 +303,6 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
 
-            // Prepare the query to update the game based on which color the player is joining as
             String updateGameQuery = "UPDATE games SET whiteUsername = ?, blackUsername = ? WHERE gameID = ?";
 
             try (PreparedStatement stmt = conn.prepareStatement(updateGameQuery)) {
@@ -320,19 +310,16 @@ public class MySqlDataAccess implements DataAccess{
                 if (game.getWhiteUsername() != null) {
                     stmt.setString(1, game.getWhiteUsername());
                 } else {
-                    stmt.setNull(1, Types.VARCHAR);  // If whiteUsername is null, set it to SQL null
+                    stmt.setNull(1, Types.VARCHAR);
                 }
 
                 if (game.getBlackUsername() != null) {
                     stmt.setString(2, game.getBlackUsername());
                 } else {
-                    stmt.setNull(2, Types.VARCHAR);  // If blackUsername is null, set it to SQL null
+                    stmt.setNull(2, Types.VARCHAR);
                 }
 
-                // Set the gameID to ensure the correct game is updated
                 stmt.setInt(3, game.getGameId());
-
-                // Execute the update
                 int rowsUpdated = stmt.executeUpdate();
                 if (rowsUpdated == 0) {
                     throw new DataAccessException("Failed to update the game with ID: " + game.getGameId());
@@ -377,4 +364,5 @@ public class MySqlDataAccess implements DataAccess{
             throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
         }
         }
+
     }
