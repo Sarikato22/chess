@@ -13,13 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
 
     private static Server server;
+    private static ServerFacade facade;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-
+        facade = new ServerFacade("http://localhost:" + port);
 
     }
 
@@ -37,7 +38,7 @@ public class ServerFacadeTests {
     //Clear test
     @Test
     public void testClearDatabase() throws Exception {
-        var facade = new ServerFacade("http://localhost:8080");
+
         facade.clear();
 
         //how can I assert its empty?
@@ -45,10 +46,9 @@ public class ServerFacadeTests {
     //Register tests
     @Test
     public void testRegisterSuccess() throws Exception {
-        var facade = new ServerFacade("http://localhost:8080");
         facade.clear();
 
-        var request = new RegisterRequest("testUser1", "password123", "test@example.com");
+        var request = new RegisterRequest("testUser", "password123", "test@example.com");
         var result = facade.register(request);
 
         System.out.println("Result: success=" + result.isSuccess() +

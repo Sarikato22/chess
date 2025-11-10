@@ -32,10 +32,8 @@ public class UserHandler {
             RegisterResult result = userService.register(request);
 
             if (result.isSuccess()) {
-                ctx.status(200).result(gson.toJson(Map.of(
-                        "username", result.getUsername(),
-                        "authToken", result.getAuthToken()
-                )));
+                ctx.status(200).result(gson.toJson(result));
+
             } else {
                 String message = result.getMessage() != null ? result.getMessage() : "Internal error";
 

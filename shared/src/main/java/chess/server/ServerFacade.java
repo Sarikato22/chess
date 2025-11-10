@@ -21,7 +21,11 @@ public class ServerFacade {
     public RegisterResult register(RegisterRequest req) throws ResponseException {
         var request = buildRequest("POST", "/user", req);
         var response = sendRequest(request);
-        return handleResponse(response, RegisterResult.class);
+        var result = handleResponse(response, RegisterResult.class);
+        if (!result.isSuccess()) {
+            throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
+        }
+        return result;
     }
 
     public void clear() throws ResponseException {
@@ -54,7 +58,11 @@ public class ServerFacade {
         }
     }
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
+
         var status = response.statusCode();
+        System.out.println("HTTP status: " + response.statusCode());
+        System.out.println("Response body: " + response.body());
+
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
