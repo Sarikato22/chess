@@ -24,6 +24,12 @@ public class ServerFacade {
         return handleResponse(response, RegisterResult.class);
     }
 
+    public void clear() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null);
+        sendRequest(request);
+    }
+
+
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))

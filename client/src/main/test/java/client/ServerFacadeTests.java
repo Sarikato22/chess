@@ -1,6 +1,7 @@
 package client;
 
 import chess.model.request.RegisterRequest;
+import chess.model.result.RegisterResult;
 import chess.server.ResponseException;
 import chess.server.ServerFacade;
 import org.junit.jupiter.api.*;
@@ -19,6 +20,7 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
+
     }
 
     @AfterAll
@@ -32,10 +34,19 @@ public class ServerFacadeTests {
         assertTrue(true);
     }
 
+    //Clear test
+    @Test
+    public void testClearDatabase() throws Exception {
+        var facade = new ServerFacade("http://localhost:8080");
+        facade.clear();
+
+        //how can I assert its empty?
+    }
     //Register tests
     @Test
     public void testRegisterSuccess() throws Exception {
         var facade = new ServerFacade("http://localhost:8080");
+        facade.clear();
 
         var request = new RegisterRequest("testUser1", "password123", "test@example.com");
         var result = facade.register(request);

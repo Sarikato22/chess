@@ -7,7 +7,7 @@
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/test/java/client/ServerFacadeTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/test/java/client/ServerFacadeTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/server/ResponseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/server/ResponseException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,10 +79,26 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\test\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ServerFacadeTests.testRegisterSuccess">
+  <component name="RunManager" selected="JUnit.ServerFacadeTests.testClearDatabase">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="server" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServerFacadeTests.testClearDatabase" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="client" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="client" />
+      <option name="MAIN_CLASS_NAME" value="client.ServerFacadeTests" />
+      <option name="METHOD_NAME" value="testClearDatabase" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -135,14 +151,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="server in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/server/src/test/java/passoff/server" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <method v="2">
         <option name="Make" enabled="true" />
@@ -156,11 +164,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ServerFacadeTests.testClearDatabase" />
         <item itemvalue="JUnit.ServerFacadeTests.testRegisterSuccess" />
         <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.UnitTests.updateGameNegativeInvalidGameId" />
         <item itemvalue="JUnit.UnitTests" />
-        <item itemvalue="JUnit.server in server" />
       </list>
     </recent_temporary>
   </component>
@@ -208,7 +216,7 @@
       <workItem from="1761277602215" duration="1673000" />
       <workItem from="1761445058006" duration="2641000" />
       <workItem from="1761596760895" duration="18756000" />
-      <workItem from="1762802605874" duration="4689000" />
+      <workItem from="1762802605874" duration="5774000" />
     </task>
     <servers />
   </component>
@@ -311,6 +319,16 @@
           <line>115</line>
           <option name="timeStamp" value="46" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java</url>
+          <line>22</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java</url>
+          <line>23</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.NullPointerException" package="java.lang" />
           <option name="timeStamp" value="18" />
@@ -326,6 +344,7 @@
     <watches-manager>
       <configuration name="JUnit">
         <watch expression="request" language="JAVA" />
+        <watch expression="((HttpResponseImpl)response).body" custom="jdk.internal.net.http.HttpResponseImpl" />
       </configuration>
     </watches-manager>
   </component>
