@@ -65,7 +65,10 @@ public class GameHandler {
                 GameResult result = gameService.createGame(authToken, request.getGameName());
 
                 if (result.isSuccess()) {
-                    ctx.status(200).result(gson.toJson(Map.of("gameID", result.getGameID())));
+                    ctx.status(200).result(gson.toJson(Map.of(
+                            "success", result.isSuccess(),
+                            "gameID", result.getGameID()
+                    )));
                 } else {
                     String message = result.getMessage() != null ? result.getMessage() : "Internal error";
 

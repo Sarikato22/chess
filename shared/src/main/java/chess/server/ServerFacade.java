@@ -1,6 +1,9 @@
 package chess.server;
 
+import chess.model.data.GameData;
+import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import com.google.gson.Gson;
 
@@ -11,6 +14,7 @@ import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -19,7 +23,7 @@ public class ServerFacade {
     public ServerFacade(String url) {serverUrl = url; }
 
     public RegisterResult register(RegisterRequest req) throws ResponseException {
-        var request = buildRequest("POST", "/user", req);
+        var request = buildRequest("POST", "/user", req, null);
         var response = sendRequest(request);
         var result = handleResponse(response, RegisterResult.class);
         if (!result.isSuccess()) {
@@ -28,21 +32,42 @@ public class ServerFacade {
         return result;
     }
 
+    public GameResult createGame(GameRequest req, Map<String, String> headers) throws ResponseException {
+        var request = buildRequest("POST", "/game", req, headers);
+        var response = sendRequest(request);
+        var result = handleResponse(response, GameResult.class);
+        if (result.getGameID() == null) {
+            throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
+        }
+        return result;
+    }
+
     public void clear() throws ResponseException {
-        var request = buildRequest("DELETE", "/db", null);
+        var request = buildRequest("DELETE", "/db", null, null);
         sendRequest(request);
     }
 
-
-    private HttpRequest buildRequest(String method, String path, Object body) {
-        var request = HttpRequest.newBuilder()
+    private HttpRequest buildRequest(String method, String path, Object body, Map<String, String> headers) {
+        var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
+
         if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+            builder.setHeader("Content-Type", "application/json");
         }
-        return request.build();
+
+        if (headers != null) {
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    builder.setHeader(entry.getKey(), entry.getValue());
+                }
+            }
+
+        }
+
+        return builder.build();
     }
+
     private BodyPublisher makeRequestBody(Object request) {
         if (request != null) {
             return BodyPublishers.ofString(new Gson().toJson(request));

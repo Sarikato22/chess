@@ -1,11 +1,14 @@
 package client;
 
+import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.result.RegisterResult;
 import chess.server.ResponseException;
 import chess.server.ServerFacade;
 import org.junit.jupiter.api.*;
 import server.Server;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,14 +38,6 @@ public class ServerFacadeTests {
         assertTrue(true);
     }
 
-    //Clear test
-    @Test
-    public void testClearDatabase() throws Exception {
-
-        facade.clear();
-
-        //how can I assert its empty?
-    }
     //Register tests
     @Test
     public void testRegisterSuccess() throws Exception {
@@ -75,4 +70,32 @@ public class ServerFacadeTests {
             assertEquals(ResponseException.Code.ClientError, ex.code());
         }
     }
+
+    //Test for createGame
+    @Test
+    public void testCreateGameSuccess() throws Exception {
+        facade.clear();
+
+        // Register a user first
+        var registerRequest = new RegisterRequest("testUser1", "password123", "test@example.com");
+        var registerResult = facade.register(registerRequest);
+
+        assertTrue(registerResult.isSuccess(), "Registration should succeed");
+
+        // Create game using the auth token
+        var gameRequest = new GameRequest("MyFirstGame");
+        var headers = Map.of("Authorization", registerResult.getAuthToken());
+        var gameResult = facade.createGame(gameRequest, headers);
+
+        System.out.println("Result: success=" + gameResult.isSuccess() +
+                ", message=" + gameResult.getMessage() +
+                ", gameId=" + gameResult.getGameID());
+
+        assertNotNull(gameResult);
+        assertTrue(gameResult.isSuccess(), "Expected game creation to succeed");
+        assertNotNull(gameResult.getGameID(), "Game ID should not be null");
+        assertNull(gameResult.getMessage(), "There should be no error message on success");
+    }
+
+
 }
