@@ -12,46 +12,31 @@ public class ResponseException extends Exception {
 
     public enum Code {
         ServerError,
-        ClientError
+        ClientError,
     }
 
-    private final Code code;
+    final private Code code;
 
-    // --- Constructors ---
     public ResponseException(Code code, String message) {
         super(message);
         this.code = code;
     }
 
-    public ResponseException(String message) {
-        this(Code.ClientError, message);
+    public String toJson() {
+        return new Gson().toJson(Map.of("message", getMessage(), "status", code));
     }
 
-    public ResponseException(Code code, String message, Throwable cause) {
-        super(message, cause);
-        this.code = code;
+    public static ResponseException fromJson(String json) {
+        var map = new Gson().fromJson(json, HashMap.class);
+        var status = Code.valueOf(map.get("status").toString());
+        String message = map.get("message").toString();
+        return new ResponseException(status, message);
     }
 
     public Code code() {
         return code;
     }
 
-    // --- JSON serialization ---
-    public String toJson() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("message", getMessage());
-        map.put("status", code.name());
-        return new Gson().toJson(map);
-    }
-
-    public static ResponseException fromJson(String json) {
-        var map = new Gson().fromJson(json, HashMap.class);
-        var code = Code.valueOf(map.get("status").toString());
-        var message = map.get("message").toString();
-        return new ResponseException(code, message);
-    }
-
-    // --- HTTP status mapping ---
     public static Code fromHttpStatusCode(int httpStatusCode) {
         return switch (httpStatusCode) {
             case 500 -> Code.ServerError;
@@ -65,13 +50,5 @@ public class ResponseException extends Exception {
             case ServerError -> 500;
             case ClientError -> 400;
         };
-    }
-
-    @Override
-    public String toString() {
-        return "ResponseException{" +
-                "code=" + code +
-                ", message='" + getMessage() + '\'' +
-                '}';
     }
 }
