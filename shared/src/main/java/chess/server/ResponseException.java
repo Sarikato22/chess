@@ -10,12 +10,17 @@ import java.util.Map;
  */
 public class ResponseException extends Exception {
 
+
+
     public enum Code {
         ServerError,
         ClientError, Unauthorized, Other,
     }
 
     final private Code code;
+    public Code getCode() {
+        return this.code;
+    }
 
     public ResponseException(Code code, String message) {
         super(message);

@@ -105,7 +105,10 @@ public class GameHandler {
             JoinGameResult result = gameService.joinGame(authToken, req.getPlayerColor(), req.getGameID());
 
             if (result.isSuccess()) {
-                ctx.status(200).result(""); // empty response
+                    ctx.status(200).result(gson.toJson(Map.of(
+                            "success", true,
+                            "message", result.getMessage()
+                    )));
             } else {
                 String message = result.getMessage() != null ? result.getMessage() : "";
                 if (message.contains("unauthorized")) {

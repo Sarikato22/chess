@@ -2,6 +2,7 @@ package chess.server;
 
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
+import chess.model.request.JoinGameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.GameListResult;
@@ -83,6 +84,14 @@ public class ServerFacade {
             throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
         }
         return result;
+    }
+    //joinGame
+
+    public GameResult joinGame(String authToken, JoinGameRequest req) throws ResponseException {
+        var headers = Map.of("authorization", authToken);
+        var request = buildRequest("PUT", "/game", req, headers);
+        var response = sendRequest(request);
+        return handleResponse(response, GameResult.class);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, Map<String, String> headers) {

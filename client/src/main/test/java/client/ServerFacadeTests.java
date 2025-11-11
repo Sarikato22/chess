@@ -1,6 +1,8 @@
 package client;
 
+import chess.ChessGame;
 import chess.model.request.GameRequest;
+import chess.model.request.JoinGameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import chess.model.result.GameListResult;
@@ -185,7 +187,60 @@ public class ServerFacadeTests {
         assertThrows(ResponseException.class, () -> facade.logout(badToken));
     }
 
+    //test JoinGame
+    @Test
+    public void testJoinGameSuccess() throws Exception {
+        facade.clear();
+        var userReq = new RegisterRequest("joinUser", "pass123", "email@example.com");
+        var userRes = facade.register(userReq);
+        assertTrue(userRes.isSuccess());
 
+        var loginReq = new SessionRequest("joinUser", "pass123");
+        var loginRes = facade.login(loginReq);
+        assertTrue(loginRes.isSuccess());
+        String authToken = loginRes.getAuthToken();
+
+        var headers = Map.of("authorization", authToken);
+
+        var createReq = new GameRequest("Cool Match");
+        var createRes = facade.createGame(createReq, headers);
+        assertTrue(createRes.isSuccess());
+        assertNotNull(createRes.getGameID());
+
+        var joinReq = new JoinGameRequest(ChessGame.TeamColor.WHITE, createRes.getGameID());
+        var joinRes = facade.joinGame(authToken, joinReq);
+
+        assertTrue(joinRes.isSuccess());
+        assertEquals("Joined game successfully", joinRes.getMessage());
+    }
+
+    @Test
+    public void testJoinGameUnauthorized() throws Exception {
+
+        facade.clear();
+
+        var regReq = new RegisterRequest("joinUserNeg", "password", "joinUserNeg@example.com");
+        var regRes = facade.register(regReq);
+        assertTrue(regRes.isSuccess());
+
+        var headers = Map.of("authorization", regRes.getAuthToken());
+        var createReq = new GameRequest("UnauthorizedGame");
+        var createRes = facade.createGame(createReq, headers);
+        assertTrue(createRes.isSuccess());
+        assertNotNull(createRes.getGameID());
+
+        // Try to join with an INVALID token
+        var invalidHeaders = Map.of("authorization", "invalid-token");
+        var joinReq = new JoinGameRequest(ChessGame.TeamColor.WHITE, createRes.getGameID());
+
+        ResponseException thrown = assertThrows(ResponseException.class, () -> {
+            facade.joinGame("invalid-token", joinReq);
+        });
+
+        // Verify correct error code and message
+        assertEquals(ResponseException.Code.Unauthorized, thrown.getCode(), "Expected unauthorized error code");
+        assertTrue(thrown.getMessage().toLowerCase().contains("unauthorized"), "Expected 'unauthorized' in error message");
+    }
 
 
 }
