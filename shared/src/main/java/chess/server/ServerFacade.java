@@ -72,6 +72,19 @@ public class ServerFacade {
         return result;
     }
     //logout
+    public SessionResult logout(String authToken) throws ResponseException {
+        var headers = Map.of("authorization", authToken);
+        var request = buildRequest("DELETE", "/session", null, headers);
+        var response = sendRequest(request);
+
+        var result = handleResponse(response, SessionResult.class);
+
+        if (!result.isSuccess()) {
+            throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
+        }
+        return result;
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, Map<String, String> headers) {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
@@ -108,26 +121,40 @@ public class ServerFacade {
         }
     }
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
-
         var status = response.statusCode();
-        System.out.println("HTTP status: " + response.statusCode());
+        System.out.println("HTTP status: " + status);
         System.out.println("Response body: " + response.body());
 
+        String body = response.body();
+
         if (!isSuccessful(status)) {
-            var body = response.body();
-            if (body != null) {
-                throw ResponseException.fromJson(body);
+            ResponseException ex = null;
+
+            if (body != null && !body.isEmpty()) {
+                try {
+                    ex = ResponseException.fromJson(body);
+                } catch (Exception parseError) {
+                    System.err.println("Failed to parse error JSON: " + parseError.getMessage());
+                }
             }
 
-            throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
+            if (ex == null) {
+                ex = new ResponseException(
+                        ResponseException.fromHttpStatusCode(status),
+                        "Request failed with status " + status + ": " + (body != null ? body : "no body")
+                );
+            }
+
+            throw ex;
         }
 
-        if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
+        if (responseClass != null && body != null && !body.isEmpty()) {
+            return new Gson().fromJson(body, responseClass);
         }
 
         return null;
     }
+
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;

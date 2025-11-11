@@ -12,7 +12,7 @@ public class ResponseException extends Exception {
 
     public enum Code {
         ServerError,
-        ClientError,
+        ClientError, Unauthorized, Other,
     }
 
     final private Code code;
@@ -25,13 +25,35 @@ public class ResponseException extends Exception {
     public String toJson() {
         return new Gson().toJson(Map.of("message", getMessage(), "status", code));
     }
-
+    
     public static ResponseException fromJson(String json) {
-        var map = new Gson().fromJson(json, HashMap.class);
-        var status = Code.valueOf(map.get("status").toString());
-        String message = map.get("message").toString();
-        return new ResponseException(status, message);
+        try {
+            Gson gson = new Gson();
+            Map<?, ?> map = gson.fromJson(json, Map.class);
+
+            if (map == null) {
+                return new ResponseException(Code.Other, "Error: empty or invalid response body");
+            }
+
+            Object msgObj = map.get("message");
+            String message = msgObj != null ? msgObj.toString() : "Unknown error";
+
+            // Try to infer the code based on the message or default to ClientError
+            Code code = Code.ClientError;
+            if (message.toLowerCase().contains("unauthorized")) {
+                code = Code.Unauthorized;
+            } else if (message.toLowerCase().contains("internal")) {
+                code = Code.ServerError;
+            }
+
+            return new ResponseException(code, message);
+
+        } catch (Exception e) {
+            System.err.println("Error parsing ResponseException JSON: " + e.getMessage());
+            return new ResponseException(Code.Other, "Failed to parse error JSON: " + e.getMessage());
+        }
     }
+
 
     public Code code() {
         return code;
@@ -49,6 +71,8 @@ public class ResponseException extends Exception {
         return switch (code) {
             case ServerError -> 500;
             case ClientError -> 400;
+            case Unauthorized -> 0;
+            case Other -> 0;
         };
     }
 }

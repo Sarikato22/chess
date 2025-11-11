@@ -31,7 +31,8 @@ public class SessionHandler {
         try {
             SessionResult result = sessionService.logout(authToken);
             if (result.isSuccess()) {
-                ctx.status(200).result(gson.toJson(Map.of()));
+                ctx.status(200).result(gson.toJson(Map.of("success", true, "message", "Logged out successfully")));
+
             } else {
                 ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
             }

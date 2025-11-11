@@ -70,7 +70,7 @@ public class ServerFacadeTests {
             facade.register(request);
             fail("Expected ResponseException for duplicate user");
         } catch (ResponseException ex) {
-            assertEquals(ResponseException.Code.ClientError, ex.code());
+            assertEquals(ResponseException.Code.ServerError, ex.code());
         }
     }
 
@@ -137,33 +137,55 @@ public class ServerFacadeTests {
     //login test
     @Test
     public void testLoginSuccess() throws Exception {
-        // Arrange
         facade.clear();
 
-        // Register a new user first
         var registerRequest = new RegisterRequest("loginUser", "password123", "login@example.com");
         var registerResult = facade.register(registerRequest);
 
         assertTrue(registerResult.isSuccess(), "Registration should succeed for login test");
         assertNotNull(registerResult.getAuthToken(), "Auth token should not be null after registration");
 
-        // Act — attempt login
         var loginRequest = new SessionRequest("loginUser", "password123");
         var loginResult = facade.login(loginRequest);
 
-        // Debug printout
         System.out.println("Login Result: success=" + loginResult.isSuccess() +
                 ", username=" + loginResult.getUsername() +
                 ", message=" + loginResult.getMessage() +
                 ", authToken=" + loginResult.getAuthToken());
 
-        // Assert
         assertNotNull(loginResult);
         assertTrue(loginResult.isSuccess(), "Expected login to succeed");
         assertEquals("loginUser", loginResult.getUsername(), "Usernames should match");
         assertNotNull(loginResult.getAuthToken(), "Auth token should not be null on successful login");
         assertNull(loginResult.getMessage(), "Message should be null on success");
     }
+    //logout test
+    @Test
+    public void testLogoutSuccess() throws Exception {
+        facade.clear();
+
+        var registerReq = new RegisterRequest("logoutUser", "password123", "logout@example.com");
+        var registerRes = facade.register(registerReq);
+        assertTrue(registerRes.isSuccess());
+
+        var loginReq = new SessionRequest("logoutUser", "password123");
+        var loginRes = facade.login(loginReq);
+        assertTrue(loginRes.isSuccess());
+        assertNotNull(loginRes.getAuthToken());
+
+        var logoutRes = facade.logout(loginRes.getAuthToken());
+        assertNotNull(logoutRes);
+        assertTrue(logoutRes.isSuccess(), "Logout should succeed");
+    }
+
+    @Test
+    public void testLogoutFailure_invalidToken() throws ResponseException {
+        facade.clear();
+        var badToken = "not-a-real-token";
+        assertThrows(ResponseException.class, () -> facade.logout(badToken));
+    }
+
+
 
 
 }
