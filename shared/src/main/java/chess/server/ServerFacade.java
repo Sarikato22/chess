@@ -3,6 +3,7 @@ package chess.server;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
 import com.google.gson.Gson;
@@ -41,7 +42,17 @@ public class ServerFacade {
         }
         return result;
     }
+    public GameListResult listGames(Map<String, String> headers) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, headers);
+        var response = sendRequest(request);
+        GameListResult result = handleResponse(response, GameListResult.class);
 
+        if (!result.isSuccess()) {
+            throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
+        }
+
+        return result;
+    }
     public void clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
         sendRequest(request);

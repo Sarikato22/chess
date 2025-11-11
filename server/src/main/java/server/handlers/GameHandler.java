@@ -35,7 +35,8 @@ public class GameHandler {
             GameListResult gameList = gameService.listGames(authToken);
 
             if (gameList.isSuccess()) {
-                ctx.status(200).result(gson.toJson(Map.of("games", gameList.getGames())));
+                ctx.status(gameList.isSuccess() ? 200 : 400)
+                        .result(gson.toJson(gameList));
             } else {
                 String message = gameList.getMessage() != null ? gameList.getMessage() : "Internal error";
                 if (message.contains("unauthorized")) {

@@ -2,12 +2,14 @@ package client;
 
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.result.GameListResult;
 import chess.model.result.RegisterResult;
 import chess.server.ResponseException;
 import chess.server.ServerFacade;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -97,5 +99,39 @@ public class ServerFacadeTests {
         assertNull(gameResult.getMessage(), "There should be no error message on success");
     }
 
+    @Test
+    public void testListGames() throws Exception {
+        facade.clear();
+
+        var registerRequest = new RegisterRequest("testUser1", "password123", "test@example.com");
+        var registerResult = facade.register(registerRequest);
+        assertTrue(registerResult.isSuccess(), "User registration should succeed");
+        String authToken = registerResult.getAuthToken();
+
+        Map<String, String> headers = Map.of("authorization", authToken);
+
+        var gameRequest1 = new GameRequest("GameOne");
+        var gameRequest2 = new GameRequest("GameTwo");
+        var createResult1 = facade.createGame(gameRequest1, headers);
+        var createResult2 = facade.createGame(gameRequest2, headers);
+        assertTrue(createResult1.isSuccess());
+        assertTrue(createResult2.isSuccess());
+
+
+        GameListResult listResult = facade.listGames(headers);
+
+        System.out.println("Games retrieved:");
+        for (var game : listResult.getGames()) {
+            System.out.println("GameID=" + game.getGameId() + ", Name=" + game.getGameName());
+        }
+
+        // Assertions
+        assertNotNull(listResult);
+        assertTrue(listResult.isSuccess(), "Listing games should succeed");
+        assertEquals(2, listResult.size(), "There should be 2 games listed");
+        List<String> gameNames = listResult.getGames().stream().map(g -> g.getGameName()).toList();
+        assertTrue(gameNames.contains("GameOne"));
+        assertTrue(gameNames.contains("GameTwo"));
+    }
 
 }
