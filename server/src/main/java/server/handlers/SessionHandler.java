@@ -59,10 +59,7 @@ public class SessionHandler {
             SessionResult sessionResult = sessionService.login(sessionRequest);
 
             if (sessionResult.isSuccess()) {
-                ctx.status(200).result(gson.toJson(Map.of(
-                        "username", sessionResult.getUsername(),
-                        "authToken", sessionResult.getAuthToken()
-                )));
+                ctx.status(200).result(gson.toJson(sessionResult));
             } else {
                 String message = sessionResult.getMessage() != null ? sessionResult.getMessage() : "Error: Bad request";
 

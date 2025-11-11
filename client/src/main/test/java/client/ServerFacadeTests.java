@@ -2,6 +2,7 @@ package client;
 
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.RegisterResult;
 import chess.server.ResponseException;
@@ -133,5 +134,36 @@ public class ServerFacadeTests {
         assertTrue(gameNames.contains("GameOne"));
         assertTrue(gameNames.contains("GameTwo"));
     }
+    //login test
+    @Test
+    public void testLoginSuccess() throws Exception {
+        // Arrange
+        facade.clear();
+
+        // Register a new user first
+        var registerRequest = new RegisterRequest("loginUser", "password123", "login@example.com");
+        var registerResult = facade.register(registerRequest);
+
+        assertTrue(registerResult.isSuccess(), "Registration should succeed for login test");
+        assertNotNull(registerResult.getAuthToken(), "Auth token should not be null after registration");
+
+        // Act — attempt login
+        var loginRequest = new SessionRequest("loginUser", "password123");
+        var loginResult = facade.login(loginRequest);
+
+        // Debug printout
+        System.out.println("Login Result: success=" + loginResult.isSuccess() +
+                ", username=" + loginResult.getUsername() +
+                ", message=" + loginResult.getMessage() +
+                ", authToken=" + loginResult.getAuthToken());
+
+        // Assert
+        assertNotNull(loginResult);
+        assertTrue(loginResult.isSuccess(), "Expected login to succeed");
+        assertEquals("loginUser", loginResult.getUsername(), "Usernames should match");
+        assertNotNull(loginResult.getAuthToken(), "Auth token should not be null on successful login");
+        assertNull(loginResult.getMessage(), "Message should be null on success");
+    }
+
 
 }

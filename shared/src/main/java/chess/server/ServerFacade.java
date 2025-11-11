@@ -3,9 +3,11 @@ package chess.server;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.RegisterResult;
+import chess.model.result.SessionResult;
 import com.google.gson.Gson;
 
 import java.net.http.HttpClient;
@@ -58,6 +60,18 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    //login
+    public SessionResult login(SessionRequest req) throws ResponseException{
+        var request = buildRequest("POST", "/session", req, null);
+        var response = sendRequest(request);
+
+        var result = handleResponse(response, SessionResult.class);
+        if (!result.isSuccess()) {
+            throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
+        }
+        return result;
+    }
+    //logout
     private HttpRequest buildRequest(String method, String path, Object body, Map<String, String> headers) {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
