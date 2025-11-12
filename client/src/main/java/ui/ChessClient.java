@@ -2,6 +2,7 @@ package ui;
 
 import java.util.*;
 
+import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
@@ -104,17 +105,33 @@ public class ChessClient {
 
         String gameName = params[0];
         GameRequest req = new GameRequest(gameName);
-
-        // Debug: print what is being sent
-        System.out.println("DEBUG: Creating game with name: " + gameName);
-        System.out.println("DEBUG: Using authToken: " + authToken);
-
         GameResult result = server.createGame(req, authToken);
-
-        // Debug: print what we received
-        System.out.println("DEBUG: Received game ID: " + result.getGameID());
-
         return String.format("Game '%s' created with ID %d.\n", gameName, result.getGameID());
+    }
+    //listGames
+    private String listGames() throws Exception {
+        GameListResult result = server.listGames(authToken);
+        if (!result.isSuccess()) {
+            return "Failed to list games: " + result.getMessage() + "\n";
+        }
+
+        lastListedGames.clear();
+        StringBuilder sb = new StringBuilder();
+        int idx = 1;
+
+        for (GameData g : result.getGames()) {
+            lastListedGames.put(idx, new GameResult(true, null, g.getGameId()));
+            sb.append(String.format(
+                    "%d: %s | White: %s | Black: %s%n",
+                    idx,
+                    g.getGameName(),
+                    g.getWhiteUsername() != null ? g.getWhiteUsername() : "Empty",
+                    g.getBlackUsername() != null ? g.getBlackUsername() : "Empty"
+            ));
+            idx++;
+        }
+
+        return sb.toString();
     }
 
     private String logout() throws Exception {
@@ -146,7 +163,7 @@ public class ChessClient {
                 case "help" -> help();
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
-//                case "listgames" -> listGames();
+                case "listgames" -> listGames();
 //                case "playgame" -> playGame(params);
 //                case "observegame" -> observeGame(params);
                 case "quit" -> "quit";
