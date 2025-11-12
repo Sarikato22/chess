@@ -5,10 +5,7 @@ import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
-import chess.model.result.GameListResult;
-import chess.model.result.GameResult;
-import chess.model.result.RegisterResult;
-import chess.model.result.SessionResult;
+import chess.model.result.*;
 import com.google.gson.Gson;
 
 import java.net.http.HttpClient;
@@ -87,11 +84,11 @@ public class ServerFacade {
     }
     //joinGame
 
-    public GameResult joinGame(String authToken, JoinGameRequest req) throws ResponseException {
+    public JoinGameResult joinGame(String authToken, JoinGameRequest req) throws ResponseException {
         var headers = Map.of("authorization", authToken);
         var request = buildRequest("PUT", "/game", req, headers);
         var response = sendRequest(request);
-        return handleResponse(response, GameResult.class);
+        return handleResponse(response, JoinGameResult.class);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, Map<String, String> headers) {
@@ -103,15 +100,11 @@ public class ServerFacade {
             builder.setHeader("Content-Type", "application/json");
         }
 
-        if (headers != null) {
             if (headers != null) {
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
                     builder.setHeader(entry.getKey(), entry.getValue());
                 }
             }
-
-        }
-
         return builder.build();
     }
 
