@@ -170,6 +170,28 @@ public class ChessClient {
         drawBoard(gameData, color);
         return String.format("Joined game %s as %s.\n", gameData.getGameName(), color);
     }
+    //Observe game
+    private String observeGame(String... params) throws Exception {
+        if (params.length < 1) return "Usage: observeGame <number>\n";
+
+        int num;
+        try {
+            num = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            return "Invalid game number.\n";
+        }
+
+        if (!lastListedGames.containsKey(num)) {
+            return "Game number not found. List games first.\n";
+        }
+
+        GameData gameData = lastListedGames.get(num);
+
+        // Observers just view the board; no join request is sent.
+        drawBoard(gameData, ChessGame.TeamColor.WHITE);
+
+        return String.format("Observing game %s.\n", gameData.getGameName());
+    }
 
     private String logout() throws Exception {
         server.logout(authToken);
@@ -202,7 +224,7 @@ public class ChessClient {
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
                 case "playgame" -> playGame(params);
-//                case "observegame" -> observeGame(params);
+                case "observegame" -> observeGame(params);
                 case "quit" -> "quit";
                 default -> "Unknown command. Type 'help'.\n";
             };
