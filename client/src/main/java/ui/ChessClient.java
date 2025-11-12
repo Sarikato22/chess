@@ -2,7 +2,10 @@ package ui;
 
 import java.util.*;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
@@ -24,8 +27,11 @@ public class ChessClient {
     private final Scanner scanner = new Scanner(System.in);
     private final Gson gson = new Gson();
 
+    private ChessBoard board = new ChessBoard();
+
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
+        board.resetBoard();
     }
 
     public void run() {
@@ -141,52 +147,67 @@ public class ChessClient {
     private static final String WHITE_PIECE = "\u001B[37m"; // white piece
     private static final String BLACK_PIECE = "\u001B[30m"; // black piece
 
-    private void drawBoard(GameData gameData, ChessGame.TeamColor perspective) {
-        // Initial setup: Unicode pieces
-        String[][] board = {
-                {"♜","♞","♝","♛","♚","♝","♞","♜"},
-                {"♟","♟","♟","♟","♟","♟","♟","♟"},
-                {" "," "," "," "," "," "," "," "},
-                {" "," "," "," "," "," "," "," "},
-                {" "," "," "," "," "," "," "," "},
-                {" "," "," "," "," "," "," "," "},
-                {"♙","♙","♙","♙","♙","♙","♙","♙"},
-                {"♖","♘","♗","♕","♔","♗","♘","♖"}
-        };
 
-        // Determine row/column order based on perspective
-        int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 7 : 0;
-        int endRow = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 8;
-        int stepRow = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 1;
+    public void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        String[] letters = {"a","b","c","d","e","f","g","h"};
 
-        int startCol = (perspective == ChessGame.TeamColor.WHITE) ? 0 : 7;
-        int endCol = (perspective == ChessGame.TeamColor.WHITE) ? 8 : -1;
-        int stepCol = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        // Determine column order based on perspective
+        int startCol = perspective == ChessGame.TeamColor.WHITE ? 1 : 8;
+        int endCol = perspective == ChessGame.TeamColor.WHITE ? 8 : 1;
+        int colStep = perspective == ChessGame.TeamColor.WHITE ? 1 : -1;
 
-        // Print board
-        for (int r = startRow; (stepRow > 0 ? r <= endRow : r >= endRow); r += stepRow) {
-            System.out.print((r + 1) + " "); // Row numbers
-            for (int c = startCol; (stepCol > 0 ? c < endCol : c > endCol); c += stepCol) {
-                boolean lightSquare = (r + c) % 2 == 0;
-                String bg = lightSquare ? LIGHT_BG : DARK_BG;
+        // Determine row order based on perspective
+        int startRow = perspective == ChessGame.TeamColor.WHITE ? 8 : 1;
+        int endRow = perspective == ChessGame.TeamColor.WHITE ? 1 : 8;
+        int rowStep = perspective == ChessGame.TeamColor.WHITE ? -1 : 1;
 
-                String piece = board[r][c];
-                String colorCode = (piece.equals(" ") || piece.equals("")) ? "" :
-                        ("♙♖♘♗♕♔".contains(piece) ? WHITE_PIECE : BLACK_PIECE);
+        // Print top column letters
+        System.out.print("   ");
+        for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
+            System.out.print(" " + letters[c - 1] + " ");
+        }
+        System.out.println();
 
-                System.out.print(bg + colorCode + " " + piece + " " + RESET);
+        // Print rows
+        for (int r = startRow; perspective == ChessGame.TeamColor.WHITE ? r >= endRow : r <= endRow; r += rowStep) {
+            System.out.print(r + " |"); // left margin
+
+            for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
+                ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(pos);
+                String symbol = piece == null ? " " : getPieceLetter(piece);
+                System.out.print(" " + symbol + " ");
             }
-            System.out.println();
+
+            System.out.println("| " + r); // right margin
         }
 
-        // Column letters
-        System.out.print("  ");
-        for (int c = 0; c < 8; c++) {
-            char colLetter = (perspective == ChessGame.TeamColor.WHITE) ? (char)('a' + c) : (char)('h' - c);
-            System.out.print(" " + colLetter + "  ");
+        // Print bottom column letters
+        System.out.print("   ");
+        for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
+            System.out.print(" " + letters[c - 1] + " ");
         }
         System.out.println();
     }
+
+    private String getPieceLetter(ChessPiece piece) {
+        String letter;
+        switch (piece.getPieceType()) {
+            case PAWN -> letter = "P";
+            case ROOK -> letter = "R";
+            case KNIGHT -> letter = "N";
+            case BISHOP -> letter = "B";
+            case QUEEN -> letter = "Q";
+            case KING -> letter = "K";
+            default -> letter = "?";
+        }
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            letter = letter.toLowerCase();
+        }
+        return letter;
+    }
+
+
     private void refreshGameListSilently() {
         try {
             GameListResult result = server.listGames(authToken); // your existing listGames
@@ -231,7 +252,7 @@ public class ChessClient {
             return "Failed to join game: " + joinResult.getMessage() + "\n";
         }
 
-        drawBoard(gameData, color);
+        drawBoard(board, color);
         return String.format("Joined game %s as %s.\n", gameData.getGameName(), color);
     }
 
@@ -251,7 +272,7 @@ public class ChessClient {
         }
 
         GameData gameData = lastListedGames.get(num);
-        drawBoard(gameData, ChessGame.TeamColor.WHITE);
+        drawBoard(board, ChessGame.TeamColor.WHITE);
 
         return String.format("Observing game %s.\n", gameData.getGameName());
     }
