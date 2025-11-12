@@ -46,10 +46,12 @@ public class ServerFacade {
 
         return result;
     }
-    public GameListResult listGames(Map<String, String> headers) throws ResponseException {
+    public GameListResult listGames(String authToken) throws ResponseException {
+        var headers = Map.of("authorization", authToken);
+
         var request = buildRequest("GET", "/game", null, headers);
         var response = sendRequest(request);
-        GameListResult result = handleResponse(response, GameListResult.class);
+        var result = handleResponse(response, GameListResult.class);
 
         if (!result.isSuccess()) {
             throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
@@ -57,6 +59,7 @@ public class ServerFacade {
 
         return result;
     }
+
     public void clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
         sendRequest(request);
