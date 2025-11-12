@@ -2,8 +2,10 @@ package ui;
 
 import java.util.*;
 
+import chess.ChessGame;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
+import chess.model.request.JoinGameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import com.google.gson.Gson;
@@ -17,7 +19,7 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
 
-    private Map<Integer, GameResult> lastListedGames = new HashMap<>();
+    private Map<Integer, GameData> lastListedGames = new HashMap<>();
     private final Scanner scanner = new Scanner(System.in);
     private final Gson gson = new Gson();
 
@@ -115,23 +117,58 @@ public class ChessClient {
             return "Failed to list games: " + result.getMessage() + "\n";
         }
 
-        lastListedGames.clear();
-        StringBuilder sb = new StringBuilder();
-        int idx = 1;
+        List<GameData> games = result.getGames();
 
-        for (GameData g : result.getGames()) {
-            lastListedGames.put(idx, new GameResult(true, null, g.getGameId()));
-            sb.append(String.format(
-                    "%d: %s | White: %s | Black: %s%n",
-                    idx,
-                    g.getGameName(),
-                    g.getWhiteUsername() != null ? g.getWhiteUsername() : "Empty",
-                    g.getBlackUsername() != null ? g.getBlackUsername() : "Empty"
-            ));
-            idx++;
+        lastListedGames.clear();
+        int i = 1;
+        for (GameData game : games) {
+            System.out.printf("%d. %s (White: %s, Black: %s)%n",
+                    i, game.getGameName(),
+                    game.getWhiteUsername(),
+                    game.getBlackUsername());
+            lastListedGames.put(i, game);
+            i++;
         }
 
-        return sb.toString();
+        return String.format("Listed %d games successfully.\n", games.size());
+    }
+
+    //drawingBoard
+    private void drawBoard(GameData gameData, ChessGame.TeamColor perspective) {
+        System.out.println("[Chess board would be drawn here: Perspective=" + perspective + "]");
+    }
+    //playGame
+    private String playGame(String... params) throws Exception {
+        if (params.length < 2) return "Usage: playGame <number> <WHITE|BLACK>\n";
+
+        int num;
+        try {
+            num = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            return "Invalid game number.\n";
+        }
+
+        if (!lastListedGames.containsKey(num)) {
+            return "Game number not found. List games first.\n";
+        }
+
+        ChessGame.TeamColor color;
+        try {
+            color = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return "Invalid color. Use WHITE or BLACK.\n";
+        }
+
+        GameData gameData = lastListedGames.get(num);
+        JoinGameRequest req = new JoinGameRequest(color, gameData.getGameId());
+        JoinGameResult joinResult = server.joinGame(authToken, req);
+
+        if (!joinResult.isSuccess()) {
+            return "Failed to join game: " + joinResult.getMessage() + "\n";
+        }
+
+        drawBoard(gameData, color);
+        return String.format("Joined game %s as %s.\n", gameData.getGameName(), color);
     }
 
     private String logout() throws Exception {
@@ -164,7 +201,7 @@ public class ChessClient {
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
-//                case "playgame" -> playGame(params);
+                case "playgame" -> playGame(params);
 //                case "observegame" -> observeGame(params);
                 case "quit" -> "quit";
                 default -> "Unknown command. Type 'help'.\n";
