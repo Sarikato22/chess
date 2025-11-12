@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/client/src/main/java/ui/ChessBoardRenderer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/main/java/ui/ChessClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/ui/ChessClient.java" afterDir="false" />
     </list>
@@ -210,7 +211,7 @@
       <workItem from="1762829826865" duration="3883000" />
       <workItem from="1762915729515" duration="2039000" />
       <workItem from="1762964007421" duration="2194000" />
-      <workItem from="1762967018618" duration="6756000" />
+      <workItem from="1762967018618" duration="9728000" />
     </task>
     <servers />
   </component>
