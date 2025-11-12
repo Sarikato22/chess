@@ -90,7 +90,7 @@ public class ServerFacadeTests {
         // Create game using the auth token
         var gameRequest = new GameRequest("MyFirstGame");
         var headers = Map.of("Authorization", registerResult.getAuthToken());
-        var gameResult = facade.createGame(gameRequest, headers);
+        var gameResult = facade.createGame(gameRequest, headers.toString());
 
         System.out.println("Result: success=" + gameResult.isSuccess() +
                 ", message=" + gameResult.getMessage() +
@@ -115,8 +115,8 @@ public class ServerFacadeTests {
 
         var gameRequest1 = new GameRequest("GameOne");
         var gameRequest2 = new GameRequest("GameTwo");
-        var createResult1 = facade.createGame(gameRequest1, headers);
-        var createResult2 = facade.createGame(gameRequest2, headers);
+        var createResult1 = facade.createGame(gameRequest1, headers.toString());
+        var createResult2 = facade.createGame(gameRequest2, headers.toString());
         assertTrue(createResult1.isSuccess());
         assertTrue(createResult2.isSuccess());
 
@@ -203,7 +203,7 @@ public class ServerFacadeTests {
         var headers = Map.of("authorization", authToken);
 
         var createReq = new GameRequest("Cool Match");
-        var createRes = facade.createGame(createReq, headers);
+        var createRes = facade.createGame(createReq, headers.toString());
         assertTrue(createRes.isSuccess());
         assertNotNull(createRes.getGameID());
 
@@ -225,7 +225,7 @@ public class ServerFacadeTests {
 
         var headers = Map.of("authorization", regRes.getAuthToken());
         var createReq = new GameRequest("UnauthorizedGame");
-        var createRes = facade.createGame(createReq, headers);
+        var createRes = facade.createGame(createReq, headers.toString());
         assertTrue(createRes.isSuccess());
         assertNotNull(createRes.getGameID());
 

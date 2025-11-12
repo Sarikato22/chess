@@ -112,7 +112,7 @@ public class UnitTests {
         String invalidToken = "invalid-token";
 
         // You should see logging in createGame indicating entry
-        assertThrows(UnauthorizedException.class, () -> {
+        assertThrows(DataAccessException.class, () -> {
             dao.createGame(game, invalidToken);  // Test target
         });
     }

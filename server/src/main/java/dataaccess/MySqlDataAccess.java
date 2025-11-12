@@ -225,37 +225,31 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Unable to get DB connection");
             }
 
-            String whiteUsername = getUsernameByToken(authToken);
-            if (whiteUsername == null) {
-                throw new UnauthorizedException("Unauthorized: White player is not authorized");
+            String creatorUsername = getUsernameByToken(authToken);
+            if (creatorUsername == null) {
+                throw new UnauthorizedException("Unauthorized: invalid auth token");
             }
 
-            // For now, blackUsername can be null (game not joined yet)
             String insertQuery = "INSERT INTO games (whiteUsername, blackUsername, gameName) VALUES (?, ?, ?)";
-
             try (PreparedStatement stmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setString(1, whiteUsername);
-                stmt.setString(2, game.getBlackUsername());
+                stmt.setNull(1, Types.VARCHAR);
+                stmt.setNull(2, Types.VARCHAR);
                 stmt.setString(3, game.getGameName());
                 stmt.executeUpdate();
 
-                // Get the auto-generated gameID
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int id = rs.getInt(1);
-                        return new GameData(id, game.getGameName(), whiteUsername, game.getBlackUsername());
+                        return new GameData(id, game.getGameName(), null, null);
                     } else {
                         throw new DataAccessException("Failed to retrieve auto-generated gameID");
                     }
                 }
             }
-
         } catch (Exception e) {
             throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
         }
     }
-
-
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
