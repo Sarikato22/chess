@@ -220,9 +220,6 @@ public class MySqlDataAccess implements DataAccess{
 
     @Override
     public GameData createGame(GameData game, String authToken) throws DataAccessException {
-        int id = nextGameId++;
-        GameData newGame = new GameData(id, game.getGameName(), game.getWhiteUsername(), game.getBlackUsername());
-
         try (Connection conn = getConnection()) {
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
@@ -233,30 +230,31 @@ public class MySqlDataAccess implements DataAccess{
                 throw new UnauthorizedException("Unauthorized: White player is not authorized");
             }
 
-            String blackUsername = getUsernameByToken(authToken);
-            if (blackUsername == null) {
-                throw new UnauthorizedException("Unauthorized: Black player is not authorized");
-            }
+            // For now, blackUsername can be null (game not joined yet)
+            String insertQuery = "INSERT INTO games (whiteUsername, blackUsername, gameName) VALUES (?, ?, ?)";
 
-            String insertQuery = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
-                stmt.setString(1, String.valueOf(id));
-                stmt.setString(2, newGame.getWhiteUsername());
-                stmt.setString(3, newGame.getBlackUsername());
-                stmt.setString(4, newGame.getGameName());
+            try (PreparedStatement stmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, whiteUsername);
+                stmt.setString(2, game.getBlackUsername());
+                stmt.setString(3, game.getGameName());
                 stmt.executeUpdate();
+
+                // Get the auto-generated gameID
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int id = rs.getInt(1);
+                        return new GameData(id, game.getGameName(), whiteUsername, game.getBlackUsername());
+                    } else {
+                        throw new DataAccessException("Failed to retrieve auto-generated gameID");
+                    }
+                }
             }
 
-            return newGame;
-
-        } catch (SQLException e) {
-            throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
-        } catch (UnauthorizedException e){
-            throw new UnauthorizedException("Unauthorized");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
         }
     }
+
 
 
     @Override
