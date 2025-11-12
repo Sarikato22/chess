@@ -33,13 +33,17 @@ public class ServerFacade {
         return result;
     }
 
-    public GameResult createGame(GameRequest req, Map<String, String> headers) throws ResponseException {
+    public GameResult createGame(GameRequest req, String authToken) throws ResponseException {
+        var headers = Map.of("authorization", authToken);
+
         var request = buildRequest("POST", "/game", req, headers);
         var response = sendRequest(request);
         var result = handleResponse(response, GameResult.class);
+
         if (result.getGameID() == null) {
             throw new ResponseException(ResponseException.Code.ClientError, result.getMessage());
         }
+
         return result;
     }
     public GameListResult listGames(Map<String, String> headers) throws ResponseException {

@@ -2,6 +2,7 @@ package ui;
 
 import java.util.*;
 
+import chess.model.request.GameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
 import com.google.gson.Gson;
@@ -94,6 +95,28 @@ public class ChessClient {
         return String.format("Registered and logged in as %s.\n", username);
     }
     //postlogin
+    private String createGame(String... params) throws Exception {
+        if (state != State.SIGNEDIN) {
+            return "You must be signed in to create a game.\n";
+        }
+
+        if (params.length < 1) return "Usage: createGame <gameName>\n";
+
+        String gameName = params[0];
+        GameRequest req = new GameRequest(gameName);
+
+        // Debug: print what is being sent
+        System.out.println("DEBUG: Creating game with name: " + gameName);
+        System.out.println("DEBUG: Using authToken: " + authToken);
+
+        GameResult result = server.createGame(req, authToken);
+
+        // Debug: print what we received
+        System.out.println("DEBUG: Received game ID: " + result.getGameID());
+
+        return String.format("Game '%s' created with ID %d.\n", gameName, result.getGameID());
+    }
+
     private String logout() throws Exception {
         server.logout(authToken);
         username = null;
@@ -122,7 +145,7 @@ public class ChessClient {
             return switch (cmd) {
                 case "help" -> help();
                 case "logout" -> logout();
-//                case "creategame" -> createGame(params);
+                case "creategame" -> createGame(params);
 //                case "listgames" -> listGames();
 //                case "playgame" -> playGame(params);
 //                case "observegame" -> observeGame(params);
