@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/chess/server/ServerFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/ui/Repl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/test/java/client/ChessClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/ui/ChessClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/test/java/client/State.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/ui/State.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/Main.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,18 +81,17 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src\test\java" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ServerFacadeTests.testJoinGameUnauthorized">
-    <configuration name="ServerFacadeTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Application.Main (1)">
+    <configuration name="Main (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="client" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="client.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="client" />
-      <option name="MAIN_CLASS_NAME" value="client.ServerFacadeTests" />
-      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="server" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -98,7 +100,7 @@
       <module name="client" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="client.*" />
+          <option name="PATTERN" value="ui.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -114,29 +116,13 @@
       <module name="client" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="client.*" />
+          <option name="PATTERN" value="ui.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="client" />
       <option name="MAIN_CLASS_NAME" value="client.ServerFacadeTests" />
       <option name="METHOD_NAME" value="testJoinGameUnauthorized" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ServerFacadeTests.testLogoutFailure_invalidToken" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="client" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="client.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="client" />
-      <option name="MAIN_CLASS_NAME" value="client.ServerFacadeTests" />
-      <option name="METHOD_NAME" value="testLogoutFailure_invalidToken" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -163,11 +149,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main (1)" />
+        <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.ServerFacadeTests.testJoinGameUnauthorized" />
         <item itemvalue="JUnit.ServerFacadeTests.testJoinGameSuccess" />
         <item itemvalue="JUnit.java in server" />
-        <item itemvalue="JUnit.ServerFacadeTests" />
-        <item itemvalue="JUnit.ServerFacadeTests.testLogoutFailure_invalidToken" />
       </list>
     </recent_temporary>
   </component>
@@ -217,6 +203,7 @@
       <workItem from="1761596760895" duration="18756000" />
       <workItem from="1762802605874" duration="10071000" />
       <workItem from="1762829826865" duration="3883000" />
+      <workItem from="1762915729515" duration="922000" />
     </task>
     <servers />
   </component>

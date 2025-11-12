@@ -1,4 +1,4 @@
-package client;
+package ui;
 
 import java.util.*;
 import com.google.gson.Gson;
