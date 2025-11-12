@@ -191,6 +191,7 @@ public class ChessClient {
 
     //Observe game
     private String observeGame(String... params) throws Exception {
+        refreshGameListSilently();
         if (params.length < 1) return "Usage: observeGame <number>\n";
 
         int num;
