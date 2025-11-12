@@ -131,9 +131,6 @@ public class ServerFacade {
     }
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
-        System.out.println("HTTP status: " + status);
-        System.out.println("Response body: " + response.body());
-
         String body = response.body();
 
         if (!isSuccessful(status)) {

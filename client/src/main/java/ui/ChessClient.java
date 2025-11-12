@@ -8,6 +8,7 @@ import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
+import chess.server.ResponseException;
 import com.google.gson.Gson;
 import chess.model.result.*;
 import chess.server.ServerFacade;
@@ -40,7 +41,7 @@ public class ChessClient {
             try {
                 System.out.print(eval(input));
             } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
         System.out.println("Goodbye!");
@@ -134,11 +135,74 @@ public class ChessClient {
     }
 
     //drawingBoard
+    private static final String RESET = "\u001B[0m";
+    private static final String LIGHT_BG = "\u001B[47m"; // white/light square
+    private static final String DARK_BG = "\u001B[48;5;94m"; // brown/dark square (ANSI 256-color)
+    private static final String WHITE_PIECE = "\u001B[37m"; // white piece
+    private static final String BLACK_PIECE = "\u001B[30m"; // black piece
+
     private void drawBoard(GameData gameData, ChessGame.TeamColor perspective) {
-        System.out.println("[Chess board would be drawn here: Perspective=" + perspective + "]");
+        // Initial setup: Unicode pieces
+        String[][] board = {
+                {"♜","♞","♝","♛","♚","♝","♞","♜"},
+                {"♟","♟","♟","♟","♟","♟","♟","♟"},
+                {" "," "," "," "," "," "," "," "},
+                {" "," "," "," "," "," "," "," "},
+                {" "," "," "," "," "," "," "," "},
+                {" "," "," "," "," "," "," "," "},
+                {"♙","♙","♙","♙","♙","♙","♙","♙"},
+                {"♖","♘","♗","♕","♔","♗","♘","♖"}
+        };
+
+        // Determine row/column order based on perspective
+        int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 7 : 0;
+        int endRow = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 8;
+        int stepRow = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 1;
+
+        int startCol = (perspective == ChessGame.TeamColor.WHITE) ? 0 : 7;
+        int endCol = (perspective == ChessGame.TeamColor.WHITE) ? 8 : -1;
+        int stepCol = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
+
+        // Print board
+        for (int r = startRow; (stepRow > 0 ? r <= endRow : r >= endRow); r += stepRow) {
+            System.out.print((r + 1) + " "); // Row numbers
+            for (int c = startCol; (stepCol > 0 ? c < endCol : c > endCol); c += stepCol) {
+                boolean lightSquare = (r + c) % 2 == 0;
+                String bg = lightSquare ? LIGHT_BG : DARK_BG;
+
+                String piece = board[r][c];
+                String colorCode = (piece.equals(" ") || piece.equals("")) ? "" :
+                        ("♙♖♘♗♕♔".contains(piece) ? WHITE_PIECE : BLACK_PIECE);
+
+                System.out.print(bg + colorCode + " " + piece + " " + RESET);
+            }
+            System.out.println();
+        }
+
+        // Column letters
+        System.out.print("  ");
+        for (int c = 0; c < 8; c++) {
+            char colLetter = (perspective == ChessGame.TeamColor.WHITE) ? (char)('a' + c) : (char)('h' - c);
+            System.out.print(" " + colLetter + "  ");
+        }
+        System.out.println();
     }
+    private void refreshGameListSilently() {
+        try {
+            GameListResult result = server.listGames(authToken); // your existing listGames
+            lastListedGames.clear();
+            int index = 1;
+            for (GameData game : result.getGames()) {
+                lastListedGames.put(index++, game);
+            }
+        } catch (ResponseException e) {
+
+        }
+    }
+
     //playGame
     private String playGame(String... params) throws Exception {
+        refreshGameListSilently();
         if (params.length < 2) return "Usage: playGame <number> <WHITE|BLACK>\n";
 
         int num;
@@ -149,7 +213,7 @@ public class ChessClient {
         }
 
         if (!lastListedGames.containsKey(num)) {
-            return "Game number not found. List games first.\n";
+            return "Game number not found. Please check available games.\n";
         }
 
         ChessGame.TeamColor color;
@@ -170,6 +234,7 @@ public class ChessClient {
         drawBoard(gameData, color);
         return String.format("Joined game %s as %s.\n", gameData.getGameName(), color);
     }
+
     //Observe game
     private String observeGame(String... params) throws Exception {
         if (params.length < 1) return "Usage: observeGame <number>\n";
@@ -186,8 +251,6 @@ public class ChessClient {
         }
 
         GameData gameData = lastListedGames.get(num);
-
-        // Observers just view the board; no join request is sent.
         drawBoard(gameData, ChessGame.TeamColor.WHITE);
 
         return String.format("Observing game %s.\n", gameData.getGameName());
