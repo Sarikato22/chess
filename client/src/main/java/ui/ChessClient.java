@@ -1,6 +1,9 @@
 package ui;
 
 import java.util.*;
+
+import chess.model.request.RegisterRequest;
+import chess.model.request.SessionRequest;
 import com.google.gson.Gson;
 import chess.model.result.*;
 import chess.server.ServerFacade;
@@ -31,8 +34,7 @@ public class ChessClient {
             if (input.equalsIgnoreCase("quit")) break;
 
             try {
-//                System.out.print(eval(input));
-                System.out.println("To be made");
+                System.out.print(eval(input));
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -65,6 +67,70 @@ public class ChessClient {
         }
     }
 
+//Prelogin
+    private String login(String... params) throws Exception {
+        if (params.length < 2) return "Usage: login <username> <password>\n";
+
+        SessionRequest req = new SessionRequest(params[0], params[1]);
+        SessionResult result = server.login(req);
+
+        this.username = result.getUsername();
+        this.authToken = result.getAuthToken();
+        this.state = State.SIGNEDIN;
+
+        return String.format("Logged in as %s.\n", username);
+    }
+
+    private String register(String... params) throws Exception {
+        if (params.length < 3) return "Usage: register <username> <password> <email>\n";
+
+        RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
+        RegisterResult result = server.register(req);
+
+        this.username = result.getUsername();
+        this.authToken = result.getAuthToken();
+        this.state = State.SIGNEDIN;
+
+        return String.format("Registered and logged in as %s.\n", username);
+    }
+    //postlogin
+    private String logout() throws Exception {
+        server.logout(authToken);
+        username = null;
+        authToken = null;
+        state = State.SIGNEDOUT;
+        lastListedGames.clear();
+        return "Logged out.\n";
+    }
+
+    //eval
+
+    private String eval(String input) throws Exception {
+        String[] tokens = input.split(" ");
+        String cmd = tokens.length > 0 ? tokens[0].toLowerCase() : "";
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        if (state == State.SIGNEDOUT) {
+            return switch (cmd) {
+                case "help" -> help();
+                case "login" -> login(params);
+                case "register" -> register(params);
+                case "quit" -> "quit";
+                default -> "Unknown command. Type 'help'.\n";
+            };
+        } else {
+            return switch (cmd) {
+                case "help" -> help();
+                case "logout" -> logout();
+//                case "creategame" -> createGame(params);
+//                case "listgames" -> listGames();
+//                case "playgame" -> playGame(params);
+//                case "observegame" -> observeGame(params);
+                case "quit" -> "quit";
+                default -> "Unknown command. Type 'help'.\n";
+            };
+        }
+    }
 
 }//end of class
 
