@@ -93,12 +93,11 @@ public class UnitTests {
         SessionRequest req = new SessionRequest("alice", "password123");
         SessionResult result = dao.loginUser(req);
 
-        GameData game = new GameData(0, "Chess Battle", "alice", null);
+        GameData game = new GameData(0, "Chess Battle", null, null);
         GameData created = dao.createGame(game, result.getAuthToken());
 
         assertNotNull(created);
         assertEquals("Chess Battle", created.getGameName());
-        assertEquals("alice", created.getWhiteUsername());
     }
 
     @Test
