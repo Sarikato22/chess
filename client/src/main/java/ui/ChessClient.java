@@ -44,8 +44,9 @@ public class ChessClient {
         while (true) {
             System.out.print("\n>>> ");
             input = scanner.nextLine().trim();
-            if (input.equalsIgnoreCase("quit")) break;
-
+            if (input.equalsIgnoreCase("quit")) {
+                break;
+            }
             try {
                 System.out.print(eval(input));
             } catch (Exception e) {
@@ -82,8 +83,9 @@ public class ChessClient {
 
 //Prelogin
     private String login(String... params) throws Exception {
-        if (params.length < 2) return "Usage: login <username> <password>\n";
-
+        if (params.length < 2) {
+            return "Usage: login <username> <password>\n";
+        }
         SessionRequest req = new SessionRequest(params[0], params[1]);
         SessionResult result = server.login(req);
 
@@ -95,8 +97,9 @@ public class ChessClient {
     }
 
     private String register(String... params) throws Exception {
-        if (params.length < 3) return "Usage: register <username> <password> <email>\n";
-
+        if (params.length < 3) {
+            return "Usage: register <username> <password> <email>\n";
+        }
         RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
         RegisterResult result = server.register(req);
 
@@ -112,8 +115,9 @@ public class ChessClient {
             return "You must be signed in to create a game.\n";
         }
 
-        if (params.length < 1) return "Usage: createGame <gameName>\n";
-
+        if (params.length < 1) {
+            return "Usage: createGame <gameName>\n";
+        }
         String gameName = params[0];
         GameRequest req = new GameRequest(gameName);
         GameResult result = server.createGame(req, authToken);
@@ -157,7 +161,9 @@ public class ChessClient {
     //playGame
     private String playGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 2) return "Usage: playGame <number> <WHITE|BLACK>\n";
+        if (params.length < 2) {
+            return "Usage: playGame <number> <WHITE|BLACK>\n";
+        }
 
         int num;
         try {
@@ -192,7 +198,9 @@ public class ChessClient {
     //Observe game
     private String observeGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 1) return "Usage: observeGame <number>\n";
+        if (params.length < 1) {
+            return "Usage: observeGame <number>\n";
+        }
 
         int num;
         try {

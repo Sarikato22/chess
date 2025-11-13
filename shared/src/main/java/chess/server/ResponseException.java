@@ -71,13 +71,4 @@ public class ResponseException extends Exception {
             default -> throw new IllegalArgumentException("Unknown HTTP status code: " + httpStatusCode);
         };
     }
-
-    public int toHttpStatusCode() {
-        return switch (code) {
-            case ServerError -> 500;
-            case ClientError -> 400;
-            case Unauthorized -> 0;
-            case Other -> 0;
-        };
-    }
 }

@@ -80,7 +80,6 @@ public class ChessBoardRenderer {
         return letter;
     }
 
-    // Hex-based ANSI color text
     private String colorText(String text, String fgHex, String bgHex) {
         int[] fg = hexToRgbArray(fgHex);
         int[] bg = hexToRgbArray(bgHex);
@@ -89,12 +88,9 @@ public class ChessBoardRenderer {
                 + text + "\u001B[0m";
     }
 
-    // Bold ANSI helper
     private String colorTextBold(String text, String fgHex, String bgHex) {
         return "\u001B[1m" + colorText(text, fgHex, bgHex) + "\u001B[0m";
     }
-
-    // Convert hex string to RGB array
     private int[] hexToRgbArray(String hex) {
         hex = hex.replace("#", "");
         int r = Integer.parseInt(hex.substring(0, 2), 16);

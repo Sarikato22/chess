@@ -180,7 +180,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogoutFailure_invalidToken() throws ResponseException {
+    public void testLogoutFailureInvalidToken() throws ResponseException {
         facade.clear();
         var badToken = "not-a-real-token";
         assertThrows(ResponseException.class, () -> facade.logout(badToken));
