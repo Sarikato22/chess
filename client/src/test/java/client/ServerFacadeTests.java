@@ -68,11 +68,12 @@ public class ServerFacadeTests {
         var facade = new ServerFacade("http://localhost:8080");
 
         var request = new RegisterRequest("existingUser", "password123", "dup@example.com");
+        facade.register(request);
         try {
             facade.register(request);
             fail("Expected ResponseException for duplicate user");
         } catch (ResponseException ex) {
-            assertEquals(ResponseException.Code.ServerError, ex.code());
+            assertEquals(ResponseException.Code.ClientError, ex.code());
         }
     }
 

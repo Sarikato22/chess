@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="" />
+    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -75,7 +77,7 @@
       <recent name="C:\Users\sarah\OneDrive\Desktop\BYU\CS240\chess\server\src" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.java in server">
+  <component name="RunManager" selected="JUnit.ServerFacadeTests">
     <configuration name="Main (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="client" />
@@ -105,18 +107,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UnitTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="server" />
+    <configuration name="ServerFacadeTests.testRegisterDuplicateUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="client" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="dataaccess.*" />
+          <option name="PATTERN" value="client.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="dataaccess" />
-      <option name="MAIN_CLASS_NAME" value="dataaccess.UnitTests" />
-      <option name="TEST_OBJECT" value="class" />
-      <dir value="$PROJECT_DIR$/server/src/test/java" />
+      <option name="PACKAGE_NAME" value="client" />
+      <option name="MAIN_CLASS_NAME" value="client.ServerFacadeTests" />
+      <option name="METHOD_NAME" value="testRegisterDuplicateUser" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -142,11 +144,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ServerFacadeTests" />
+        <item itemvalue="JUnit.ServerFacadeTests.testRegisterDuplicateUser" />
         <item itemvalue="JUnit.java in server" />
         <item itemvalue="Application.Main (1)" />
         <item itemvalue="Application.Main" />
-        <item itemvalue="JUnit.UnitTests" />
-        <item itemvalue="JUnit.ServerFacadeTests" />
       </list>
     </recent_temporary>
   </component>
@@ -199,7 +201,7 @@
       <workItem from="1762915729515" duration="2039000" />
       <workItem from="1762964007421" duration="2194000" />
       <workItem from="1762967018618" duration="9728000" />
-      <workItem from="1763081241240" duration="2069000" />
+      <workItem from="1763081241240" duration="2376000" />
     </task>
     <servers />
   </component>
