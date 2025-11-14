@@ -235,9 +235,45 @@ public class ServerFacadeTests {
             facade.joinGame("invalid-token", joinReq);
         });
 
-        // Verify correct error code and message
         assertEquals(ResponseException.Code.Unauthorized, thrown.getCode(), "Expected unauthorized error code");
         assertTrue(thrown.getMessage().toLowerCase().contains("unauthorized"), "Expected 'unauthorized' in error message");
+    }
+
+    @Test
+    public void testCreateGameUnauthorized() throws Exception {
+        facade.clear();
+
+        var gameRequest = new GameRequest("BadGame");
+
+        assertThrows(ResponseException.class, () -> {
+            facade.createGame(gameRequest, "invalid-token");
+        });
+    }
+
+    @Test
+    public void testListGamesUnauthorized() throws ResponseException {
+        facade.clear();
+
+        assertThrows(ResponseException.class, () -> {
+            facade.listGames("invalid-token");
+        });
+    }
+
+    @Test
+    public void testClearSuccess() throws Exception {
+        var registerRequest = new RegisterRequest("clearUser", "password123", "clear@example.com");
+        var registerResult = facade.register(registerRequest);
+
+        assertTrue(registerResult.isSuccess());
+        assertNotNull(registerResult.getAuthToken());
+
+        assertDoesNotThrow(() -> facade.clear(), "Clear should not throw an exception");
+
+        var loginRequest = new SessionRequest("clearUser", "password123");
+
+        assertThrows(ResponseException.class, () -> {
+            facade.login(loginRequest);
+        }, "Expected login to fail after clear() resets the database");
     }
 
 

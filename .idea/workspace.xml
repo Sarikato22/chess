@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/client/client.iml" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/test/java/service/UnitTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/test/java/service/UnitTests.java" afterDir="false" />
-    </list>
+    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -202,7 +199,7 @@
       <workItem from="1762915729515" duration="2039000" />
       <workItem from="1762964007421" duration="2194000" />
       <workItem from="1762967018618" duration="9728000" />
-      <workItem from="1763081241240" duration="1764000" />
+      <workItem from="1763081241240" duration="2069000" />
     </task>
     <servers />
   </component>
