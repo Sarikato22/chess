@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import chess.model.data.GameData;
+import chess.model.request.GameRequest;
 import chess.model.result.GameListResult;
 import chess.model.result.GameResult;
 import chess.model.result.JoinGameResult;
@@ -17,28 +18,25 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public GameResult createGame(String authToken, String gameName) throws Exception {
+    public GameResult createGame(GameRequest request, String authToken) throws Exception {
         if (authToken == null || authToken.isEmpty()) {
             return GameResult.failure("Unauthorized");
         }
-
         String username = dataAccess.getUsernameByToken(authToken);
         if (username == null) {
             return GameResult.failure("Unauthorized");
         }
-
+        String gameName = request.getGameName();
         if (gameName == null || gameName.isEmpty()) {
             return GameResult.failure("Error: bad request");
         }
-
         GameData newGame = dataAccess.createGame(new GameData(1, gameName, null, null), authToken);
-
         if (newGame == null) {
             return GameResult.failure("Error: internal failure");
         }
-
         return GameResult.success(newGame.getGameId());
     }
+
 
 
     public GameListResult listGames(String authToken) throws Exception {

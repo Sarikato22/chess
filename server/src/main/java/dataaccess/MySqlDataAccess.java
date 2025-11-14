@@ -224,19 +224,16 @@ public class MySqlDataAccess implements DataAccess{
             if (conn == null) {
                 throw new DataAccessException("Unable to get DB connection");
             }
-
             String creatorUsername = getUsernameByToken(authToken);
             if (creatorUsername == null) {
                 throw new UnauthorizedException("Unauthorized: invalid auth token");
             }
-
             String insertQuery = "INSERT INTO games (whiteUsername, blackUsername, gameName) VALUES (?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setNull(1, Types.VARCHAR);
                 stmt.setNull(2, Types.VARCHAR);
                 stmt.setString(3, game.getGameName());
                 stmt.executeUpdate();
-
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         int id = rs.getInt(1);
@@ -250,7 +247,6 @@ public class MySqlDataAccess implements DataAccess{
             throw new DataAccessException("Database error during game creation: " + e.getMessage(), e);
         }
     }
-
     @Override
     public List<GameData> listGames() throws DataAccessException {
         List<GameData> result = new ArrayList<>();;

@@ -83,7 +83,7 @@ public class ChessClient {
 
 //Prelogin
     private String login(String... params) throws Exception {
-        if (params.length < 2) {
+        if (params.length < 2 || params.length > 2) {
             return "Usage: login <username> <password>\n";
         }
         SessionRequest req = new SessionRequest(params[0], params[1]);
@@ -97,7 +97,7 @@ public class ChessClient {
     }
 
     private String register(String... params) throws Exception {
-        if (params.length < 3) {
+        if (params.length < 3 || params.length > 3 ) {
             return "Usage: register <username> <password> <email>\n";
         }
         RegisterRequest req = new RegisterRequest(params[0], params[1], params[2]);
@@ -115,7 +115,7 @@ public class ChessClient {
             return "You must be signed in to create a game.\n";
         }
 
-        if (params.length < 1) {
+        if (params.length < 1 || params.length > 1) {
             return "Usage: createGame <gameName>\n";
         }
         String gameName = params[0];
@@ -161,7 +161,7 @@ public class ChessClient {
     //playGame
     private String playGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 2) {
+        if (params.length < 2 || params.length > 2) {
             return "Usage: playGame <number> <WHITE|BLACK>\n";
         }
 
@@ -198,7 +198,7 @@ public class ChessClient {
     //Observe game
     private String observeGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 1) {
+        if (params.length < 1 || params.length > 1) {
             return "Usage: observeGame <number>\n";
         }
 

@@ -53,41 +53,36 @@ public class GameHandler {
 
     public void createGame(Context ctx) {
         String authToken = ctx.header("authorization");
-            GameRequest request;
-
-            try {
-                request = gson.fromJson(ctx.body(), GameRequest.class);
-            } catch (Exception e) {
-                ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
-                return;
-            }
-
-            try {
-                GameResult result = gameService.createGame(authToken, request.getGameName());
-
-                if (result.isSuccess()) {
-                    ctx.status(200).result(gson.toJson(Map.of(
-                            "success", result.isSuccess(),
-                            "gameID", result.getGameID()
-                    )));
-                } else {
-                    String message = result.getMessage() != null ? result.getMessage() : "Internal error";
-
-                    if (message.contains("Unauthorized")) {
-                        ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
-                    } else if (message.contains("bad request")) {
-                        ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
-                    } else {
-                        ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + message)));
-                    }
-                }
-            } catch (UnauthorizedException e) {
-                ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
-            } catch (Exception e) {
-                ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
-            }
+        GameRequest request;
+        try {
+            request = gson.fromJson(ctx.body(), GameRequest.class);
+        } catch (Exception e) {
+            ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
+            return;
         }
-
+        try {
+            GameResult result = gameService.createGame(request, authToken);
+            if (result.isSuccess()) {
+                ctx.status(200).result(gson.toJson(Map.of(
+                        "success", result.isSuccess(),
+                        "gameID", result.getGameID()
+                )));
+            } else {
+                String message = result.getMessage() != null ? result.getMessage() : "Internal error";
+                if (message.contains("Unauthorized")) {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized")));
+                } else if (message.contains("bad request")) {
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request")));
+                } else {
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + message)));
+                }
+            }
+        } catch (UnauthorizedException e) {
+            ctx.status(401).result(gson.toJson(Map.of("message", e.getMessage())));
+        } catch (Exception e) {
+            ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage())));
+        }
+    }
 
     // PUT /game
     public void joinGame(Context ctx) {
