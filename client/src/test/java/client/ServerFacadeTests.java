@@ -65,8 +65,6 @@ public class ServerFacadeTests {
 
     @Test
     public void testRegisterDuplicateUser() throws Exception {
-        var facade = new ServerFacade("http://localhost:8080");
-
         var request = new RegisterRequest("existingUser", "password123", "dup@example.com");
         facade.register(request);
         try {
