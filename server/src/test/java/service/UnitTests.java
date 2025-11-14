@@ -164,7 +164,7 @@ public class UnitTests {
 
         // Act: create a game
         GameRequest request = new GameRequest("My First Game");
-        GameResult result = gameService.createGame(session.getAuthToken(), request.getGameName());
+        GameResult result = gameService.createGame(request ,session.getAuthToken());
 
         // Assert
         assertTrue(result.isSuccess(), "Game creation should succeed");
@@ -196,7 +196,7 @@ public class UnitTests {
 
         // Act
         GameRequest request = new GameRequest(null);
-        GameResult result = gameService.createGame(session.getAuthToken(), request.getGameName());
+        GameResult result = gameService.createGame(request, session.getAuthToken());
 
         // Assert
         assertFalse(result.isSuccess(), "Should fail with missing game name");
@@ -215,8 +215,8 @@ public class UnitTests {
 
         GameRequest game1 = new GameRequest("First Game");
         GameRequest game2 = new GameRequest("Second Game");
-        gameService.createGame(session.getAuthToken(), game1.getGameName());
-        gameService.createGame(session.getAuthToken(), game2.getGameName());
+        gameService.createGame(game1,session.getAuthToken());
+        gameService.createGame(game2,session.getAuthToken());
 
 
         GameListResult gameList = gameService.listGames(session.getAuthToken());
