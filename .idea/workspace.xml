@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="" />
+    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/shared/src/main/java/websocket/messages/LoadGameMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -201,7 +204,7 @@
       <workItem from="1762967018618" duration="9728000" />
       <workItem from="1763081241240" duration="2821000" />
       <workItem from="1764126396026" duration="2738000" />
-      <workItem from="1764256695568" duration="1028000" />
+      <workItem from="1764256695568" duration="2222000" />
     </task>
     <servers />
   </component>
