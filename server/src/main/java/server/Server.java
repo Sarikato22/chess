@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import io.javalin.Javalin;
+import server.handlers.WebSocketChessHandler;
 import server.handlers.*;
 import service.ClearService;
 import service.GameService;
@@ -27,8 +28,16 @@ public class Server {
         //
         GameService gameService = new GameService(dao);
         GameHandler gameHandler = new GameHandler(gameService);
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
+        // WebSocket endpoint
+        javalin.ws("/ws", ws -> {
+            var handler = new WebSocketChessHandler();
+            ws.onConnect(handler);
+            ws.onMessage(handler);
+            ws.onClose(handler);
+        });
         // User endpoints
         javalin.post("/user", userHandler::register);
         javalin.post("/session", sessionHandler::login);
