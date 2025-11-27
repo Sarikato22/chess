@@ -1,7 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.api.Session;
+import io.javalin.websocket.WsMessageContext;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 
@@ -9,40 +9,56 @@ public class WebSocketGameService {
 
     private final Gson gson = new Gson();
 
-    public void handleMessage(Session session, String json) {
+    public void handleMessage(WsMessageContext wsCtx) {
         int gameId = -1;
 
         try {
+            String json = wsCtx.message();
             UserGameCommand command = gson.fromJson(json, UserGameCommand.class);
             gameId = command.getGameID();
             String username = getUsername(command.getAuthString());
-            saveSession(gameId, session);
+            saveSession(gameId, wsCtx);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leaveGame(session, username, (LeaveGameCommand) command);
-                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case CONNECT -> connect(wsCtx, username, (ConnectCommand) command);
+                case MAKE_MOVE -> makeMove(wsCtx, username, (MakeMoveCommand) command);
+                case LEAVE -> leaveGame(wsCtx, username, (LeaveGameCommand) command);
+                case RESIGN -> resign(wsCtx, username, (ResignCommand) command);
             }
         } catch (Exception ex) {
-            sendMessage(session, gameId, new ErrorMessage("Error: " + ex.getMessage()));
+            sendMessage(wsCtx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
 
-    private String getUsername(String authToken) { return null; }
+    // ===== stubs to fill in later =====
 
-    private void saveSession(int gameId, Session session) {}
-
-    private void sendMessage(Session root, int gameId, ErrorMessage msg) {
-        // gson.toJson(msg) then root.getRemote().sendString(...)
+    private String getUsername(String authToken) {
+        // TODO: use your auth DAO/service
+        return null;
     }
 
-    private void connect(Session session, String username, ConnectCommand command) {}
+    private void saveSession(int gameId, WsMessageContext ctx) {
+        // TODO: store per-game sessions in a ConnectionManager
+    }
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) {}
+    private void sendMessage(WsMessageContext root, int gameId, ErrorMessage msg) {
+        String json = gson.toJson(msg);
+        root.send(json);
+    }
 
-    private void leaveGame(Session session, String username, LeaveGameCommand command) {}
+    private void connect(WsMessageContext ctx, String username, ConnectCommand command) {
+        // TODO
+    }
 
-    private void resign(Session session, String username, ResignCommand command) {}
+    private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {
+        // TODO
+    }
+
+    private void leaveGame(WsMessageContext ctx, String username, LeaveGameCommand command) {
+        // TODO
+    }
+
+    private void resign(WsMessageContext ctx, String username, ResignCommand command) {
+        // TODO
+    }
 }
-
