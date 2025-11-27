@@ -30,6 +30,11 @@ public class UserGameCommand {
         return authToken;
     }
 
+    public String getAuthString() {
+        return authToken;
+    }
+
+
     public Integer getGameID() {
         return gameID;
     }
