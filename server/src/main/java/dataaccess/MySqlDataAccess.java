@@ -358,41 +358,39 @@ public class MySqlDataAccess implements DataAccess{
             throw new DataAccessException("Database error during token invalidation: " + e.getMessage(), e);
         }
         }
-
     @Override
     public ChessGame getChessGame(int gameID) throws DataAccessException {
         try (var conn = getConnection();
              var stmt = conn.prepareStatement(
-                     "SELECT game_state FROM games WHERE game_id = ?")) {
+                     "SELECT game_state FROM games WHERE gameID = ?")) {  // gameID
 
             stmt.setInt(1, gameID);
             try (var rs = stmt.executeQuery()) {
                 if (!rs.next()) {
-                    // no such game
                     throw new DataAccessException("Game not found");
                 }
 
-                String json = rs.getString("game_state"); // this is the initialization
+                String json = rs.getString("game_state");
 
                 if (json == null) {
-                    // if for some reason nothing was stored yet, start from fresh
-                    ChessGame game = new ChessGame();
-                    return game;
+                    // no state stored yet → fresh game
+                    return new ChessGame();
                 }
 
                 return gson.fromJson(json, ChessGame.class);
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage());
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
+
     @Override
     public void updateChessGame(int gameID, ChessGame game) throws DataAccessException {
         String json = gson.toJson(game);
 
         try (var conn = getConnection();
              var stmt = conn.prepareStatement(
-                     "UPDATE games SET game_state = ? WHERE game_id = ?")) {
+                     "UPDATE games SET game_state = ? WHERE gameID = ?")) {  // gameID
 
             stmt.setString(1, json);
             stmt.setInt(2, gameID);
@@ -402,10 +400,8 @@ public class MySqlDataAccess implements DataAccess{
                 throw new DataAccessException("Game not found");
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(ex.getMessage());
+            throw new DataAccessException(ex.getMessage(), ex);
         }
     }
-
-
 
 }
