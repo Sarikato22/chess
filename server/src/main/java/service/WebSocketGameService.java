@@ -16,6 +16,7 @@ public class WebSocketGameService {
 
     private final Gson gson = new Gson();
     private final Map<Integer, ConnectionManager> connections = new HashMap<>();
+    private final Map<Integer, Boolean> gameOver = new HashMap<>();
     private final DataAccess dataAccess;
 
     public WebSocketGameService(DataAccess dataAccess) {
@@ -86,6 +87,11 @@ public class WebSocketGameService {
         var move = command.getMove();
         try {
             GameData gameData = dataAccess.getGameData(gameId);
+
+            if (Boolean.TRUE.equals(gameOver.get(gameId))) {
+                sendMessage(ctx, gameId, new ErrorMessage("Error: game already over"));
+                return;
+            }
             if (gameData == null) {
                 sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
                 return;
@@ -149,7 +155,6 @@ public class WebSocketGameService {
         private void leaveGame (WsMessageContext ctx, String username, LeaveGameCommand command){
             int gameId = command.getGameID();
             try {
-     git
                 var gameData = dataAccess.getGameData(gameId);
                 if (gameData == null) {
                     sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
@@ -180,7 +185,38 @@ public class WebSocketGameService {
             }
         }
 
-        private void resign (WsMessageContext ctx, String username, ResignCommand command){
-            // TODO
+    private void resign(WsMessageContext ctx, String username, ResignCommand command) {
+        int gameId = command.getGameID();
+
+        try {
+            var gameData = dataAccess.getGameData(gameId);
+            if (gameData == null) {
+                sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                return;
+            }
+
+            boolean isWhite = username.equals(gameData.getWhiteUsername());
+            boolean isBlack = username.equals(gameData.getBlackUsername());
+            if (!isWhite && !isBlack) {
+                // observers cannot resign
+                sendMessage(ctx, gameId, new ErrorMessage("Error: cannot resign"));
+                return;
+            }
+            if (Boolean.TRUE.equals(gameOver.get(gameId))) {
+                sendMessage(ctx, gameId, new ErrorMessage("Error: game already over"));
+                return;
+            }
+
+            gameOver.put(gameId, true);
+            ConnectionManager manager = connections.get(gameId);
+            if (manager != null) {
+                String noteText = username + " resigned";
+                NotificationMessage note = new NotificationMessage(noteText);
+                manager.broadcastToAll(note, gson);
+            }
+
+        } catch (Exception ex) {
+            sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
+    }
 }
