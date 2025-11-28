@@ -7,9 +7,13 @@ import io.javalin.websocket.WsMessageContext;
 import websocket.commands.*;
 import websocket.messages.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WebSocketGameService {
 
     private final Gson gson = new Gson();
+    private final Map<Integer, ConnectionManager> connections = new HashMap<>();
     private final DataAccess dataAccess;
 
     public WebSocketGameService(DataAccess dataAccess) {
@@ -24,7 +28,6 @@ public class WebSocketGameService {
             UserGameCommand command = gson.fromJson(json, UserGameCommand.class);
             gameId = command.getGameID();
             String username = getUsername(command.getAuthString());
-            saveSession(gameId, username, wsCtx);
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(wsCtx, username, (ConnectCommand) command);
@@ -41,18 +44,18 @@ public class WebSocketGameService {
         return dataAccess.getUsernameByToken(authToken);
     }
 
-    private void saveSession(int gameId, String username, WsMessageContext ctx) {
-        // TODO: implement ConnectionManager later
-    }
 
     private void sendMessage(WsMessageContext root, int gameId, ServerMessage msg) {
         String json = gson.toJson(msg);
         root.send(json);
     }
 
+    private ConnectionManager getConnectionManager(int gameId) {
+        return connections.computeIfAbsent(gameId, id -> new ConnectionManager());
+    }
+
     private void connect(WsMessageContext ctx, String username, ConnectCommand command) throws Exception {
         int gameId = command.getGameID();
-
         var gameData = dataAccess.getGameData(gameId);
         if (gameData == null) {
             sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
@@ -61,21 +64,30 @@ public class WebSocketGameService {
 
         ChessGame game = dataAccess.getChessGame(gameId);
 
-        var loadMsg = new LoadGameMessage(game);
-        sendMessage(ctx, gameId, loadMsg);
+        ConnectionManager manager = getConnectionManager(gameId);
+        manager.addPlayer(username, ctx);
 
-        // 4) Later, you’ll also broadcast NOTIFICATION to other sessions in this game
-    }
+        sendMessage(ctx, gameId, new LoadGameMessage(game));
 
-    private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {
-        // TODO
+        String noteText;
+        if (username.equals(gameData.getWhiteUsername())) {
+            noteText = username + " joined as WHITE";
+        } else if (username.equals(gameData.getBlackUsername())) {
+            noteText = username + " joined as BLACK";
+        } else {
+            noteText = username + " joined as OBSERVER";
+        }
+        manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
     }
+        private void makeMove (WsMessageContext ctx, String username, MakeMoveCommand command){
+            // TODO
+        }
 
-    private void leaveGame(WsMessageContext ctx, String username, LeaveGameCommand command) {
-        // TODO
-    }
+        private void leaveGame (WsMessageContext ctx, String username, LeaveGameCommand command){
+            // TODO
+        }
 
-    private void resign(WsMessageContext ctx, String username, ResignCommand command) {
-        // TODO
-    }
+        private void resign (WsMessageContext ctx, String username, ResignCommand command){
+            // TODO
+        }
 }
