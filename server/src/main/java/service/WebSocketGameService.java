@@ -147,7 +147,37 @@ public class WebSocketGameService {
     }
 
         private void leaveGame (WsMessageContext ctx, String username, LeaveGameCommand command){
-            // TODO
+            int gameId = command.getGameID();
+            try {
+     git
+                var gameData = dataAccess.getGameData(gameId);
+                if (gameData == null) {
+                    sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                    return;
+                }
+
+                boolean isPlayer = false;
+                if (username.equals(gameData.getWhiteUsername())) {
+                    gameData.setWhiteUsername(null);
+                    isPlayer = true;
+                } else if (username.equals(gameData.getBlackUsername())) {
+                    gameData.setBlackUsername(null);
+                    isPlayer = true;
+                }
+
+                if (isPlayer) {
+                    dataAccess.updateGame(gameData);
+                }
+                ConnectionManager manager = connections.get(gameId);
+                if (manager != null) {
+                    manager.removePlayer(username);
+
+                    String noteText = username + " left the game";
+                    manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
+                }
+            } catch (Exception ex) {
+                sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
+            }
         }
 
         private void resign (WsMessageContext ctx, String username, ResignCommand command){
