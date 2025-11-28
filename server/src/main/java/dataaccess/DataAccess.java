@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
@@ -25,7 +26,9 @@ public interface DataAccess {
 
     void updateGame(GameData game) throws DataAccessException;
 
-    GameData getGame(int gameID) throws DataAccessException;
+    GameData getGameData(int gameID) throws DataAccessException;
+    ChessGame getChessGame(int gameID) throws DataAccessException;
 
+    void updateChessGame(int gameID, ChessGame game) throws DataAccessException;
 
 }

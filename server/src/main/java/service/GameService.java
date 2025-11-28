@@ -70,7 +70,7 @@ public class GameService {
             return JoinGameResult.failure("Error: bad request");
         }
 
-        GameData game = dataAccess.getGame(gameID);
+        GameData game = dataAccess.getGameData(gameID);
         if (game == null) {
             return JoinGameResult.failure("Error: bad request");
         }

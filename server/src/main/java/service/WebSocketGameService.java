@@ -1,13 +1,20 @@
 package service;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import io.javalin.websocket.WsMessageContext;
 import websocket.commands.*;
-import websocket.messages.ErrorMessage;
+import websocket.messages.*;
 
 public class WebSocketGameService {
 
     private final Gson gson = new Gson();
+    private final DataAccess dataAccess;
+
+    public WebSocketGameService(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
 
     public void handleMessage(WsMessageContext wsCtx) {
         int gameId = -1;
@@ -30,23 +37,34 @@ public class WebSocketGameService {
         }
     }
 
-    // ===== stubs to fill in later =====
-
-    private String getUsername(String authToken) {
-        // TODO: use your auth DAO/service
-        return null;
+    private String getUsername(String authToken) throws Exception {
+        return dataAccess.getUsernameByToken(authToken);
     }
 
     private void saveSession(int gameId, String username, WsMessageContext ctx) {
-        // TODO: store per-game connections
+        // TODO: implement ConnectionManager later
     }
-    private void sendMessage(WsMessageContext root, int gameId, ErrorMessage msg) {
+
+    private void sendMessage(WsMessageContext root, int gameId, ServerMessage msg) {
         String json = gson.toJson(msg);
         root.send(json);
     }
 
-    private void connect(WsMessageContext ctx, String username, ConnectCommand command) {
-        // TODO
+    private void connect(WsMessageContext ctx, String username, ConnectCommand command) throws Exception {
+        int gameId = command.getGameID();
+
+        var gameData = dataAccess.getGameData(gameId);
+        if (gameData == null) {
+            sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+            return;
+        }
+
+        ChessGame game = dataAccess.getChessGame(gameId);
+
+        var loadMsg = new LoadGameMessage(game);
+        sendMessage(ctx, gameId, loadMsg);
+
+        // 4) Later, you’ll also broadcast NOTIFICATION to other sessions in this game
     }
 
     private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {

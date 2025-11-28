@@ -145,7 +145,7 @@ public class UnitTests {
         created.setBlackUsername("alice");
         dao.updateGame(created);
 
-        GameData updated = dao.getGame(created.getGameId());
+        GameData updated = dao.getGameData(created.getGameId());
         assertEquals("alice", updated.getBlackUsername());
     }
 
@@ -162,7 +162,7 @@ public class UnitTests {
         List<GameData> games = dao.listGames();
         assertFalse(games.isEmpty());
         GameData first = games.get(0);
-        GameData result = dao.getGame(first.getGameId());
+        GameData result = dao.getGameData(first.getGameId());
         assertNotNull(result);
         assertEquals(first.getGameId(), result.getGameId());
     }
@@ -170,7 +170,7 @@ public class UnitTests {
     @Test
     @Order(16)
     void getGameNegativeNotFound() throws Exception {
-        GameData result = dao.getGame(9999);
+        GameData result = dao.getGameData(9999);
         assertNull(result);
     }
 

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
@@ -18,6 +19,8 @@ import static dataaccess.DatabaseManager.getConnection;
 
 public class MySqlDataAccess implements DataAccess{
     private int nextGameId = 1;
+    private final Gson gson = new Gson();
+
     public MySqlDataAccess() {
         try {
             configureDatabase();
@@ -326,7 +329,7 @@ public class MySqlDataAccess implements DataAccess{
 
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGameData(int gameID) throws DataAccessException {
 
         try (Connection conn = getConnection()) {
             if (conn == null) {
@@ -356,4 +359,53 @@ public class MySqlDataAccess implements DataAccess{
         }
         }
 
+    @Override
+    public ChessGame getChessGame(int gameID) throws DataAccessException {
+        try (var conn = getConnection();
+             var stmt = conn.prepareStatement(
+                     "SELECT game_state FROM games WHERE game_id = ?")) {
+
+            stmt.setInt(1, gameID);
+            try (var rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    // no such game
+                    throw new DataAccessException("Game not found");
+                }
+
+                String json = rs.getString("game_state"); // this is the initialization
+
+                if (json == null) {
+                    // if for some reason nothing was stored yet, start from fresh
+                    ChessGame game = new ChessGame();
+                    return game;
+                }
+
+                return gson.fromJson(json, ChessGame.class);
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
+    @Override
+    public void updateChessGame(int gameID, ChessGame game) throws DataAccessException {
+        String json = gson.toJson(game);
+
+        try (var conn = getConnection();
+             var stmt = conn.prepareStatement(
+                     "UPDATE games SET game_state = ? WHERE game_id = ?")) {
+
+            stmt.setString(1, json);
+            stmt.setInt(2, gameID);
+
+            int rows = stmt.executeUpdate();
+            if (rows == 0) {
+                throw new DataAccessException("Game not found");
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+
+
+}
