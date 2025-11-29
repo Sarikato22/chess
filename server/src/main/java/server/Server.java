@@ -7,61 +7,55 @@ import dataaccess.MySqlDataAccess;
 import io.javalin.Javalin;
 import server.handlers.WebSocketChessHandler;
 import server.handlers.*;
-import service.ClearService;
-import service.GameService;
-import service.SessionService;
-import service.UserService;
+import service.*;
 
 public class Server {
 
-    private final Javalin javalin;
+    private final Javalin app;
+    private final DataAccess dao;
 
     public Server() {
-        DataAccess dao = new MySqlDataAccess();
+        this.dao = new MySqlDataAccess();
+
         UserService userService = new UserService(dao);
         ClearService clearService = new ClearService(dao);
+        SessionService sessionService = new SessionService(dao);
+        GameService gameService = new GameService(dao);
+        WebSocketGameService wsGameService = new WebSocketGameService(dao);
+
         AdminHandler adminHandler = new AdminHandler(clearService);
         UserHandler userHandler = new UserHandler(userService);
-        //
-        SessionService sessionService = new SessionService(dao);
         SessionHandler sessionHandler = new SessionHandler(sessionService);
-        //
-        GameService gameService = new GameService(dao);
         GameHandler gameHandler = new GameHandler(gameService);
+        WebSocketChessHandler wsHandler = new WebSocketChessHandler(wsGameService);
 
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        app = Javalin.create(config -> config.staticFiles.add("web"));
+
+        // HTTP endpoints
+        app.post("/user", userHandler::register);
+        app.post("/session", sessionHandler::login);
+        app.delete("/session", sessionHandler::logout);
+
+        app.get("/game", gameHandler::listGames);
+        app.post("/game", gameHandler::createGame);
+        app.put("/game", gameHandler::joinGame);
+
+        app.delete("/db", adminHandler::clear);
 
         // WebSocket endpoint
-        javalin.ws("/ws", ws -> {
-            var handler = new WebSocketChessHandler();
-            ws.onConnect(handler);
-            ws.onMessage(handler);
-            ws.onClose(handler);
+        app.ws("/ws", ws -> {
+            ws.onConnect(wsHandler);
+            ws.onMessage(wsHandler);
+            ws.onClose(wsHandler);
         });
-        // User endpoints
-        javalin.post("/user", userHandler::register);
-        javalin.post("/session", sessionHandler::login);
-        javalin.delete("/session", sessionHandler::logout);
-
-        // Game endpoints
-        javalin.get("/game", gameHandler::listGames);
-        javalin.post("/game", gameHandler::createGame);
-        javalin.put("/game", gameHandler::joinGame);
-
-        // Admin endpoint
-        javalin.delete("/db", adminHandler::clear);
-
     }
 
-
-
     public int run(int desiredPort) {
-        javalin.start(desiredPort);
-        return javalin.port();
+        app.start(desiredPort);
+        return app.port();
     }
 
     public void stop() {
-        javalin.stop();
+        app.stop();
     }
 }
-

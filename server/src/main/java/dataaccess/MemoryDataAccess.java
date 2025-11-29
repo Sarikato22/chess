@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import chess.model.data.GameData;
 import chess.model.request.RegisterRequest;
 import chess.model.request.SessionRequest;
@@ -100,6 +101,16 @@ public class MemoryDataAccess implements DataAccess {
             throw new DataAccessException("Game not found");
         }
         return game;
+    }
+
+    @Override
+    public ChessGame getChessGame(int gameID) throws DataAccessException {
+        return null;
+    }
+
+    @Override
+    public void updateChessGame(int gameID, ChessGame game) throws DataAccessException {
+
     }
 
     @Override

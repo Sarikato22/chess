@@ -9,8 +9,12 @@ import websocket.messages.ErrorMessage;
 
 public class WebSocketChessHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
-    private final WebSocketGameService service = new WebSocketGameService();
+    private final WebSocketGameService service;
     private final Gson gson = new Gson();
+
+    public WebSocketChessHandler(WebSocketGameService service) {
+        this.service = service;
+    }
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) {
