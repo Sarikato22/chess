@@ -23,6 +23,12 @@ public class WebSocketGameService {
         this.dataAccess = dataAccess;
     }
 
+    public void clearState() {
+        gameOver.clear();
+        connections.clear();
+    }
+
+
     public void handleMessage(WsMessageContext wsCtx) {
         int gameId = -1;
 
@@ -204,16 +210,17 @@ public class WebSocketGameService {
             boolean isWhite = username.equals(gameData.getWhiteUsername());
             boolean isBlack = username.equals(gameData.getBlackUsername());
             if (!isWhite && !isBlack) {
-                // observers cannot resign
                 sendMessage(ctx, gameId, new ErrorMessage("Error: cannot resign"));
                 return;
             }
+
+            // Only block *second* (or later) resigns
             if (Boolean.TRUE.equals(gameOver.get(gameId))) {
                 sendMessage(ctx, gameId, new ErrorMessage("Error: game already over"));
                 return;
             }
-
             gameOver.put(gameId, true);
+
             ConnectionManager manager = connections.get(gameId);
             if (manager != null) {
                 String noteText = username + " resigned";
@@ -225,4 +232,5 @@ public class WebSocketGameService {
             sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
+
 }

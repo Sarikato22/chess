@@ -23,7 +23,7 @@ public class Server {
         GameService gameService = new GameService(dao);
         WebSocketGameService wsGameService = new WebSocketGameService(dao);
 
-        AdminHandler adminHandler = new AdminHandler(clearService);
+        AdminHandler adminHandler = new AdminHandler(clearService,wsGameService);
         UserHandler userHandler = new UserHandler(userService);
         SessionHandler sessionHandler = new SessionHandler(sessionService);
         GameHandler gameHandler = new GameHandler(gameService);
