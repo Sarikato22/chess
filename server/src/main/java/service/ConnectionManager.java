@@ -19,19 +19,33 @@ class ConnectionManager {
         sessions.remove(username);
     }
 
-    void broadcastToOthers(String exceptUsername, ServerMessage msg, Gson gson) {
+    void broadcastToAll(ServerMessage msg, Gson gson) {
         String json = gson.toJson(msg);
-        for (var entry : sessions.entrySet()) {
-            if (!entry.getKey().equals(exceptUsername)) {
+        var it = sessions.entrySet().iterator();
+        while (it.hasNext()) {
+            var entry = it.next();
+            try {
                 entry.getValue().send(json);
+            } catch (Exception e) {
+                // channel is dead; drop this session
+                it.remove();
             }
         }
     }
 
-    void broadcastToAll(ServerMessage msg, Gson gson) {
+    void broadcastToOthers(String exceptUsername, ServerMessage msg, Gson gson) {
         String json = gson.toJson(msg);
-        for (var entry : sessions.entrySet()) {
-            entry.getValue().send(json);
+        var it = sessions.entrySet().iterator();
+        while (it.hasNext()) {
+            var entry = it.next();
+            if (entry.getKey().equals(exceptUsername)) {
+                continue;
+            }
+            try {
+                entry.getValue().send(json);
+            } catch (Exception e) {
+                it.remove();
+            }
         }
     }
 }//end of class

@@ -30,22 +30,28 @@ public class WebSocketGameService {
             String json = wsCtx.message();
             UserGameCommand command = gson.fromJson(json, UserGameCommand.class);
             gameId = command.getGameID();
-            String username = getUsername(command.getAuthString());
+            String username = getUsername(command.getAuthString()); // will throw for bad auth
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(wsCtx, username, command);
                 case MAKE_MOVE -> makeMove(wsCtx, username, command);
-                case LEAVE   -> leaveGame(wsCtx, username, command);
-                case RESIGN  -> resign(wsCtx, username, command);
+                case LEAVE    -> leaveGame(wsCtx, username, command);
+                case RESIGN   -> resign(wsCtx, username, command);
             }
         } catch (Exception ex) {
             sendMessage(wsCtx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
 
+
     private String getUsername(String authToken) throws Exception {
-        return dataAccess.getUsernameByToken(authToken);
+        String username = dataAccess.getUsernameByToken(authToken);
+        if (username == null) {
+            throw new Exception("Error: unauthorized");
+        }
+        return username;
     }
+
 
 
     private void sendMessage(WsMessageContext root, int gameId, ServerMessage msg) {

@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/dataaccess/MySqlDataAccess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/service/ConnectionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/ConnectionManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/src/main/java/service/WebSocketGameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/service/WebSocketGameService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/src/main/java/websocket/commands/UserGameCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/shared/src/main/java/websocket/commands/UserGameCommand.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,10 +141,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="java in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="WebSocketTests.validMove" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="server" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/server/src/test/java" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="passoff.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="passoff.server" />
+      <option name="MAIN_CLASS_NAME" value="passoff.server.WebSocketTests" />
+      <option name="METHOD_NAME" value="validMove" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -165,10 +171,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.WebSocketTests" />
+        <item itemvalue="JUnit.WebSocketTests.validMove" />
         <item itemvalue="JUnit.WebSocketTests.connectSingleUser" />
         <item itemvalue="JUnit.ServerFacadeTests" />
         <item itemvalue="JUnit.ServerFacadeTests.testRegisterDuplicateUser" />
-        <item itemvalue="JUnit.java in server" />
       </list>
     </recent_temporary>
   </component>
@@ -225,7 +231,7 @@
       <workItem from="1764126396026" duration="2738000" />
       <workItem from="1764256695568" duration="5416000" />
       <workItem from="1764343688764" duration="2058000" />
-      <workItem from="1764432114525" duration="2454000" />
+      <workItem from="1764432114525" duration="2886000" />
     </task>
     <servers />
   </component>
