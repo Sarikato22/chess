@@ -33,10 +33,10 @@ public class WebSocketGameService {
             String username = getUsername(command.getAuthString());
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(wsCtx, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(wsCtx, username, (MakeMoveCommand) command);
-                case LEAVE -> leaveGame(wsCtx, username, (LeaveGameCommand) command);
-                case RESIGN -> resign(wsCtx, username, (ResignCommand) command);
+                case CONNECT -> connect(wsCtx, username, command);
+                case MAKE_MOVE -> makeMove(wsCtx, username, command);
+                case LEAVE   -> leaveGame(wsCtx, username, command);
+                case RESIGN  -> resign(wsCtx, username, command);
             }
         } catch (Exception ex) {
             sendMessage(wsCtx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
@@ -57,7 +57,7 @@ public class WebSocketGameService {
         return connections.computeIfAbsent(gameId, id -> new ConnectionManager());
     }
 
-    private void connect(WsMessageContext ctx, String username, ConnectCommand command) throws Exception {
+    private void connect(WsMessageContext ctx, String username, UserGameCommand command)  throws Exception {
         int gameId = command.getGameID();
         var gameData = dataAccess.getGameData(gameId);
         if (gameData == null) {
@@ -82,7 +82,7 @@ public class WebSocketGameService {
         }
         manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
     }
-    private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {
+    private void makeMove(WsMessageContext ctx, String username, UserGameCommand command) {
         int gameId = command.getGameID();
         var move = command.getMove();
         try {
@@ -152,7 +152,7 @@ public class WebSocketGameService {
         }
     }
 
-        private void leaveGame (WsMessageContext ctx, String username, LeaveGameCommand command){
+        private void leaveGame (WsMessageContext ctx, String username, UserGameCommand command){
             int gameId = command.getGameID();
             try {
                 var gameData = dataAccess.getGameData(gameId);
@@ -185,7 +185,7 @@ public class WebSocketGameService {
             }
         }
 
-    private void resign(WsMessageContext ctx, String username, ResignCommand command) {
+    private void resign(WsMessageContext ctx, String username, UserGameCommand command) {
         int gameId = command.getGameID();
 
         try {

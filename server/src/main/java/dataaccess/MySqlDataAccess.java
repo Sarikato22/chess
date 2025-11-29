@@ -46,16 +46,19 @@ public class MySqlDataAccess implements DataAccess{
     );
     """,
 
-            """
-    CREATE TABLE IF NOT EXISTS games (
-        gameID INT AUTO_INCREMENT PRIMARY KEY,
-        whiteUsername VARCHAR(50),
-        blackUsername VARCHAR(50),
-        gameName VARCHAR(100) NOT NULL,
-        FOREIGN KEY (whiteUsername) REFERENCES users(username) ON DELETE SET NULL,
-        FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
+
+     """
+            CREATE TABLE IF NOT EXISTS games (
+            gameID INT AUTO_INCREMENT PRIMARY KEY,
+            whiteUsername VARCHAR(50),
+            blackUsername VARCHAR(50),
+            gameName VARCHAR(100) NOT NULL,
+            game_state TEXT,
+            FOREIGN KEY (whiteUsername) REFERENCES users(username) ON DELETE SET NULL,
+            FOREIGN KEY (blackUsername) REFERENCES users(username) ON DELETE SET NULL
     );
     """
+
     };
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
