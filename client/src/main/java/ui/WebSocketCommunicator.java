@@ -13,6 +13,7 @@ public class WebSocketCommunicator {
     private final ServerMessageObserver observer;
     private Session session;
 
+
     public WebSocketCommunicator(ServerMessageObserver observer, String serverUrl) throws Exception {
         this.observer = observer;
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();

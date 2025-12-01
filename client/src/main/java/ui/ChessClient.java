@@ -29,8 +29,12 @@ public class ChessClient implements ServerMessageObserver {
 
     private ChessBoard board = new ChessBoard();
     private ChessBoardRenderer renderer;
+    private WebSocketCommunicator ws;
+    private Integer currentGameId = null;
+    private final String serverUrl;
 
-    public ChessClient(String serverUrl)  {
+    public ChessClient(String serverUrl) {
+        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
         board.resetBoard();
         renderer = new ChessBoardRenderer();
@@ -161,7 +165,7 @@ public class ChessClient implements ServerMessageObserver {
     //playGame
     private String playGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 2 || params.length > 2) {
+        if (params.length != 2) {
             return "Usage: playGame <number> <WHITE|BLACK>\n";
         }
 
@@ -191,8 +195,13 @@ public class ChessClient implements ServerMessageObserver {
             return "Failed to join game: " + joinResult.getMessage() + "\n";
         }
 
-        renderer.drawBoard(board, color);
-        return String.format("Joined game %s as %s.\n", gameData.getGameName(), color);
+        currentGameId = gameData.getGameId();
+
+        ws = new WebSocketCommunicator(this, serverUrl);
+        ws.sendConnect(authToken, currentGameId);
+
+        return String.format("Joined game %s as %s. Waiting for board...\n",
+                gameData.getGameName(), color);
     }
 
     //Observe game
