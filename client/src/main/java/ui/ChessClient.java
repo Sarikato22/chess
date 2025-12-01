@@ -207,10 +207,9 @@ public class ChessClient implements ServerMessageObserver {
     //Observe game
     private String observeGame(String... params) throws Exception {
         refreshGameListSilently();
-        if (params.length < 1 || params.length > 1) {
+        if (params.length != 1) {
             return "Usage: observeGame <number>\n";
         }
-
         int num;
         try {
             num = Integer.parseInt(params[0]);
@@ -223,10 +222,15 @@ public class ChessClient implements ServerMessageObserver {
         }
 
         GameData gameData = lastListedGames.get(num);
-        renderer.drawBoard(board, ChessGame.TeamColor.WHITE);
 
-        return String.format("Observing game %s.\n", gameData.getGameName());
+        currentGameId = gameData.getGameId();
+
+        ws = new WebSocketCommunicator(this, serverUrl);
+        ws.sendConnect(authToken, currentGameId);
+
+        return String.format("Observing game %s. Waiting for board...\n", gameData.getGameName());
     }
+
 
     private String logout() throws Exception {
         server.logout(authToken);
