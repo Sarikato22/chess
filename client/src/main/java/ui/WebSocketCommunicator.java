@@ -1,4 +1,5 @@
 package ui;
+
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import java.net.URI;
@@ -8,7 +9,6 @@ import websocket.messages.ServerMessage;
 
 @ClientEndpoint
 public class WebSocketCommunicator {
-
     private final Gson gson = new Gson();
     private final ServerMessageObserver observer;
     private Session session;
@@ -16,7 +16,6 @@ public class WebSocketCommunicator {
     public WebSocketCommunicator(ServerMessageObserver observer, String serverUrl) throws Exception {
         this.observer = observer;
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        // serverUrl like "http://localhost:8080", convert to "ws://localhost:8080/ws"
         String wsUrl = serverUrl.replaceFirst("^http", "ws") + "/ws";
         this.session = container.connectToServer(this, new URI(wsUrl));
     }
@@ -29,14 +28,12 @@ public class WebSocketCommunicator {
 
     public void sendConnect(String authToken, int gameId) throws Exception {
         UserGameCommand cmd = new ConnectCommand(authToken, gameId);
-        String json = gson.toJson(cmd);
-        session.getBasicRemote().sendText(json);
+        session.getBasicRemote().sendText(gson.toJson(cmd));
     }
 
     public void sendMakeMove(String authToken, int gameId, chess.ChessMove move) throws Exception {
         UserGameCommand cmd = new MakeMoveCommand(authToken, gameId, move);
-        String json = gson.toJson(cmd);
-        session.getBasicRemote().sendText(json);
+        session.getBasicRemote().sendText(gson.toJson(cmd));
     }
 
     public void sendLeave(String authToken, int gameId) throws Exception {

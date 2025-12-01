@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/src/main/java/ui/ServerMessageObserver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/java/ui/WebSocketCommunicator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="46d63725-7f9f-4f18-9cc2-838171943407" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -234,7 +230,7 @@
       <workItem from="1764343688764" duration="2058000" />
       <workItem from="1764432114525" duration="3005000" />
       <workItem from="1764451518318" duration="1756000" />
-      <workItem from="1764614732642" duration="2162000" />
+      <workItem from="1764614732642" duration="2536000" />
     </task>
     <servers />
   </component>

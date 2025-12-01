@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import chess.model.result.*;
 import chess.server.ServerFacade;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
 
     private String username = null;
     private String authToken = null;
@@ -30,7 +30,7 @@ public class ChessClient {
     private ChessBoard board = new ChessBoard();
     private ChessBoardRenderer renderer;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl)  {
         server = new ServerFacade(serverUrl);
         board.resetBoard();
         renderer = new ChessBoardRenderer();
@@ -257,5 +257,10 @@ public class ChessClient {
         }
     }
 
+    @Override
+    public void notify(websocket.messages.ServerMessage message) {
+// TODO: handle LOAD_GAME / NOTIFICATION / ERROR later
+        System.out.println("Received message from server: " + message.getServerMessageType());
+    }
 }//end of class
 
