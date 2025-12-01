@@ -4,8 +4,6 @@ import java.util.*;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
@@ -32,6 +30,10 @@ public class ChessClient implements ServerMessageObserver {
     private WebSocketCommunicator ws;
     private Integer currentGameId = null;
     private final String serverUrl;
+    private boolean inGame = false;
+
+    private ChessGame currentGame = null;
+    private ChessGame.TeamColor currentColor = null;
 
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -183,9 +185,12 @@ public class ChessClient implements ServerMessageObserver {
         ChessGame.TeamColor color;
         try {
             color = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
+            inGame = true;
+            currentColor = color;
         } catch (IllegalArgumentException e) {
             return "Invalid color. Use WHITE or BLACK.\n";
         }
+
 
         GameData gameData = lastListedGames.get(num);
         JoinGameRequest req = new JoinGameRequest(color, gameData.getGameId());
@@ -224,6 +229,8 @@ public class ChessClient implements ServerMessageObserver {
         GameData gameData = lastListedGames.get(num);
 
         currentGameId = gameData.getGameId();
+        inGame = true;
+        currentColor = null;
 
         ws = new WebSocketCommunicator(this, serverUrl);
         ws.sendConnect(authToken, currentGameId);
@@ -242,13 +249,24 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     //eval
-
     private String eval(String input) throws Exception {
         String[] tokens = input.split(" ");
         String cmd = tokens.length > 0 ? tokens[0].toLowerCase() : "";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
-        if (state == State.SIGNEDOUT) {
+        if (inGame) {
+            // IN-GAME commands
+            return switch (cmd) {
+                case "help"     -> inGameHelp();
+                case "move"     -> inGameMove(params);
+                case "leave"    -> inGameLeave();
+                case "resign"   -> inGameResign();
+                case "redraw"   -> inGameRedraw();
+                case "highlight"-> inGameHighlight(params);
+                case "quit"     -> "quit";
+                default         -> "Unknown command. Type 'help'.\n";
+            };
+        } else if (state == State.SIGNEDOUT) {
             return switch (cmd) {
                 case "help" -> help();
                 case "login" -> login(params);
@@ -272,8 +290,65 @@ public class ChessClient implements ServerMessageObserver {
 
     @Override
     public void notify(websocket.messages.ServerMessage message) {
-// TODO: handle LOAD_GAME / NOTIFICATION / ERROR later
-        System.out.println("Received message from server: " + message.getServerMessageType());
+        switch (message.getServerMessageType()) {
+            case LOAD_GAME -> {
+                var load = (websocket.messages.LoadGameMessage) message;
+                this.currentGame = load.getGame();
+
+                ChessGame.TeamColor perspective =
+                        (currentColor != null ? currentColor : ChessGame.TeamColor.WHITE);
+
+                if (currentGame != null) {
+                    renderer.drawBoard(currentGame.getBoard(), perspective);
+                }
+            }
+            case NOTIFICATION -> {
+                var note = (websocket.messages.NotificationMessage) message;
+                System.out.println("\n[Notification] " + note.getMessage());
+            }
+            case ERROR -> {
+                var err = (websocket.messages.ErrorMessage) message;
+                System.out.println("\n[Error] " + err.getErrorMessage());
+            }
+        }
     }
+    private String inGameHelp() {
+        return """
+            Gameplay commands:
+            - help
+            - move <from> <to>      (e.g., move e2 e4)
+            - highlight <square>    (e.g., highlight e2)
+            - redraw
+            - leave
+            - resign
+            """;
+    }
+
+    private String inGameMove(String... params) throws Exception {
+        // TODO: parse params into a ChessMove and call ws.sendMakeMove(...)
+        return "";
+    }
+
+    private String inGameLeave() throws Exception {
+        // TODO: ws.sendLeave(...), close ws, set inGame=false
+        return "";
+    }
+
+    private String inGameResign() throws Exception {
+        // TODO: ws.sendResign(...)
+        return "";
+    }
+
+    private String inGameRedraw() {
+        // TODO: if currentGame != null, renderer.drawBoard(...)
+        return "";
+    }
+
+    private String inGameHighlight(String... params) {
+        // TODO later: compute validMoves on currentGame
+        return "";
+    }
+
+
 }//end of class
 
