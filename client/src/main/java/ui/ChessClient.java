@@ -343,13 +343,18 @@ public class ChessClient implements ServerMessageObserver {
             """;
     }
     private ChessPosition parseSquare(String s) {
-        if (s == null || s.length() != 2) return null;
-
+        if (s == null || s.length() != 2) {
+            return null;
+        }
         char file = Character.toLowerCase(s.charAt(0)); // a–h
         char rank = s.charAt(1);                        // '1'–'8'
 
-        if (file < 'a' || file > 'h') return null;
-        if (rank < '1' || rank > '8') return null;
+        if (file < 'a' || file > 'h') {
+            return null;
+        }
+        if (rank < '1' || rank > '8') {
+            return null;
+        }
 
         int col = file - 'a' + 1;         // 1–8
         int row = rank - '0';             // '1' → 1, etc.
