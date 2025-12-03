@@ -366,14 +366,40 @@ public class ChessClient implements ServerMessageObserver {
 
 
     private String inGameLeave() throws Exception {
-        // TODO: ws.sendLeave(...), close ws, set inGame=false
-        return "";
+        if (currentGameId == null || ws == null) {
+            inGame = false;
+            currentGame = null;
+            currentColor = null;
+            return "Not in a game.\n";
+        }
+
+        ws.sendLeave(authToken, currentGameId);
+        ws.close();
+
+        inGame = false;
+        currentGameId = null;
+        currentGame = null;
+        currentColor = null;
+
+        return "Left game. Returned to main menu.\n";
     }
 
+
     private String inGameResign() throws Exception {
-        // TODO: ws.sendResign(...)
-        return "";
+        if (currentGameId == null || ws == null) {
+            return "Not in a game.\n";
+        }
+
+        System.out.print("Are you sure you want to resign? (yes/no): ");
+        String answer = scanner.nextLine().trim().toLowerCase();
+        if (!answer.equals("yes")) {
+            return "Resign cancelled.\n";
+        }
+
+        ws.sendResign(authToken, currentGameId);
+        return "Resign sent. Game is over.\n";
     }
+
 
     private String inGameRedraw() {
         // TODO: if currentGame != null, renderer.drawBoard(...)
