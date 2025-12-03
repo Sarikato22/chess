@@ -32,8 +32,10 @@ public class ChessClient implements ServerMessageObserver {
     private final String serverUrl;
     private boolean inGame = false;
 
+
     private ChessGame currentGame = null;
     private ChessGame.TeamColor currentColor = null;
+
 
     public ChessClient(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -255,7 +257,6 @@ public class ChessClient implements ServerMessageObserver {
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
 
         if (inGame) {
-            // IN-GAME commands
             return switch (cmd) {
                 case "help"     -> inGameHelp();
                 case "move"     -> inGameMove(params);
@@ -287,6 +288,7 @@ public class ChessClient implements ServerMessageObserver {
             };
         }
     }
+
 
     @Override
     public void notify(websocket.messages.ServerMessage message) {
