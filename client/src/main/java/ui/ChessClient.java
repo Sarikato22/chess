@@ -413,9 +413,33 @@ public class ChessClient implements ServerMessageObserver {
 
 
     private String inGameHighlight(String... params) {
-        // TODO later: compute validMoves on currentGame
+        if (currentGame == null) {
+            return "No game loaded yet.\n";
+        }
+        if (params.length != 1) {
+            return "Usage: highlight <square> (e.g., highlight e2)\n";
+        }
+
+        ChessPosition pos = parseSquare(params[0]);
+        if (pos == null) {
+            return "Square must look like e2 or h7.\n";
+        }
+
+        var moves = currentGame.validMoves(pos);
+        if (moves.isEmpty()) {
+            return "No legal moves for that square.\n";
+        }
+
+        System.out.println("Legal moves from " + params[0] + ":");
+        for (var m : moves) {
+            ChessPosition end = m.getEndPosition();
+            char file = (char) ('a' + end.getColumn() - 1);
+            char rank = (char) ('0' + end.getRow());
+            System.out.println("  " + file + rank);
+        }
         return "";
     }
+
 
 
 }//end of class
