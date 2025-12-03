@@ -49,12 +49,18 @@ public class ChessClient implements ServerMessageObserver {
         System.out.println("♕ Welcome to Chess Client");
         System.out.print(help());
 
-        String input;
         while (true) {
-            input = scanner.nextLine().trim();
+            System.out.print("\n>>> ");
+            String input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("quit") && inGame) {
+                System.out.println("You are in a game. Use 'leave' first, then 'quit'.");
+                continue;
+            }
             if (input.equalsIgnoreCase("quit")) {
                 break;
             }
+
             try {
                 System.out.print(eval(input));
             } catch (Exception e) {
@@ -62,7 +68,6 @@ public class ChessClient implements ServerMessageObserver {
             }
         }
         System.out.println("Goodbye!");
-
 
     }
 
@@ -276,7 +281,7 @@ public class ChessClient implements ServerMessageObserver {
                 case "resign"   -> inGameResign();
                 case "redraw"   -> inGameRedraw();
                 case "highlight"-> inGameHighlight(params);
-                case "quit"     -> "quit";
+                case "quit"      -> "You are in a game. Use 'leave' first, then 'quit'.\n";
                 default         -> "Unknown command. Type 'help'.\n";
             };
         } else if (state == State.SIGNEDOUT) {

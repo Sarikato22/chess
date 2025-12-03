@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import chess.model.data.GameData;
 import com.google.gson.Gson;
@@ -34,20 +35,34 @@ public class WebSocketGameService {
 
         try {
             String json = wsCtx.message();
-            UserGameCommand command = gson.fromJson(json, UserGameCommand.class);
-            gameId = command.getGameID();
-            String username = getUsername(command.getAuthString()); // will throw for bad auth
+            UserGameCommand base = gson.fromJson(json, UserGameCommand.class);
+            gameId = base.getGameID();
+            String username = getUsername(base.getAuthString());
 
-            switch (command.getCommandType()) {
-                case CONNECT -> connect(wsCtx, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(wsCtx, username, (MakeMoveCommand) command);
-                case LEAVE    -> leaveGame(wsCtx, username, command);
-                case RESIGN   -> resign(wsCtx, username, command);
+            switch (base.getCommandType()) {
+                case CONNECT -> {
+                    ConnectCommand cmd = gson.fromJson(json, ConnectCommand.class);
+                    connect(wsCtx, username, cmd);
+                }
+                case MAKE_MOVE -> {
+                    MakeMoveCommand cmd = gson.fromJson(json, MakeMoveCommand.class);
+                    makeMove(wsCtx, username, cmd);
+                }
+                case LEAVE -> {
+                    LeaveGameCommand cmd = gson.fromJson(json, LeaveGameCommand.class);
+                    leaveGame(wsCtx, username, cmd);
+                }
+                case RESIGN -> {
+                    ResignCommand cmd = gson.fromJson(json, ResignCommand.class);
+                    resign(wsCtx, username, cmd);
+                }
             }
+
         } catch (Exception ex) {
             sendMessage(wsCtx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
+
 
 
     private String getUsername(String authToken) throws Exception {
@@ -67,7 +82,7 @@ public class WebSocketGameService {
         return connections.computeIfAbsent(gameId, id -> new ConnectionManager());
     }
 
-    private void connect(WsMessageContext ctx, String username, UserGameCommand command)  throws Exception {
+    private void connect(WsMessageContext ctx, String username, ConnectCommand command) throws Exception {
         int gameId = command.getGameID();
         var gameData = dataAccess.getGameData(gameId);
         if (gameData == null) {
@@ -92,6 +107,13 @@ public class WebSocketGameService {
         }
         manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
     }
+
+    private String formatSquare(ChessPosition pos) {
+        char file = (char) ('a' + pos.getColumn() - 1); // 1→'a'
+        char rank = (char) ('0' + pos.getRow());        // 1→'1'
+        return "" + file + rank;
+    }
+
     private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {
         int gameId = command.getGameID();
         var move = command.getMove();
@@ -138,10 +160,12 @@ public class WebSocketGameService {
             LoadGameMessage load = new LoadGameMessage(game);
             manager.broadcastToAll(load, gson);
 
-            String moveText = username + " moved from " +
-                    move.getStartPosition() + " to " + move.getEndPosition();
+            String from = formatSquare(move.getStartPosition());
+            String to   = formatSquare(move.getEndPosition());
+            String moveText = username + " moved " + from + " to " + to;
             NotificationMessage moveNote = new NotificationMessage(moveText);
             manager.broadcastToOthers(username, moveNote, gson);
+
 
             ChessGame.TeamColor opponent =
                     (playerColor == ChessGame.TeamColor.WHITE)
@@ -163,40 +187,41 @@ public class WebSocketGameService {
             sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
-    private void leaveGame (WsMessageContext ctx, String username, UserGameCommand command){
-            int gameId = command.getGameID();
-            try {
-                var gameData = dataAccess.getGameData(gameId);
-                if (gameData == null) {
-                    sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
-                    return;
-                }
-
-                boolean isPlayer = false;
-                if (username.equals(gameData.getWhiteUsername())) {
-                    gameData.setWhiteUsername(null);
-                    isPlayer = true;
-                } else if (username.equals(gameData.getBlackUsername())) {
-                    gameData.setBlackUsername(null);
-                    isPlayer = true;
-                }
-
-                if (isPlayer) {
-                    dataAccess.updateGame(gameData);
-                }
-                ConnectionManager manager = connections.get(gameId);
-                if (manager != null) {
-                    manager.removePlayer(username);
-
-                    String noteText = username + " left the game";
-                    manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
-                }
-            } catch (Exception ex) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
+    private void leaveGame(WsMessageContext ctx, String username, LeaveGameCommand command) {
+        int gameId = command.getGameID();
+        try {
+            var gameData = dataAccess.getGameData(gameId);
+            if (gameData == null) {
+                sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                return;
             }
-        }
 
-    private void resign(WsMessageContext ctx, String username, UserGameCommand command) {
+            boolean isPlayer = false;
+            if (username.equals(gameData.getWhiteUsername())) {
+                gameData.setWhiteUsername(null);
+                isPlayer = true;
+            } else if (username.equals(gameData.getBlackUsername())) {
+                gameData.setBlackUsername(null);
+                isPlayer = true;
+            }
+
+            if (isPlayer) {
+                dataAccess.updateGame(gameData);
+            }
+            ConnectionManager manager = connections.get(gameId);
+            if (manager != null) {
+                manager.removePlayer(username);
+
+                String noteText = username + " left the game";
+                manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
+            }
+        } catch (Exception ex) {
+            sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
+        }
+    }
+
+
+    private void resign(WsMessageContext ctx, String username, ResignCommand command) {
         int gameId = command.getGameID();
 
         try {
@@ -231,5 +256,6 @@ public class WebSocketGameService {
             sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
+
 
 }
