@@ -4,6 +4,7 @@ import java.util.*;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPosition;
 import chess.model.data.GameData;
 import chess.model.request.GameRequest;
 import chess.model.request.JoinGameRequest;
@@ -325,11 +326,44 @@ public class ChessClient implements ServerMessageObserver {
             - resign
             """;
     }
+    private ChessPosition parseSquare(String s) {
+        if (s == null || s.length() != 2) return null;
+
+        char file = Character.toLowerCase(s.charAt(0)); // a–h
+        char rank = s.charAt(1);                        // '1'–'8'
+
+        if (file < 'a' || file > 'h') return null;
+        if (rank < '1' || rank > '8') return null;
+
+        int col = file - 'a' + 1;         // 1–8
+        int row = rank - '0';             // '1' → 1, etc.
+
+        return new ChessPosition(row, col);
+    }
+
 
     private String inGameMove(String... params) throws Exception {
-        // TODO: parse params into a ChessMove and call ws.sendMakeMove(...)
+        if (currentGameId == null || ws == null) {
+            return "Not connected to a game.\n";
+        }
+        if (params.length != 2) {
+            return "Usage: move <from> <to> (e.g., move e2 e4)\n";
+        }
+        if (currentGame == null) {
+            return "No game state yet. Wait for the server to send the board.\n";
+        }
+
+        ChessPosition from = parseSquare(params[0]);
+        ChessPosition to   = parseSquare(params[1]);
+        if (from == null || to == null) {
+            return "Squares must look like e2 or h7.\n";
+        }
+
+        chess.ChessMove move = new chess.ChessMove(from, to, null);
+        ws.sendMakeMove(authToken, currentGameId, move);
         return "";
     }
+
 
     private String inGameLeave() throws Exception {
         // TODO: ws.sendLeave(...), close ws, set inGame=false
