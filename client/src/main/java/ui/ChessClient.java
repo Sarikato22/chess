@@ -51,7 +51,6 @@ public class ChessClient implements ServerMessageObserver {
 
         String input;
         while (true) {
-            System.out.print("\n>>> ");
             input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("quit")) {
                 break;
@@ -442,17 +441,17 @@ public class ChessClient implements ServerMessageObserver {
             return "No legal moves for that square.\n";
         }
 
-        System.out.println("Legal moves from " + params[0] + ":");
+        Set<ChessPosition> targets = new HashSet<>();
         for (var m : moves) {
-            ChessPosition end = m.getEndPosition();
-            char file = (char) ('a' + end.getColumn() - 1);
-            char rank = (char) ('0' + end.getRow());
-            System.out.println("  " + file + rank);
+            targets.add(m.getEndPosition());
         }
+
+        ChessGame.TeamColor perspective =
+                (currentColor != null ? currentColor : ChessGame.TeamColor.WHITE);
+
+        // NEW: use selected + legalTargets
+        renderer.drawBoard(currentGame.getBoard(), perspective, pos, targets);
         return "";
     }
-
-
-
 }//end of class
 

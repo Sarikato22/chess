@@ -5,6 +5,9 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collections;
+import java.util.Set;
+
 public class ChessBoardRenderer {
 
     // Tile colors
@@ -13,19 +16,26 @@ public class ChessBoardRenderer {
     private static final String MARGIN_COLOR = "#219EBC";
     private static final String WHITE_PIECE = "#E98A15";
     private static final String BLACK_PIECE = "#6B2737";
+    private static final String LEGAL_HIGHLIGHT = "#00ff00"; // bright green
+    private static final String SELECT_HIGHLIGHT = "#ffff00"; // yellow
+
 
     private static final String[] LETTERS = {"a","b","c","d","e","f","g","h"};
 
-    public void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+    public void drawBoard(ChessBoard board,
+                          ChessGame.TeamColor perspective,
+                          ChessPosition selected,
+                          Set<ChessPosition> legalTargets) {
+
         int startCol = perspective == ChessGame.TeamColor.WHITE ? 1 : 8;
-        int endCol = perspective == ChessGame.TeamColor.WHITE ? 8 : 1;
-        int colStep = perspective == ChessGame.TeamColor.WHITE ? 1 : -1;
+        int endCol   = perspective == ChessGame.TeamColor.WHITE ? 8 : 1;
+        int colStep  = perspective == ChessGame.TeamColor.WHITE ? 1 : -1;
 
         int startRow = perspective == ChessGame.TeamColor.WHITE ? 8 : 1;
-        int endRow = perspective == ChessGame.TeamColor.WHITE ? 1 : 8;
-        int rowStep = perspective == ChessGame.TeamColor.WHITE ? -1 : 1;
+        int endRow   = perspective == ChessGame.TeamColor.WHITE ? 1 : 8;
+        int rowStep  = perspective == ChessGame.TeamColor.WHITE ? -1 : 1;
 
-        // Top margin with corners
+        // Top margin
         System.out.print(colorText("  ", "#000000", MARGIN_COLOR));
         for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
             System.out.print(colorText(" " + LETTERS[c - 1] + " ", "#000000", MARGIN_COLOR));
@@ -34,32 +44,43 @@ public class ChessBoardRenderer {
 
         // Rows
         for (int r = startRow; perspective == ChessGame.TeamColor.WHITE ? r >= endRow : r <= endRow; r += rowStep) {
-            // Left margin
             System.out.print(colorText(String.format("%d ", r), "#000000", MARGIN_COLOR));
 
             for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
-                ChessPosition pos = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(pos);
+                ChessPosition pos  = new ChessPosition(r, c);
+                ChessPiece piece   = board.getPiece(pos);
 
                 boolean isBlackTile = (r + c) % 2 == 0;
-                String tileColor = isBlackTile ? BLACK_TILE : WHITE_TILE;
+                String tileColor    = isBlackTile ? BLACK_TILE : WHITE_TILE;
+
+                // highlight logic
+                if (selected != null && pos.equals(selected)) {
+                    tileColor = SELECT_HIGHLIGHT;          // yellow for selected
+                } else if (legalTargets != null && legalTargets.contains(pos)) {
+                    tileColor = LEGAL_HIGHLIGHT;           // green for legal destination
+                }
 
                 String symbol = piece == null ? " " : getPieceLetter(piece);
-                String pieceColor = piece == null ? tileColor : (piece.getTeamColor() == ChessGame.TeamColor.BLACK ? BLACK_PIECE : WHITE_PIECE);
+                String pieceColor = piece == null
+                        ? tileColor
+                        : (piece.getTeamColor() == ChessGame.TeamColor.BLACK ? BLACK_PIECE : WHITE_PIECE);
 
                 System.out.print(colorTextBold(" " + symbol + " ", pieceColor, tileColor));
             }
 
-            // Right margin
-            System.out.println(colorText(" ", "#000000", MARGIN_COLOR) + colorText(String.format("%d", r), "#000000", MARGIN_COLOR));
+            System.out.println(colorText(" ", "#000000", MARGIN_COLOR)
+                    + colorText(String.format("%d", r), "#000000", MARGIN_COLOR));
         }
 
-        // Bottom margin with corners
+        // Bottom margin
         System.out.print(colorText("  ", "#000000", MARGIN_COLOR));
         for (int c = startCol; perspective == ChessGame.TeamColor.WHITE ? c <= endCol : c >= endCol; c += colStep) {
             System.out.print(colorText(" " + LETTERS[c - 1] + " ", "#000000", MARGIN_COLOR));
         }
         System.out.println(colorText("  ", "#000000", MARGIN_COLOR));
+    }
+    public void drawBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        drawBoard(board, perspective, null, Collections.emptySet());
     }
 
     // Piece letters

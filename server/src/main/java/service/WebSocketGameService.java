@@ -39,8 +39,8 @@ public class WebSocketGameService {
             String username = getUsername(command.getAuthString()); // will throw for bad auth
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(wsCtx, username, command);
-                case MAKE_MOVE -> makeMove(wsCtx, username, command);
+                case CONNECT -> connect(wsCtx, username, (ConnectCommand) command);
+                case MAKE_MOVE -> makeMove(wsCtx, username, (MakeMoveCommand) command);
                 case LEAVE    -> leaveGame(wsCtx, username, command);
                 case RESIGN   -> resign(wsCtx, username, command);
             }
@@ -57,8 +57,6 @@ public class WebSocketGameService {
         }
         return username;
     }
-
-
 
     private void sendMessage(WsMessageContext root, int gameId, ServerMessage msg) {
         String json = gson.toJson(msg);
@@ -94,7 +92,7 @@ public class WebSocketGameService {
         }
         manager.broadcastToOthers(username, new NotificationMessage(noteText), gson);
     }
-    private void makeMove(WsMessageContext ctx, String username, UserGameCommand command) {
+    private void makeMove(WsMessageContext ctx, String username, MakeMoveCommand command) {
         int gameId = command.getGameID();
         var move = command.getMove();
         try {
@@ -109,7 +107,7 @@ public class WebSocketGameService {
                 return;
             }
 
-            //Determine the color this user is allowed to move
+            // Determine the color this user is allowed to move
             ChessGame.TeamColor playerColor = null;
             if (username.equals(gameData.getWhiteUsername())) {
                 playerColor = ChessGame.TeamColor.WHITE;
@@ -135,9 +133,11 @@ public class WebSocketGameService {
             }
 
             dataAccess.updateChessGame(gameId, game);
+
             ConnectionManager manager = getConnectionManager(gameId);
             LoadGameMessage load = new LoadGameMessage(game);
             manager.broadcastToAll(load, gson);
+
             String moveText = username + " moved from " +
                     move.getStartPosition() + " to " + move.getEndPosition();
             NotificationMessage moveNote = new NotificationMessage(moveText);
@@ -163,8 +163,7 @@ public class WebSocketGameService {
             sendMessage(ctx, gameId, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
-
-        private void leaveGame (WsMessageContext ctx, String username, UserGameCommand command){
+    private void leaveGame (WsMessageContext ctx, String username, UserGameCommand command){
             int gameId = command.getGameID();
             try {
                 var gameData = dataAccess.getGameData(gameId);

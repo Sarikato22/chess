@@ -33,8 +33,6 @@ public class UserGameCommand {
     public String getAuthString() {
         return authToken;
     }
-    private chess.ChessMove move;
-    public chess.ChessMove getMove() { return move; }
 
     public Integer getGameID() {
         return gameID;
