@@ -68,7 +68,7 @@ public class WebSocketGameService {
     private String getUsername(String authToken) throws Exception {
         String username = dataAccess.getUsernameByToken(authToken);
         if (username == null) {
-            throw new Exception("Error: unauthorized");
+            throw new Exception("Invalid request, please try again");
         }
         return username;
     }
@@ -121,11 +121,11 @@ public class WebSocketGameService {
             GameData gameData = dataAccess.getGameData(gameId);
 
             if (Boolean.TRUE.equals(gameOver.get(gameId))) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: game already over"));
+                sendMessage(ctx, gameId, new ErrorMessage("Game already over"));
                 return;
             }
             if (gameData == null) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                sendMessage(ctx, gameId, new ErrorMessage("Bad request"));
                 return;
             }
 
@@ -136,21 +136,21 @@ public class WebSocketGameService {
             } else if (username.equals(gameData.getBlackUsername())) {
                 playerColor = ChessGame.TeamColor.BLACK;
             } else {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: observer cannot move"));
+                sendMessage(ctx, gameId, new ErrorMessage("Observer cannot move"));
                 return;
             }
 
             ChessGame game = dataAccess.getChessGame(gameId);
 
             if (game.getTeamTurn() != playerColor) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: not your turn"));
+                sendMessage(ctx, gameId, new ErrorMessage("Not your turn"));
                 return;
             }
 
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException e) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: invalid move"));
+                sendMessage(ctx, gameId, new ErrorMessage("Invalid move"));
                 return;
             }
 
@@ -192,7 +192,7 @@ public class WebSocketGameService {
         try {
             var gameData = dataAccess.getGameData(gameId);
             if (gameData == null) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                sendMessage(ctx, gameId, new ErrorMessage("Bad request"));
                 return;
             }
 
@@ -227,20 +227,20 @@ public class WebSocketGameService {
         try {
             var gameData = dataAccess.getGameData(gameId);
             if (gameData == null) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: bad request"));
+                sendMessage(ctx, gameId, new ErrorMessage("Bad request"));
                 return;
             }
 
             boolean isWhite = username.equals(gameData.getWhiteUsername());
             boolean isBlack = username.equals(gameData.getBlackUsername());
             if (!isWhite && !isBlack) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: cannot resign"));
+                sendMessage(ctx, gameId, new ErrorMessage("Cannot resign"));
                 return;
             }
 
             // Only block *second* (or later) resigns
             if (Boolean.TRUE.equals(gameOver.get(gameId))) {
-                sendMessage(ctx, gameId, new ErrorMessage("Error: game already over"));
+                sendMessage(ctx, gameId, new ErrorMessage("Game already over"));
                 return;
             }
             gameOver.put(gameId, true);

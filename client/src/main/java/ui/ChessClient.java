@@ -50,7 +50,7 @@ public class ChessClient implements ServerMessageObserver {
         System.out.print(help());
 
         while (true) {
-            System.out.print("\n>>> ");
+            System.out.print("\n");
             String input = scanner.nextLine().trim();
 
             if (input.equalsIgnoreCase("quit") && inGame) {
