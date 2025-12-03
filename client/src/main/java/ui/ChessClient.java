@@ -188,21 +188,22 @@ public class ChessClient implements ServerMessageObserver {
         ChessGame.TeamColor color;
         try {
             color = ChessGame.TeamColor.valueOf(params[1].toUpperCase());
-            inGame = true;
-            currentColor = color;
         } catch (IllegalArgumentException e) {
             return "Invalid color. Use WHITE or BLACK.\n";
         }
-
 
         GameData gameData = lastListedGames.get(num);
         JoinGameRequest req = new JoinGameRequest(color, gameData.getGameId());
         JoinGameResult joinResult = server.joinGame(authToken, req);
 
         if (!joinResult.isSuccess()) {
+            // DO NOT set inGame here
             return "Failed to join game: " + joinResult.getMessage() + "\n";
         }
 
+        // Only after a successful join:
+        inGame = true;
+        currentColor = color;
         currentGameId = gameData.getGameId();
 
         ws = new WebSocketCommunicator(this, serverUrl);
@@ -211,6 +212,7 @@ public class ChessClient implements ServerMessageObserver {
         return String.format("Joined game %s as %s. Waiting for board...\n",
                 gameData.getGameName(), color);
     }
+
 
     //Observe game
     private String observeGame(String... params) throws Exception {
@@ -243,6 +245,15 @@ public class ChessClient implements ServerMessageObserver {
 
 
     private String logout() throws Exception {
+        if (ws != null) {
+            ws.close();
+            ws = null;
+        }
+        inGame = false;
+        currentGameId = null;
+        currentGame = null;
+        currentColor = null;
+
         server.logout(authToken);
         username = null;
         authToken = null;
@@ -250,6 +261,7 @@ public class ChessClient implements ServerMessageObserver {
         lastListedGames.clear();
         return "Logged out.\n";
     }
+
 
     //eval
     private String eval(String input) throws Exception {

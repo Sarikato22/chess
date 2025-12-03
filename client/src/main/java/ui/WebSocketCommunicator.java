@@ -5,6 +5,9 @@ import jakarta.websocket.*;
 import java.net.URI;
 
 import websocket.commands.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 @ClientEndpoint
@@ -22,10 +25,24 @@ public class WebSocketCommunicator {
     }
 
     @OnMessage
-    public void onMessage(String message) {
-        ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-        observer.notify(serverMessage);
+    public void onMessage(String json) {
+        ServerMessage base = gson.fromJson(json, ServerMessage.class);
+        switch (base.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage msg = gson.fromJson(json, LoadGameMessage.class);
+                observer.notify(msg);
+            }
+            case NOTIFICATION -> {
+                NotificationMessage msg = gson.fromJson(json, NotificationMessage.class);
+                observer.notify(msg);
+            }
+            case ERROR -> {
+                ErrorMessage msg = gson.fromJson(json, ErrorMessage.class);
+                observer.notify(msg);
+            }
+        }
     }
+
 
     public void sendConnect(String authToken, int gameId) throws Exception {
         UserGameCommand cmd = new ConnectCommand(authToken, gameId);
