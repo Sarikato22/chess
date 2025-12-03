@@ -402,9 +402,15 @@ public class ChessClient implements ServerMessageObserver {
 
 
     private String inGameRedraw() {
-        // TODO: if currentGame != null, renderer.drawBoard(...)
+        if (currentGame == null) {
+            return "No game loaded yet.\n";
+        }
+        ChessGame.TeamColor perspective =
+                (currentColor != null ? currentColor : ChessGame.TeamColor.WHITE);
+        renderer.drawBoard(currentGame.getBoard(), perspective);
         return "";
     }
+
 
     private String inGameHighlight(String... params) {
         // TODO later: compute validMoves on currentGame
